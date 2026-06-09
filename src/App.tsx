@@ -82,7 +82,7 @@ function renderMd(text: string) {
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@300;400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--gold:#C4973F;--bg:#080808;--bg2:#0e0e0e;--bg3:#141414;--border:#1c1c1c;--text:#e8e2d9;--text2:#7a7269;--text3:#3a3632;--red:#e74c3c;--green:#2ecc71}
+:root{--gold:#C4973F;--bg:#080808;--bg2:#0e0e0e;--bg3:#141414;--border:#1c1c1c;--text:#ede8e0;--text2:#9a9088;--text3:#6a6258;--red:#e74c3c;--green:#2ecc71}
 ::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:#8a6b2a;border-radius:1px}
 body{background:var(--bg);font-family:'Jost',sans-serif}
 .sv{background:var(--bg);min-height:100vh;color:var(--text);font-weight:300;max-width:430px;margin:0 auto;position:relative}
@@ -92,7 +92,7 @@ body{background:var(--bg);font-family:'Jost',sans-serif}
 .bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#0a0a0a;border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
 .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;cursor:pointer;gap:3px;transition:all .2s;border:none;background:none}
 .bnav-icon{font-size:20px;transition:transform .2s}
-.bnav-label{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-family:'Jost',sans-serif;transition:color .2s}
+.bnav-label{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);font-family:'Jost',sans-serif;transition:color .2s}
 .bnav-item.on .bnav-label{color:var(--gold)}
 .bnav-item.on .bnav-icon{transform:scale(1.15)}
 
@@ -117,7 +117,7 @@ body{background:var(--bg);font-family:'Jost',sans-serif}
 .card-gold{border-color:rgba(196,151,63,.2)}
 
 /* Pills */
-.pill{padding:6px 14px;border-radius:20px;font-family:'Jost',sans-serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text3);transition:all .2s;white-space:nowrap}
+.pill{padding:6px 14px;border-radius:20px;font-family:'Jost',sans-serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .2s;white-space:nowrap}
 .pill.on{background:var(--gold);color:#080808;border-color:var(--gold);font-weight:600}
 .pill:hover:not(.on){border-color:rgba(196,151,63,.3);color:var(--gold)}
 
@@ -183,9 +183,17 @@ export default function StyleVault() {
   const chatEnd = useRef<HTMLDivElement>(null);
 
   // Avatar / Virtual Try
-  const [avatarPhoto, setAvatarPhoto] = useState<string|null>(null);
-  const [avatarData, setAvatarData] = useState<any>(null);
+  const [avatarPhoto, setAvatarPhoto] = useState<string|null>(() => localStorage.getItem("sv_avatar_photo"));
+  const [avatarData, setAvatarData] = useState<any>(() => {
+    const d = localStorage.getItem("sv_avatar_data");
+    return d ? JSON.parse(d) : null;
+  });
   const [avatarL, setAvatarL] = useState(false);
+  const [customCats, setCustomCats] = useState<string[]>(() => {
+    return JSON.parse(localStorage.getItem("sv_custom_cats") || "[]");
+  });
+  const [newCatInput, setNewCatInput] = useState("");
+  const [showAddCat, setShowAddCat] = useState(false);
   const [selectedForTry, setSelectedForTry] = useState<number[]>([]);
   const [tryResult, setTryResult] = useState<string|null>(null);
   const [tryL, setTryL] = useState(false);
@@ -368,14 +376,16 @@ export default function StyleVault() {
     r.onload = async (ev) => {
       const dataUrl = ev.target?.result as string;
       setAvatarPhoto(dataUrl);
+      localStorage.setItem("sv_avatar_photo", dataUrl);
       setAvatarL(true);
       try {
         const base64 = dataUrl.split(',')[1];
         const text = await callClaudeWithImage(AVATAR_SYSTEM, base64, f.type, "Analiza el cuerpo completo de esta persona para crear su perfil de moda.");
         const parsed = JSON.parse(text.replace(/```json|```/g,"").trim());
         setAvatarData(parsed);
-        showToast("✦ Avatar analizado");
-      } catch { showToast("Error al analizar. Intenta de nuevo."); }
+        setAvatarData(parsed);
+        localStorage.setItem("sv_avatar_data", JSON.stringify(parsed));
+        showToast("✦ Avatar guardado permanentemente");
       setAvatarL(false);
     };
     r.readAsDataURL(f);
@@ -403,6 +413,25 @@ export default function StyleVault() {
       setTripR(JSON.parse(raw.replace(/```json|```/g,"").trim()));
     } catch { setTripR({ intro:"Error.", llevar:[], faltan:[], consejo:"" }); }
     setTripL(false);
+  };
+
+  const allCategories = [...["Tops","Pantalones","Vestidos","Zapatos","Accesorios","Abrigos","Deportivo"], ...customCats];
+
+  const addCustomCategory = () => {
+    const cat = newCatInput.trim();
+    if (!cat || allCategories.includes(cat)) return;
+    const next = [...customCats, cat];
+    setCustomCats(next);
+    localStorage.setItem("sv_custom_cats", JSON.stringify(next));
+    setNewCatInput("");
+    setShowAddCat(false);
+    showToast("✦ Categoría agregada");
+  };
+
+  const removeCustomCategory = (cat: string) => {
+    const next = customCats.filter(c => c !== cat);
+    setCustomCats(next);
+    localStorage.setItem("sv_custom_cats", JSON.stringify(next));
   };
 
   const filtered = clothes.filter(c => fc === "Todo" || c.category === fc);
@@ -637,7 +666,7 @@ export default function StyleVault() {
                 <div style={{ display:"flex", flexDirection:"column", gap:"9px" }}>
                   <input className="inp" placeholder="Nombre de la prenda" value={ni.name} onChange={e=>setNi(p=>({...p,name:e.target.value}))} />
                   <select className="sel" value={ni.category} onChange={e=>setNi(p=>({...p,category:e.target.value}))}>
-                    {CATEGORIES.map(c=><option key={c}>{c}</option>)}
+                    {allCategories.map(c=><option key={c}>{c}</option>)}
                   </select>
                   <select className="sel" value={ni.occasion} onChange={e=>setNi(p=>({...p,occasion:e.target.value}))}>
                     <option value="">Ocasión</option>
@@ -655,7 +684,17 @@ export default function StyleVault() {
             )}
 
             <div style={{ display:"flex", gap:"7px", overflowX:"auto", paddingBottom:"10px", marginBottom:"14px" }}>
-              {["Todo",...CATEGORIES].map(c => <button key={c} className={`pill ${fc===c?"on":""}`} onClick={()=>setFc(c)}>{c}</button>)}
+              {["Todo",...allCategories].map(c => <button key={c} className={`pill ${fc===c?"on":""}`} onClick={()=>setFc(c)}>{c}</button>)}
+              {customCats.map(c => (
+                <button key={c+"_del"} onClick={()=>removeCustomCategory(c)} style={{ padding:"4px 8px", background:"rgba(192,57,43,.08)", border:"1px solid rgba(192,57,43,.2)", borderRadius:"20px", color:"#e74c3c", fontSize:"9px", cursor:"pointer", flexShrink:0 }}>✕</button>
+              ))}
+              <button onClick={()=>setShowAddCat(!showAddCat)} className="pill" style={{ borderStyle:"dashed", color:"var(--gold)", borderColor:"rgba(196,151,63,.3)" }}>+ Nueva</button>
+              {showAddCat && (
+                <div style={{ display:"flex", gap:"6px", alignItems:"center", width:"100%" }}>
+                  <input className="inp" placeholder="Nombre categoría..." value={newCatInput} onChange={e=>setNewCatInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCustomCategory()} style={{ flex:1, padding:"8px 12px", fontSize:"12px" }} />
+                  <button onClick={addCustomCategory} className="btn-o" style={{ padding:"8px 12px", fontSize:"10px", flexShrink:0 }}>Agregar</button>
+                </div>
+              )}
             </div>
 
             {cloading ? (
@@ -789,15 +828,15 @@ export default function StyleVault() {
               <>
                 {/* Step 1: Upload photo */}
                 <div className="card" style={{ marginBottom:"14px" }}>
-                  <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"12px" }}>Paso 1 · Tu foto de cuerpo completo</div>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"12px" }}><div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase" }}>Paso 1 · Tu avatar personal</div>{avatarData && <span style={{ fontSize:"9px", color:"#2ecc71", border:"1px solid rgba(39,174,96,.3)", padding:"3px 8px", borderRadius:"20px" }}>✓ Configurado</span>}</div>
                   <div className="pbox" style={{ height:"280px", marginBottom:"10px" }} onClick={()=>avatarRef.current?.click()}>
                     {avatarPhoto ? (
                       <img src={avatarPhoto} alt="avatar" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                     ) : (
                       <div style={{ textAlign:"center", color:"var(--text3)" }}>
                         <div style={{ fontSize:"40px", marginBottom:"8px" }}>🧍</div>
-                        <div style={{ fontSize:"11px", letterSpacing:"1px", marginBottom:"4px" }}>Sube una foto de cuerpo completo</div>
-                        <div style={{ fontSize:"10px", color:"var(--text3)" }}>La IA analizará tu tipo de cuerpo</div>
+                        <div style={{ fontSize:"11px", letterSpacing:"1px", marginBottom:"4px" }}>Sube foto de cuerpo completo</div>
+                        <div style={{ fontSize:"10px", color:"var(--text2)" }}>Se guarda automáticamente</div>
                       </div>
                     )}
                   </div>
@@ -806,6 +845,9 @@ export default function StyleVault() {
                       <div className="dot"/><div className="dot"/><div className="dot"/>
                       <span style={{ marginLeft:"6px" }}>Analizando tu perfil corporal...</span>
                     </div>
+                  )}
+                  {avatarData && !avatarL && (
+                    <button onClick={()=>avatarRef.current?.click()} className="btn-g" style={{ fontSize:"10px", marginTop:"6px", letterSpacing:"1px" }}>🔄 Actualizar foto del avatar</button>
                   )}
                   {avatarData && !avatarL && (
                     <div className="fade" style={{ marginTop:"12px" }}>
