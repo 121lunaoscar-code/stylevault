@@ -493,9 +493,9 @@ export default function StyleVault() {
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:"10px" }}>
           {isPremium && <span className="premium-badge">Premium</span>}
-          <div style={{ textAlign:"right" }}>
+          <div style={{ textAlign:"right", cursor:"pointer" }} onClick={handleLogout}>
             <div style={{ fontSize:"12px" }}>{profile?.name?.split(" ")[0]}</div>
-            <div style={{ fontSize:"8px", color:"rgba(196,151,63,.5)", letterSpacing:"1px", textTransform:"uppercase" }}>{profile?.plan}</div>
+            <div style={{ fontSize:"8px", color:"rgba(196,151,63,.5)", letterSpacing:"1px", textTransform:"uppercase" }}>{profile?.plan} · Salir</div>
           </div>
         </div>
       </header>
