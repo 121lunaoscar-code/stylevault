@@ -150,6 +150,10 @@ body{background:var(--bg);font-family:'Jost',sans-serif}
 
 export default function StyleVault() {
   const [screen, setScreen] = useState("login");
+  const [resetToken, setResetToken] = useState<string|null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [resetMsg, setResetMsg] = useState("");
+  const [resetL, setResetL] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [lf, setLf] = useState({ name:"", email:"", password:"" });
   const [lmode, setLmode] = useState("login");
@@ -204,6 +208,18 @@ export default function StyleVault() {
 
   useEffect(() => {
     const saved = localStorage.getItem("sb_profile");
+    const saved = localStorage.getItem("sb_profile");
+    // Check for password recovery token in URL
+    const hash = window.location.hash;
+    const params = new URLSearchParams(hash.replace("#", "?"));
+    const accessToken = params.get("access_token");
+    const type = params.get("type");
+    if (accessToken && type === "recovery") {
+      setResetToken(accessToken);
+      setScreen("reset");
+      window.history.replaceState(null, "", window.location.pathname);
+      return;
+    }
     if (saved) { const p = JSON.parse(saved); setProfile(p); setScreen("app"); }
     const favs = JSON.parse(localStorage.getItem("sv_favorites") || "[]");
     setFavorites(favs);
@@ -243,6 +259,25 @@ export default function StyleVault() {
       showToast("✦ Bienvenido a StyleVault");
     } catch { setLerr("Error al crear cuenta."); }
     setAL(false);
+  };
+
+  const handleResetPassword = async () => {
+    if (!newPassword || newPassword.length < 6) { setResetMsg("La contraseña debe tener al menos 6 caracteres."); return; }
+    setResetL(true); setResetMsg("");
+    try {
+      const res = await fetch(`${SB_URL}/auth/v1/user`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", apikey: SB_KEY, Authorization: `Bearer ${resetToken}` },
+        body: JSON.stringify({ password: newPassword }),
+      });
+      if (res.ok) {
+        setResetMsg("✅ Contraseña actualizada. Ahora puedes iniciar sesión.");
+        setTimeout(() => setScreen("login"), 2500);
+      } else {
+        setResetMsg("Error al actualizar. El link puede haber expirado.");
+      }
+    } catch { setResetMsg("Error de conexión."); }
+    setResetL(false);
   };
 
   const handleLogout = () => {
@@ -379,6 +414,30 @@ export default function StyleVault() {
   const suggestions = ["¿Qué colores van con azul marino?","Armario cápsula esencial","¿Cómo vestir para entrevista?","Smart Casual dress code","Tips para parecer más alto"];
 
   // ── LOGIN ──────────────────────────────────────────────────────────────────
+  // ── RESET PASSWORD SCREEN ────────────────────────────────────────────────
+  if (screen === "reset") return (
+    <div style={{ fontFamily:"'Jost',sans-serif", background:"#080808", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"24px" }}>
+      <style>{CSS}</style>
+      <div style={{ width:"100%", maxWidth:"360px" }}>
+        <div style={{ textAlign:"center", marginBottom:"40px" }}>
+          <div className="serif" style={{ fontSize:"36px", letterSpacing:"8px", color:"#C4973F", fontWeight:300 }}>STYLE<em>VAULT</em></div>
+        </div>
+        <div className="card">
+          <div style={{ fontSize:"9px", color:"#C4973F", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"20px" }}>✦ Nueva Contraseña</div>
+          <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
+            <input className="inp" placeholder="Nueva contraseña (mínimo 6 caracteres)" type="password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleResetPassword()} />
+            {resetMsg && <div style={{ color:resetMsg.startsWith("✅")?"#2ecc71":"#e74c3c", fontSize:"12px", textAlign:"center", lineHeight:1.5 }}>{resetMsg}</div>}
+            <button className="btn-p" onClick={handleResetPassword} disabled={resetL}>
+              {resetL?"Actualizando...":"✦  Actualizar Contraseña"}
+            </button>
+            <button onClick={()=>setScreen("login")} style={{ background:"none", border:"none", color:"#3a3632", fontSize:"10px", cursor:"pointer", letterSpacing:"1.5px", fontFamily:"'Jost',sans-serif", textDecoration:"underline", textAlign:"center" }}>Volver al inicio de sesión</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── LOGIN ──────────────────────────────────────────────────────────────────
   if (screen === "login") return (
     <div style={{ fontFamily:"'Jost',sans-serif", background:"#080808", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"24px" }}>
       <style>{CSS}</style>
@@ -403,6 +462,15 @@ export default function StyleVault() {
             <button className="btn-p" style={{ marginTop:"6px" }} onClick={lmode==="login"?handleLogin:handleRegister} disabled={aloading}>
               {aloading?"...":lmode==="login"?"✦  Entrar":"✦  Crear Cuenta"}
             </button>
+            {lmode==="login" && (
+              <button onClick={async()=>{
+                if (!lf.email) { alert("Escribe tu correo primero"); return; }
+                const res = await fetch(`${SB_URL}/auth/v1/recover`, { method:"POST", headers:{"Content-Type":"application/json", apikey:SB_KEY, Authorization:`Bearer ${SB_KEY}`}, body:JSON.stringify({ email:lf.email }) });
+                alert(res.ok?"✅ Revisa tu correo para recuperar tu contraseña":"Error al enviar. Intenta de nuevo.");
+              }} style={{ background:"none", border:"none", color:"#3a3632", fontSize:"10px", cursor:"pointer", letterSpacing:"1.5px", fontFamily:"Jost,sans-serif", textDecoration:"underline", textAlign:"center", width:"100%", padding:"4px" }}>
+                ¿Olvidaste tu contraseña?
+              </button>
+            )}
           </div>
         </div>
       </div>
