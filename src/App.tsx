@@ -208,7 +208,6 @@ export default function StyleVault() {
 
   useEffect(() => {
     const saved = localStorage.getItem("sb_profile");
-    const saved = localStorage.getItem("sb_profile");
     // Check for password recovery token in URL
     const hash = window.location.hash;
     const params = new URLSearchParams(hash.replace("#", "?"));
