@@ -5,33 +5,29 @@ const MODEL = "claude-sonnet-4-5";
 
 const callClaude = async (systemPrompt: string, messages: any[]) => {
   const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model: MODEL, max_tokens: 1500, system: systemPrompt, messages }),
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ model: MODEL, max_tokens: 2000, system: systemPrompt, messages }),
   });
   const data = await res.json();
   return data.content?.map((i: any) => i.text || "").join("") || "";
 };
 
-const callClaudeWithImage = async (systemPrompt: string, base64: string, mediaType: string, text: string) => {
+const callClaudeVision = async (systemPrompt: string, images: {base64: string, type: string}[], text: string) => {
+  const content: any[] = images.map(img => ({
+    type: "image", source: { type: "base64", media_type: img.type, data: img.base64 }
+  }));
+  content.push({ type: "text", text });
   const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: MODEL, max_tokens: 1000, system: systemPrompt,
-      messages: [{ role: "user", content: [
-        { type: "image", source: { type: "base64", media_type: mediaType, data: base64 } },
-        { type: "text", text }
-      ]}],
-    }),
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ model: MODEL, max_tokens: 3000, system: systemPrompt, messages: [{ role: "user", content }] }),
   });
   const data = await res.json();
   return data.content?.map((i: any) => i.text || "").join("") || "";
 };
 
+// Supabase
 const SB_URL = "https://rnrzifixbecsvbnxavus.supabase.co";
 const SB_KEY = "sb_publishable_M4XCdb1bVj86biRwJXubCQ_OQJA74UP";
-
 const sbFetch = async (path: string, options: any = {}) => {
   const token = localStorage.getItem("sb_token");
   const res = await fetch(`${SB_URL}${path}`, {
@@ -42,7 +38,6 @@ const sbFetch = async (path: string, options: any = {}) => {
   if (res.status === 204) return null;
   return res.json();
 };
-
 const sbSignIn = async (email: string, password: string) => {
   const res = await fetch(`${SB_URL}/auth/v1/token?grant_type=password`, { method: "POST", headers: { "Content-Type": "application/json", apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }, body: JSON.stringify({ email, password }) });
   return res.json();
@@ -56,47 +51,65 @@ const dbInsert = (table: string, body: any) => sbFetch(`/rest/v1/${table}`, { me
 const dbDelete = (table: string, match: string) => sbFetch(`/rest/v1/${table}?${match}`, { method: "DELETE" });
 const dbUpdate = (table: string, match: string, body: any) => sbFetch(`/rest/v1/${table}?${match}`, { method: "PATCH", body: JSON.stringify(body) });
 
-const CATEGORIES = ["Tops","Pantalones","Vestidos","Zapatos","Accesorios","Abrigos","Deportivo"];
+// Constants
+const BASE_CATS = ["Tops","Pantalones","Vestidos","Zapatos","Accesorios","Abrigos","Deportivo"];
 const OCCASIONS = ["Casual","Trabajo","Formal","Deportivo","Fiesta","Viaje"];
 const SEASONS = ["Todo el año","Primavera","Verano","Otoño","Invierno"];
 const EVENTS = ["Trabajo / Oficina","Cita romántica","Reunión de negocios","Evento formal","Día casual","Fiesta / Antro","Deporte / Gym","Viaje"];
 const CAT_ICON: Record<string,string> = { Tops:"👕", Pantalones:"👖", Vestidos:"👗", Zapatos:"👟", Accesorios:"💍", Abrigos:"🧥", Deportivo:"🏃" };
 
-const ADVISOR_SYSTEM = `Eres StyleVault, asesor de moda experto. Usa markdown: **negrita**, listas con guiones. Sé conciso (máx 4 párrafos). Responde en español. Termina con una pregunta de seguimiento.`;
+// System prompts
+const ADVISOR_SYSTEM = `Eres StyleVault, asesor de moda experto y sofisticado. Usa markdown: **negrita**, listas. Sé conciso (máx 4 párrafos). Responde en español. Termina con pregunta de seguimiento.`;
 const OUTFIT_SYSTEM = `Eres experto en moda. SOLO JSON sin markdown: { outfit: [{emoji,name,why}], explanation: string, colorPalette: string, rating: number 1-5, ratingExplanation: string }`;
-const PHOTO_SYSTEM = `Analiza esta prenda de ropa. SOLO JSON: { name: string, category: "Tops"|"Pantalones"|"Vestidos"|"Zapatos"|"Accesorios"|"Abrigos"|"Deportivo", color: string, occasion: "Casual"|"Trabajo"|"Formal"|"Deportivo"|"Fiesta"|"Viaje", season: "Todo el año"|"Primavera"|"Verano"|"Otoño"|"Invierno" }`;
-const AVATAR_SYSTEM = `Eres experto en moda y análisis corporal. Analiza la foto de cuerpo completo. SOLO JSON: { bodyType: string, height: string, build: string, skinTone: string, recommendations: [string], styleAdvice: string }`;
-const VIRTUAL_TRY_SYSTEM = `Eres estilista virtual experto. Dado un perfil corporal y prendas seleccionadas, describe cómo luciría el outfit en esa persona específicamente. Sé descriptivo y específico. Responde en español, máx 3 párrafos.`;
+const PHOTO_SYSTEM = `Analiza esta prenda. SOLO JSON: { name: string, category: "Tops"|"Pantalones"|"Vestidos"|"Zapatos"|"Accesorios"|"Abrigos"|"Deportivo", color: string, occasion: "Casual"|"Trabajo"|"Formal"|"Deportivo"|"Fiesta"|"Viaje", season: "Todo el año"|"Primavera"|"Verano"|"Otoño"|"Invierno" }`;
 const TRIP_SYSTEM = `Eres experto en moda y viajes. SOLO JSON: { intro: string, llevar: [{categoria: string, items: [string], tip: string}], faltan: [{name: string, why: string, urgente: boolean}], consejo: string }`;
 
+const DNA_SYSTEM = `Eres experto en análisis de imagen personal y moda. Analiza estas fotos (selfie frontal, cuerpo completo frontal, cuerpo completo lateral) junto con los datos del usuario.
+
+SOLO responde en JSON válido sin markdown:
+{
+  "faceShape": string,
+  "skinTone": string,
+  "skinUndertone": "frío"|"cálido"|"neutro",
+  "eyeShape": string,
+  "neckType": string,
+  "bodyType": string,
+  "bodyProportions": { "shoulders": string, "waist": string, "hips": string, "torso": string, "legs": string },
+  "posture": string,
+  "hairAnalysis": { "length": string, "volume": string, "texture": string },
+  "idealColors": [string],
+  "colorsToAvoid": [string],
+  "recommendedStyles": [string],
+  "recommendedClothes": [string],
+  "clothesToAvoid": [string],
+  "fashionPersonality": string,
+  "precisionLevel": number,
+  "styleAdvice": string,
+  "topTips": [string]
+}`;
+
+const VIRTUAL_SYSTEM = `Eres estilista virtual experto. Dado el Fashion DNA del usuario y las prendas seleccionadas, describe detalladamente cómo luciría el outfit en esa persona específicamente. Incluye: cómo cada prenda favorece su tipo de cuerpo, qué colores complementan su tono de piel, y cómo se ve el conjunto completo. Máx 3 párrafos. En español.`;
+
 function renderMd(text: string) {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/^- (.*?)$/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>\n?)+/g, m => `<ul>${m}</ul>`)
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br/>');
+  return text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/^- (.*?)$/gm,'<li>$1</li>').replace(/(<li>.*<\/li>\n?)+/g,m=>`<ul>${m}</ul>`).replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br/>');
 }
 
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--gold:#C4973F;--bg:#080808;--bg2:#0e0e0e;--bg3:#141414;--border:#1c1c1c;--text:#ede8e0;--text2:#9a9088;--text3:#6a6258;--red:#e74c3c;--green:#2ecc71}
+:root{--gold:#C4973F;--bg:#080808;--bg2:#0e0e0e;--bg3:#141414;--border:#1c1c1c;--border2:#282828;--text:#ede8e0;--text2:#9a9088;--text3:#6a6258;--red:#e74c3c;--green:#2ecc71}
 ::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:#8a6b2a;border-radius:1px}
 body{background:var(--bg);font-family:'Jost',sans-serif}
 .sv{background:var(--bg);min-height:100vh;color:var(--text);font-weight:300;max-width:430px;margin:0 auto;position:relative}
 .serif{font-family:'Cormorant Garamond',serif}
 
-/* Bottom Nav */
 .bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#0a0a0a;border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
-.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;cursor:pointer;gap:3px;transition:all .2s;border:none;background:none}
-.bnav-icon{font-size:20px;transition:transform .2s}
-.bnav-label{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);font-family:'Jost',sans-serif;transition:color .2s}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;cursor:pointer;gap:3px;border:none;background:none;transition:all .2s}
+.bnav-icon{font-size:18px;transition:transform .2s}
+.bnav-label{font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);font-family:'Jost',sans-serif;transition:color .2s}
 .bnav-item.on .bnav-label{color:var(--gold)}
 .bnav-item.on .bnav-icon{transform:scale(1.15)}
 
-/* Buttons */
 .btn-p{background:var(--gold);color:#080808;border:none;padding:14px 24px;border-radius:1px;cursor:pointer;font-family:'Jost',sans-serif;font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;width:100%;transition:filter .2s}
 .btn-p:hover{filter:brightness(1.1)}
 .btn-p:disabled{opacity:.3;cursor:not-allowed}
@@ -106,32 +119,27 @@ body{background:var(--bg);font-family:'Jost',sans-serif}
 .btn-g{background:transparent;border:none;color:var(--text2);cursor:pointer;font-family:'Jost',sans-serif;font-size:11px;padding:6px 10px;transition:color .2s}
 .btn-g:hover{color:var(--text)}
 
-/* Inputs */
 .inp{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:13px 15px;border-radius:1px;font-family:'Jost',sans-serif;font-size:13px;font-weight:300;width:100%;outline:none;transition:border-color .2s}
 .inp:focus{border-color:rgba(196,151,63,.4)}
 .inp::placeholder{color:var(--text3)}
 .sel{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:13px 15px;border-radius:1px;font-family:'Jost',sans-serif;font-size:13px;width:100%;cursor:pointer;outline:none}
 
-/* Cards */
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:16px}
 .card-gold{border-color:rgba(196,151,63,.2)}
 
-/* Pills */
 .pill{padding:6px 14px;border-radius:20px;font-family:'Jost',sans-serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .2s;white-space:nowrap}
 .pill.on{background:var(--gold);color:#080808;border-color:var(--gold);font-weight:600}
 .pill:hover:not(.on){border-color:rgba(196,151,63,.3);color:var(--gold)}
 
-/* Dots */
 .dot{width:5px;height:5px;border-radius:50%;background:var(--gold);animation:bop 1.2s ease-in-out infinite}
 .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
 @keyframes bop{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-7px);opacity:1}}
 
-/* Misc */
 .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(196,151,63,.15),transparent);margin:18px 0}
 .fade{animation:fu .3s ease both}
 @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid rgba(196,151,63,.3);color:var(--text);padding:10px 20px;border-radius:2px;font-size:11px;font-family:'Jost',sans-serif;letter-spacing:1.5px;z-index:999;animation:fu .3s ease;white-space:nowrap}
-.pbox{width:100%;border:1px dashed var(--border);border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:var(--bg);transition:border-color .2s}
+.pbox{width:100%;border:1px dashed var(--border2);border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:var(--bg);transition:border-color .2s}
 .pbox:hover{border-color:rgba(196,151,63,.3)}
 .chip{padding:7px 12px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:20px;cursor:pointer;font-family:'Jost',sans-serif;font-size:11px;white-space:nowrap;transition:all .2s}
 .chip:hover{border-color:rgba(196,151,63,.3);color:var(--gold)}
@@ -145,10 +153,20 @@ body{background:var(--bg);font-family:'Jost',sans-serif}
 .bubble-a p:last-child{margin-bottom:0}
 .stat-mini{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:14px 10px;text-align:center;flex:1}
 .premium-badge{background:linear-gradient(135deg,#C4973F,#8a6b2a);color:#080808;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border-radius:20px;font-weight:600}
-.lock-overlay{position:absolute;inset:0;background:rgba(8,8,8,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-radius:2px;z-index:5}
+.dna-tag{display:inline-block;padding:4px 10px;border-radius:20px;font-size:10px;letter-spacing:1px;margin:3px;font-family:'Jost',sans-serif}
+.dna-good{background:rgba(39,174,96,.1);color:#2ecc71;border:1px solid rgba(39,174,96,.2)}
+.dna-avoid{background:rgba(231,76,60,.1);color:#e74c3c;border:1px solid rgba(231,76,60,.2)}
+.dna-style{background:rgba(196,151,63,.1);color:var(--gold);border:1px solid rgba(196,151,63,.2)}
+.onboard-step{display:flex;align-items:center;gap:8px;margin-bottom:32px}
+.onboard-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);transition:all .3s}
+.onboard-dot.on{background:var(--gold);width:24px;border-radius:4px}
+.photo-upload-box{border:1px dashed rgba(196,151,63,.3);border-radius:2px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg)}
+.photo-upload-box:hover{border-color:var(--gold);background:rgba(196,151,63,.03)}
+.photo-upload-box.done{border-color:rgba(39,174,96,.4);background:rgba(39,174,96,.05)}
 `;
 
 export default function StyleVault() {
+  // Auth
   const [screen, setScreen] = useState("login");
   const [resetToken, setResetToken] = useState<string|null>(null);
   const [newPassword, setNewPassword] = useState("");
@@ -160,9 +178,30 @@ export default function StyleVault() {
   const [lerr, setLerr] = useState("");
   const [aloading, setAL] = useState(false);
 
+  // Onboarding
+  const [obStep, setObStep] = useState(1);
+  const [obInfo, setObInfo] = useState({ nombre:"", edad:"", altura:"", peso:"", ojos:"", cabello:"Lacio" });
+  const [obPhotos, setObPhotos] = useState<{selfie:string|null, front:string|null, side:string|null}>({ selfie:null, front:null, side:null });
+  const [obPhotoFiles, setObPhotoFiles] = useState<{selfie:File|null, front:File|null, side:File|null}>({ selfie:null, front:null, side:null });
+  const [obAnalyzing, setObAnalyzing] = useState(false);
+  const [obAnalysisStep, setObAnalysisStep] = useState("");
+  const selfieRef = useRef<HTMLInputElement>(null);
+  const frontRef = useRef<HTMLInputElement>(null);
+  const sideRef = useRef<HTMLInputElement>(null);
+
+  // DNA
+  const [dna, setDna] = useState<any>(() => {
+    const d = localStorage.getItem("sv_dna");
+    return d ? JSON.parse(d) : null;
+  });
+
+  // App
   const [tab, setTab] = useState("home");
   const [clothes, setClothes] = useState<any[]>([]);
-  const [favorites, setFavorites] = useState<number[]>([]);
+  const [customCats, setCustomCats] = useState<string[]>(() => JSON.parse(localStorage.getItem("sv_custom_cats") || "[]"));
+  const [newCatInput, setNewCatInput] = useState("");
+  const [showAddCat, setShowAddCat] = useState(false);
+  const [favorites, setFavorites] = useState<number[]>(() => JSON.parse(localStorage.getItem("sv_favorites") || "[]"));
   const [fc, setFc] = useState("Todo");
   const [showForm, setSF] = useState(false);
   const [ni, setNi] = useState({ name:"", category:"Tops", color:"#C4973F", season:"Todo el año", occasion:"" });
@@ -182,22 +221,10 @@ export default function StyleVault() {
   const [cload, setCload] = useState(false);
   const chatEnd = useRef<HTMLDivElement>(null);
 
-  // Avatar / Virtual Try
-  const [avatarPhoto, setAvatarPhoto] = useState<string|null>(() => localStorage.getItem("sv_avatar_photo"));
-  const [avatarData, setAvatarData] = useState<any>(() => {
-    const d = localStorage.getItem("sv_avatar_data");
-    return d ? JSON.parse(d) : null;
-  });
-  const [avatarL, setAvatarL] = useState(false);
-  const [customCats, setCustomCats] = useState<string[]>(() => {
-    return JSON.parse(localStorage.getItem("sv_custom_cats") || "[]");
-  });
-  const [newCatInput, setNewCatInput] = useState("");
-  const [showAddCat, setShowAddCat] = useState(false);
+  // Virtual try
   const [selectedForTry, setSelectedForTry] = useState<number[]>([]);
   const [tryResult, setTryResult] = useState<string|null>(null);
   const [tryL, setTryL] = useState(false);
-  const avatarRef = useRef<HTMLInputElement>(null);
 
   // Trip
   const [tripDest, setTripDest] = useState("");
@@ -215,8 +242,7 @@ export default function StyleVault() {
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2600); };
 
   useEffect(() => {
-    const saved = localStorage.getItem("sb_profile");
-    // Check for password recovery token in URL
+    // Check recovery token
     const hash = window.location.hash;
     const params = new URLSearchParams(hash.replace("#", "?"));
     const accessToken = params.get("access_token");
@@ -227,12 +253,17 @@ export default function StyleVault() {
       window.history.replaceState(null, "", window.location.pathname);
       return;
     }
-    if (saved) { const p = JSON.parse(saved); setProfile(p); setScreen("app"); }
-    const favs = JSON.parse(localStorage.getItem("sv_favorites") || "[]");
-    setFavorites(favs);
+    const saved = localStorage.getItem("sb_profile");
+    if (saved) {
+      const p = JSON.parse(saved);
+      setProfile(p);
+      // Check if DNA exists
+      const savedDna = localStorage.getItem("sv_dna");
+      setScreen(savedDna ? "app" : "onboarding");
+    }
   }, []);
 
-  // ── AUTH ──────────────────────────────────────────────────────────────────
+  // Auth
   const handleLogin = async () => {
     setLerr(""); setAL(true);
     try {
@@ -247,7 +278,9 @@ export default function StyleVault() {
       const p = users[0];
       if (p.status === "blocked") { setLerr("Tu cuenta está bloqueada."); setAL(false); return; }
       localStorage.setItem("sb_profile", JSON.stringify(p));
-      setProfile(p); setScreen("app");
+      setProfile(p);
+      const savedDna = localStorage.getItem("sv_dna");
+      setScreen(savedDna ? "app" : "onboarding");
     } catch { setLerr("Error de conexión."); }
     setAL(false);
   };
@@ -262,27 +295,23 @@ export default function StyleVault() {
       const newProfile = { id: auth.user?.id, name: lf.name, email: lf.email, plan: "Basic", status: "active", created_at: new Date().toISOString() };
       await dbInsert("users", newProfile);
       localStorage.setItem("sb_profile", JSON.stringify(newProfile));
-      setProfile(newProfile); setScreen("app");
-      showToast("✦ Bienvenido a StyleVault");
+      setProfile(newProfile);
+      setScreen("onboarding");
     } catch { setLerr("Error al crear cuenta."); }
     setAL(false);
   };
 
   const handleResetPassword = async () => {
     if (!newPassword || newPassword.length < 6) { setResetMsg("La contraseña debe tener al menos 6 caracteres."); return; }
-    setResetL(true); setResetMsg("");
+    setResetL(true);
     try {
       const res = await fetch(`${SB_URL}/auth/v1/user`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", apikey: SB_KEY, Authorization: `Bearer ${resetToken}` },
         body: JSON.stringify({ password: newPassword }),
       });
-      if (res.ok) {
-        setResetMsg("✅ Contraseña actualizada. Ahora puedes iniciar sesión.");
-        setTimeout(() => setScreen("login"), 2500);
-      } else {
-        setResetMsg("Error al actualizar. El link puede haber expirado.");
-      }
+      if (res.ok) { setResetMsg("✅ Contraseña actualizada. Ahora puedes iniciar sesión."); setTimeout(() => setScreen("login"), 2500); }
+      else setResetMsg("Error al actualizar. El link puede haber expirado.");
     } catch { setResetMsg("Error de conexión."); }
     setResetL(false);
   };
@@ -292,7 +321,62 @@ export default function StyleVault() {
     setProfile(null); setClothes([]); setScreen("login");
   };
 
-  // ── CLOTHES ───────────────────────────────────────────────────────────────
+  // Onboarding photo handler
+  const handleObPhoto = (type: "selfie"|"front"|"side") => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = (ev) => {
+      const dataUrl = ev.target?.result as string;
+      setObPhotos(prev => ({ ...prev, [type]: dataUrl }));
+      setObPhotoFiles(prev => ({ ...prev, [type]: f }));
+    };
+    r.readAsDataURL(f);
+  };
+
+  // Analyze with AI
+  const analyzeWithAI = async () => {
+    if (!obPhotos.selfie || !obPhotos.front || !obPhotos.side) { showToast("Sube las 3 fotos para continuar"); return; }
+    setObAnalyzing(true);
+
+    try {
+      setObAnalysisStep("Analizando rasgos faciales...");
+      await new Promise(r => setTimeout(r, 800));
+      setObAnalysisStep("Analizando tipo de cuerpo y proporciones...");
+      await new Promise(r => setTimeout(r, 800));
+      setObAnalysisStep("Analizando tono de piel y colores ideales...");
+      await new Promise(r => setTimeout(r, 800));
+      setObAnalysisStep("Creando tu Fashion DNA™...");
+
+      const images = [
+        { base64: obPhotos.selfie.split(',')[1], type: obPhotoFiles.selfie!.type },
+        { base64: obPhotos.front.split(',')[1], type: obPhotoFiles.front!.type },
+        { base64: obPhotos.side.split(',')[1], type: obPhotoFiles.side!.type },
+      ];
+
+      const userContext = `Datos del usuario: Nombre: ${obInfo.nombre}, Edad: ${obInfo.edad} años, Altura: ${obInfo.altura} cm, Peso: ${obInfo.peso} kg, Color de ojos: ${obInfo.ojos}, Tipo de cabello: ${obInfo.cabello}.`;
+
+      const raw = await callClaudeVision(DNA_SYSTEM, images, userContext + " Analiza las 3 fotos y genera el Fashion DNA completo.");
+      const parsed = JSON.parse(raw.replace(/```json|```/g,"").trim());
+
+      const dnaData = { ...parsed, userInfo: obInfo, createdAt: new Date().toISOString() };
+      setDna(dnaData);
+      localStorage.setItem("sv_dna", JSON.stringify(dnaData));
+
+      // Save to Supabase if possible
+      try {
+        await dbUpdate("users", `id=eq.${profile?.id}`, { dna_profile: dnaData });
+      } catch {}
+
+      setObAnalysisStep("¡Tu Fashion DNA™ está listo!");
+      await new Promise(r => setTimeout(r, 1000));
+      setObStep(4); // Result step
+    } catch {
+      showToast("Error al analizar. Intenta de nuevo.");
+    }
+    setObAnalyzing(false);
+  };
+
+  // Clothes
   useEffect(() => { if (screen === "app" && profile) loadClothes(); }, [screen, profile]);
 
   const loadClothes = async () => {
@@ -306,13 +390,13 @@ export default function StyleVault() {
     const r = new FileReader();
     r.onload = async (ev) => {
       const dataUrl = ev.target?.result as string;
-      setPp(dataUrl);
-      setAnalyzing(true);
+      setPp(dataUrl); setAnalyzing(true);
       try {
         const base64 = dataUrl.split(',')[1];
-        const text = await callClaudeWithImage(PHOTO_SYSTEM, base64, f.type, "Analiza esta prenda.");
+        const images = [{ base64, type: f.type }];
+        const text = await callClaudeVision(PHOTO_SYSTEM, images, "Analiza esta prenda.");
         const parsed = JSON.parse(text.replace(/```json|```/g,"").trim());
-        setNi(prev => ({ ...prev, name: parsed.name || prev.name, category: parsed.category || prev.category, season: parsed.season || prev.season, occasion: parsed.occasion || prev.occasion }));
+        setNi(prev => ({ ...prev, name: parsed.name||prev.name, category: parsed.category||prev.category, season: parsed.season||prev.season, occasion: parsed.occasion||prev.occasion }));
         showToast("✦ Prenda analizada con IA");
       } catch {}
       setAnalyzing(false);
@@ -334,76 +418,55 @@ export default function StyleVault() {
   const removeItem = async (id: number) => {
     try { await dbDelete("clothes", `id=eq.${id}`); } catch {}
     setClothes(clothes.filter(c => c.id !== id));
-    showToast("Prenda eliminada");
   };
 
   const toggleFav = (id: number) => {
     const next = favorites.includes(id) ? favorites.filter(f => f !== id) : [...favorites, id];
-    setFavorites(next);
-    localStorage.setItem("sv_favorites", JSON.stringify(next));
+    setFavorites(next); localStorage.setItem("sv_favorites", JSON.stringify(next));
   };
 
-  // ── OUTFIT ────────────────────────────────────────────────────────────────
+  // Outfit
   const generateOutfit = async () => {
     if (!selEv) return;
     setOL(true); setOR(null);
-    const list = clothes.map(c => `${c.name} (${c.category}, ${c.occasion||"sin ocasión"})`).join("\n");
+    const list = clothes.map(c => `${c.name} (${c.category}, ${c.occasion||""})`).join("\n");
+    const dnaCtx = dna ? `\nFashion DNA del usuario: Tipo de cuerpo: ${dna.bodyType}, Tono: ${dna.skinTone}, Subtono: ${dna.skinUndertone}, Colores ideales: ${dna.idealColors?.join(", ")}.` : "";
     try {
-      const raw = await callClaude(OUTFIT_SYSTEM, [{ role:"user", content:`Armario:\n${list}\n\nEvento: ${selEv}\nTemporada: ${selSe}\n\nCrea el outfit ideal y califícalo.` }]);
+      const raw = await callClaude(OUTFIT_SYSTEM, [{ role:"user", content:`Armario:\n${list}\n\nEvento: ${selEv}\nTemporada: ${selSe}${dnaCtx}\n\nCrea el outfit ideal personalizado para este usuario y califícalo.` }]);
       setOR(JSON.parse(raw.replace(/```json|```/g,"").trim()));
       showToast("✦ Outfit creado");
     } catch { setOR({ outfit:[], explanation:"Error.", colorPalette:"", rating:0, ratingExplanation:"" }); }
     setOL(false);
   };
 
-  // ── CHAT ──────────────────────────────────────────────────────────────────
+  // Chat
   const sendChat = async (msg?: string) => {
     const m = msg || cin; if (!m.trim()) return;
     const next = [...msgs, { role:"user", text:m }];
     setMsgs(next); setCin(""); setCload(true);
-    const ctx = clothes.length > 0 ? `\n\nArmario: ${clothes.slice(0,15).map(c=>`${c.name} (${c.category})`).join(", ")}` : "";
+    const dnaCtx = dna ? `\nFashion DNA: Tipo de cuerpo: ${dna.bodyType}, Tono: ${dna.skinTone}, Subtono: ${dna.skinUndertone}, Colores ideales: ${dna.idealColors?.join(", ")}, Prendas recomendadas: ${dna.recommendedClothes?.slice(0,5).join(", ")}.` : "";
+    const wardrobeCtx = clothes.length > 0 ? `\nArmario: ${clothes.slice(0,15).map(c=>`${c.name} (${c.category})`).join(", ")}` : "";
     try {
-      const reply = await callClaude(ADVISOR_SYSTEM + ctx, next.map(x => ({ role: x.role==="assistant"?"assistant":"user", content: x.text })));
+      const reply = await callClaude(ADVISOR_SYSTEM + dnaCtx + wardrobeCtx, next.map(x=>({ role:x.role==="assistant"?"assistant":"user", content:x.text })));
       setMsgs([...next, { role:"assistant", text:reply }]);
     } catch { setMsgs([...next, { role:"assistant", text:"Error de conexión." }]); }
     setCload(false);
   };
 
-  // ── AVATAR / VIRTUAL TRY ──────────────────────────────────────────────────
-  const analyzeAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0]; if (!f) return;
-    const r = new FileReader();
-    r.onload = async (ev) => {
-      const dataUrl = ev.target?.result as string;
-      setAvatarPhoto(dataUrl);
-      localStorage.setItem("sv_avatar_photo", dataUrl);
-      setAvatarL(true);
-      try {
-        const base64 = dataUrl.split(',')[1];
-        const text = await callClaudeWithImage(AVATAR_SYSTEM, base64, f.type, "Analiza el cuerpo completo de esta persona para crear su perfil de moda.");
-        const parsed = JSON.parse(text.replace(/```json|```/g,"").trim());
-        setAvatarData(parsed);
-        localStorage.setItem("sv_avatar_data", JSON.stringify(parsed));
-        showToast("✦ Avatar guardado permanentemente");
-      } catch { showToast("Error al analizar. Intenta de nuevo."); }
-      setAvatarL(false);
-    };
-    r.readAsDataURL(f);
-  };
-
+  // Virtual try
   const virtualTryOn = async () => {
-    if (!avatarData || selectedForTry.length === 0) return;
+    if (!dna || selectedForTry.length === 0) return;
     setTryL(true); setTryResult(null);
     const prendas = clothes.filter(c => selectedForTry.includes(c.id)).map(c => `${c.name} (${c.category}, color: ${c.color})`).join(", ");
-    const perfil = `Tipo de cuerpo: ${avatarData.bodyType}, Complexión: ${avatarData.build}, Tono de piel: ${avatarData.skinTone}`;
+    const perfil = `Tipo de cuerpo: ${dna.bodyType}, Proporciones: hombros ${dna.bodyProportions?.shoulders}, cintura ${dna.bodyProportions?.waist}, caderas ${dna.bodyProportions?.hips}. Tono de piel: ${dna.skinTone} (${dna.skinUndertone}). Colores ideales: ${dna.idealColors?.join(", ")}.`;
     try {
-      const result = await callClaude(VIRTUAL_TRY_SYSTEM, [{ role:"user", content:`Perfil corporal:\n${perfil}\n\nPrendas seleccionadas:\n${prendas}\n\nDescribe detalladamente cómo luciría este outfit en esta persona específicamente, incluyendo cómo cada prenda favorece su tipo de cuerpo.` }]);
+      const result = await callClaude(VIRTUAL_SYSTEM, [{ role:"user", content:`Fashion DNA:\n${perfil}\n\nOutfit seleccionado:\n${prendas}\n\nDescribe cómo luciría este outfit en esta persona específicamente.` }]);
       setTryResult(result);
     } catch { setTryResult("Error al procesar."); }
     setTryL(false);
   };
 
-  // ── TRIP ──────────────────────────────────────────────────────────────────
+  // Trip
   const planTrip = async () => {
     if (!tripDest || !tripDays) return;
     setTripL(true); setTripR(null);
@@ -415,34 +478,26 @@ export default function StyleVault() {
     setTripL(false);
   };
 
-  const allCategories = [...["Tops","Pantalones","Vestidos","Zapatos","Accesorios","Abrigos","Deportivo"], ...customCats];
-
+  const allCategories = [...BASE_CATS, ...customCats];
   const addCustomCategory = () => {
     const cat = newCatInput.trim();
     if (!cat || allCategories.includes(cat)) return;
     const next = [...customCats, cat];
-    setCustomCats(next);
-    localStorage.setItem("sv_custom_cats", JSON.stringify(next));
-    setNewCatInput("");
-    setShowAddCat(false);
-    showToast("✦ Categoría agregada");
+    setCustomCats(next); localStorage.setItem("sv_custom_cats", JSON.stringify(next));
+    setNewCatInput(""); setShowAddCat(false); showToast("✦ Categoría agregada");
   };
-
   const removeCustomCategory = (cat: string) => {
     const next = customCats.filter(c => c !== cat);
-    setCustomCats(next);
-    localStorage.setItem("sv_custom_cats", JSON.stringify(next));
+    setCustomCats(next); localStorage.setItem("sv_custom_cats", JSON.stringify(next));
   };
 
   const filtered = clothes.filter(c => fc === "Todo" || c.category === fc);
   const favClothes = clothes.filter(c => favorites.includes(c.id));
   const isPremium = profile?.plan === "Premium" || profile?.plan === "Admin";
   const renderStars = (n: number) => "★".repeat(Math.min(5,Math.max(0,Math.round(n)))) + "☆".repeat(5-Math.min(5,Math.max(0,Math.round(n))));
+  const suggestions = ["¿Qué colores van con mi tono de piel?","Armario cápsula para mi tipo de cuerpo","¿Cómo vestir para entrevista?","Prendas que me favorecen más"];
 
-  const suggestions = ["¿Qué colores van con azul marino?","Armario cápsula esencial","¿Cómo vestir para entrevista?","Smart Casual dress code","Tips para parecer más alto"];
-
-  // ── LOGIN ──────────────────────────────────────────────────────────────────
-  // ── RESET PASSWORD SCREEN ────────────────────────────────────────────────
+  // ── RESET PASSWORD ────────────────────────────────────────────────────────
   if (screen === "reset") return (
     <div style={{ fontFamily:"'Jost',sans-serif", background:"#080808", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"24px" }}>
       <style>{CSS}</style>
@@ -451,33 +506,32 @@ export default function StyleVault() {
           <div className="serif" style={{ fontSize:"36px", letterSpacing:"8px", color:"#C4973F", fontWeight:300 }}>STYLE<em>VAULT</em></div>
         </div>
         <div className="card">
-          <div style={{ fontSize:"9px", color:"#C4973F", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"20px" }}>✦ Nueva Contraseña</div>
+          <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"20px" }}>✦ Nueva Contraseña</div>
           <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
             <input className="inp" placeholder="Nueva contraseña (mínimo 6 caracteres)" type="password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleResetPassword()} />
-            {resetMsg && <div style={{ color:resetMsg.startsWith("✅")?"#2ecc71":"#e74c3c", fontSize:"12px", textAlign:"center", lineHeight:1.5 }}>{resetMsg}</div>}
-            <button className="btn-p" onClick={handleResetPassword} disabled={resetL}>
-              {resetL?"Actualizando...":"✦  Actualizar Contraseña"}
-            </button>
-            <button onClick={()=>setScreen("login")} style={{ background:"none", border:"none", color:"#3a3632", fontSize:"10px", cursor:"pointer", letterSpacing:"1.5px", fontFamily:"'Jost',sans-serif", textDecoration:"underline", textAlign:"center" }}>Volver al inicio de sesión</button>
+            {resetMsg && <div style={{ color:resetMsg.startsWith("✅")?"var(--green)":"var(--red)", fontSize:"12px", textAlign:"center" }}>{resetMsg}</div>}
+            <button className="btn-p" onClick={handleResetPassword} disabled={resetL}>{resetL?"Actualizando...":"✦  Actualizar Contraseña"}</button>
+            <button onClick={()=>setScreen("login")} style={{ background:"none", border:"none", color:"var(--text3)", fontSize:"10px", cursor:"pointer", letterSpacing:"1.5px", fontFamily:"'Jost',sans-serif", textDecoration:"underline", textAlign:"center" }}>Volver al inicio</button>
           </div>
         </div>
       </div>
     </div>
   );
 
-  // ── LOGIN ──────────────────────────────────────────────────────────────────
+  // ── LOGIN ─────────────────────────────────────────────────────────────────
   if (screen === "login") return (
     <div style={{ fontFamily:"'Jost',sans-serif", background:"#080808", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"24px" }}>
       <style>{CSS}</style>
       <div style={{ width:"100%", maxWidth:"360px" }}>
         <div style={{ textAlign:"center", marginBottom:"48px" }}>
-          <div className="serif" style={{ fontSize:"40px", letterSpacing:"10px", color:"#C4973F", fontWeight:300 }}>STYLE<em>VAULT</em></div>
-          <div style={{ fontSize:"8px", letterSpacing:"6px", color:"#2a2826", marginTop:"8px", textTransform:"uppercase" }}>Armario Inteligente con IA</div>
+          <div style={{ fontSize:"11px", letterSpacing:"6px", color:"var(--text3)", marginBottom:"14px" }}>✦</div>
+          <div className="serif" style={{ fontSize:"40px", letterSpacing:"10px", color:"var(--gold)", fontWeight:300 }}>STYLE<em>VAULT</em></div>
+          <div style={{ fontSize:"8px", letterSpacing:"6px", color:"var(--text3)", marginTop:"8px", textTransform:"uppercase" }}>Armario Inteligente con IA</div>
         </div>
         <div className="card">
-          <div style={{ display:"flex", marginBottom:"24px", borderBottom:"1px solid #1c1c1c" }}>
+          <div style={{ display:"flex", marginBottom:"24px", borderBottom:"1px solid var(--border)" }}>
             {["login","register"].map(m => (
-              <button key={m} onClick={()=>{setLmode(m);setLerr("");}} style={{ flex:1, padding:"11px", background:"none", border:"none", borderBottom:`2px solid ${lmode===m?"#C4973F":"transparent"}`, color:lmode===m?"#C4973F":"#3a3632", cursor:"pointer", fontFamily:"'Jost',sans-serif", fontSize:"9px", letterSpacing:"3px", textTransform:"uppercase", fontWeight:500 }}>
+              <button key={m} onClick={()=>{setLmode(m);setLerr("");}} style={{ flex:1, padding:"11px", background:"none", border:"none", borderBottom:`2px solid ${lmode===m?"var(--gold)":"transparent"}`, color:lmode===m?"var(--gold)":"var(--text3)", cursor:"pointer", fontFamily:"'Jost',sans-serif", fontSize:"9px", letterSpacing:"3px", textTransform:"uppercase", fontWeight:500 }}>
                 {m==="login"?"Iniciar Sesión":"Registrarse"}
               </button>
             ))}
@@ -486,21 +540,226 @@ export default function StyleVault() {
             {lmode==="register" && <input className="inp" placeholder="Tu nombre completo" value={lf.name} onChange={e=>setLf(p=>({...p,name:e.target.value}))} />}
             <input className="inp" placeholder="Correo electrónico" type="email" value={lf.email} onChange={e=>setLf(p=>({...p,email:e.target.value}))} />
             <input className="inp" placeholder="Contraseña" type="password" value={lf.password} onChange={e=>setLf(p=>({...p,password:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&(lmode==="login"?handleLogin():handleRegister())} />
-            {lerr && <div style={{ color:lerr.startsWith("✅")?"#2ecc71":"#e74c3c", fontSize:"12px", textAlign:"center" }}>{lerr}</div>}
+            {lerr && <div style={{ color:"var(--red)", fontSize:"12px", textAlign:"center" }}>{lerr}</div>}
             <button className="btn-p" style={{ marginTop:"6px" }} onClick={lmode==="login"?handleLogin:handleRegister} disabled={aloading}>
               {aloading?"...":lmode==="login"?"✦  Entrar":"✦  Crear Cuenta"}
             </button>
             {lmode==="login" && (
               <button onClick={async()=>{
-                if (!lf.email) { alert("Escribe tu correo primero"); return; }
+                if (!lf.email) { setLerr("Escribe tu correo primero"); return; }
                 const res = await fetch(`${SB_URL}/auth/v1/recover`, { method:"POST", headers:{"Content-Type":"application/json", apikey:SB_KEY, Authorization:`Bearer ${SB_KEY}`}, body:JSON.stringify({ email:lf.email }) });
-                alert(res.ok?"✅ Revisa tu correo para recuperar tu contraseña":"Error al enviar. Intenta de nuevo.");
-              }} style={{ background:"none", border:"none", color:"#3a3632", fontSize:"10px", cursor:"pointer", letterSpacing:"1.5px", fontFamily:"Jost,sans-serif", textDecoration:"underline", textAlign:"center", width:"100%", padding:"4px" }}>
+                setLerr(res.ok?"✅ Revisa tu correo para recuperar tu contraseña":"Error al enviar.");
+              }} style={{ background:"none", border:"none", color:"var(--text3)", fontSize:"10px", cursor:"pointer", letterSpacing:"1.5px", fontFamily:"'Jost',sans-serif", textDecoration:"underline", textAlign:"center" }}>
                 ¿Olvidaste tu contraseña?
               </button>
             )}
           </div>
         </div>
+      </div>
+    </div>
+  );
+
+  // ── ONBOARDING ────────────────────────────────────────────────────────────
+  if (screen === "onboarding") return (
+    <div className="sv fade">
+      <style>{CSS}</style>
+      {toast && <div className="toast">{toast}</div>}
+      <div style={{ padding:"20px 18px 40px", minHeight:"100vh" }}>
+
+        {/* Step indicators */}
+        {obStep < 4 && (
+          <div className="onboard-step">
+            {[1,2,3].map(s => <div key={s} className={`onboard-dot ${obStep===s?"on":""}`} />)}
+          </div>
+        )}
+
+        {/* STEP 1: Welcome */}
+        {obStep===1 && (
+          <div className="fade">
+            <div style={{ textAlign:"center", marginBottom:"40px" }}>
+              <div className="serif" style={{ fontSize:"22px", letterSpacing:"6px", color:"var(--gold)", fontWeight:300, marginBottom:"24px" }}>STYLE<em>VAULT</em></div>
+              <div style={{ fontSize:"48px", marginBottom:"20px" }}>🧬</div>
+              <div className="serif" style={{ fontSize:"32px", fontWeight:300, marginBottom:"12px" }}>Crea tu Avatar IA</div>
+              <div style={{ fontSize:"14px", color:"var(--text2)", lineHeight:1.7, maxWidth:"320px", margin:"0 auto" }}>
+                Tu estilista personal necesita conocerte para crear una versión digital de ti y darte recomendaciones perfectas.
+              </div>
+            </div>
+            <div style={{ display:"flex", flexDirection:"column", gap:"12px", marginBottom:"32px" }}>
+              {["Análisis facial y corporal con IA", "Fashion DNA™ personalizado", "Recomendaciones basadas en tu cuerpo real", "Prueba outfits antes de vestirte"].map(f => (
+                <div key={f} style={{ display:"flex", alignItems:"center", gap:"12px", padding:"12px", background:"var(--bg2)", border:"1px solid var(--border)", borderRadius:"2px" }}>
+                  <div style={{ color:"var(--gold)", fontSize:"14px" }}>✦</div>
+                  <div style={{ fontSize:"13px", color:"var(--text2)" }}>{f}</div>
+                </div>
+              ))}
+            </div>
+            <button className="btn-p" onClick={()=>setObStep(2)}>Comenzar →</button>
+            <button onClick={()=>{ setDna({}); setScreen("app"); }} style={{ background:"none", border:"none", color:"var(--text3)", fontSize:"10px", cursor:"pointer", letterSpacing:"1px", fontFamily:"'Jost',sans-serif", textDecoration:"underline", textAlign:"center", width:"100%", marginTop:"16px", padding:"8px" }}>
+              Omitir por ahora
+            </button>
+          </div>
+        )}
+
+        {/* STEP 2: Basic info */}
+        {obStep===2 && (
+          <div className="fade">
+            <div style={{ marginBottom:"28px" }}>
+              <div className="serif" style={{ fontSize:"28px", fontWeight:300, marginBottom:"8px" }}>Información básica</div>
+              <div style={{ fontSize:"12px", color:"var(--text2)" }}>Solo lo que la IA no puede detectar por sí sola</div>
+            </div>
+            <div style={{ display:"flex", flexDirection:"column", gap:"12px", marginBottom:"24px" }}>
+              <div>
+                <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"6px" }}>Nombre</div>
+                <input className="inp" placeholder="Tu nombre" value={obInfo.nombre} onChange={e=>setObInfo(p=>({...p,nombre:e.target.value}))} />
+              </div>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px" }}>
+                <div>
+                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"6px" }}>Edad</div>
+                  <input className="inp" placeholder="Años" type="number" value={obInfo.edad} onChange={e=>setObInfo(p=>({...p,edad:e.target.value}))} />
+                </div>
+                <div>
+                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"6px" }}>Altura (cm)</div>
+                  <input className="inp" placeholder="170" type="number" value={obInfo.altura} onChange={e=>setObInfo(p=>({...p,altura:e.target.value}))} />
+                </div>
+              </div>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px" }}>
+                <div>
+                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"6px" }}>Peso aprox. (kg)</div>
+                  <input className="inp" placeholder="70" type="number" value={obInfo.peso} onChange={e=>setObInfo(p=>({...p,peso:e.target.value}))} />
+                </div>
+                <div>
+                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"6px" }}>Color de ojos</div>
+                  <input className="inp" placeholder="Café, verde..." value={obInfo.ojos} onChange={e=>setObInfo(p=>({...p,ojos:e.target.value}))} />
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"10px" }}>Tipo de cabello</div>
+                <div style={{ display:"flex", gap:"8px", flexWrap:"wrap" }}>
+                  {["Lacio","Ondulado","Rizado","Afro"].map(t => (
+                    <button key={t} className={`pill ${obInfo.cabello===t?"on":""}`} onClick={()=>setObInfo(p=>({...p,cabello:t}))}>{t}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div style={{ display:"flex", gap:"10px" }}>
+              <button className="btn-o" onClick={()=>setObStep(1)}>← Atrás</button>
+              <button className="btn-p" onClick={()=>setObStep(3)} disabled={!obInfo.nombre||!obInfo.altura} style={{ flex:1 }}>Continuar →</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 3: Photos */}
+        {obStep===3 && (
+          <div className="fade">
+            <div style={{ marginBottom:"24px" }}>
+              <div className="serif" style={{ fontSize:"28px", fontWeight:300, marginBottom:"8px" }}>Escaneo Inteligente</div>
+              <div style={{ fontSize:"12px", color:"var(--text2)" }}>3 fotos para crear tu avatar con máxima precisión</div>
+            </div>
+
+            <input ref={selfieRef} type="file" accept="image/*" style={{display:"none"}} onChange={handleObPhoto("selfie")} />
+            <input ref={frontRef} type="file" accept="image/*" style={{display:"none"}} onChange={handleObPhoto("front")} />
+            <input ref={sideRef} type="file" accept="image/*" style={{display:"none"}} onChange={handleObPhoto("side")} />
+
+            <div style={{ display:"flex", flexDirection:"column", gap:"14px", marginBottom:"24px" }}>
+              {[
+                { key:"selfie", ref:selfieRef, label:"Foto 1 · Selfie frontal", tips:["Buena iluminación","Sin lentes oscuros","Rostro completamente visible"], icon:"🤳" },
+                { key:"front", ref:frontRef, label:"Foto 2 · Cuerpo completo frontal", tips:["De pie","Brazos relajados","Fondo simple"], icon:"🧍" },
+                { key:"side", ref:sideRef, label:"Foto 3 · Cuerpo completo lateral", tips:["Perfil completo","Fondo simple"], icon:"🚶" },
+              ].map(({ key, ref, label, tips, icon }) => (
+                <div key={key} className={`photo-upload-box ${obPhotos[key as keyof typeof obPhotos]?"done":""}`} onClick={()=>ref.current?.click()}>
+                  {obPhotos[key as keyof typeof obPhotos] ? (
+                    <div style={{ display:"flex", alignItems:"center", gap:"12px", padding:"4px 0" }}>
+                      <img src={obPhotos[key as keyof typeof obPhotos]!} alt={key} style={{ width:"60px", height:"60px", objectFit:"cover", borderRadius:"2px" }} />
+                      <div>
+                        <div style={{ fontSize:"12px", color:"var(--green)", marginBottom:"4px" }}>✓ {label}</div>
+                        <div style={{ fontSize:"10px", color:"var(--text2)" }}>Toca para cambiar</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div style={{ fontSize:"32px", marginBottom:"8px" }}>{icon}</div>
+                      <div style={{ fontSize:"12px", fontWeight:500, marginBottom:"8px" }}>{label}</div>
+                      <div style={{ display:"flex", gap:"6px", flexWrap:"wrap", justifyContent:"center" }}>
+                        {tips.map(t => <span key={t} style={{ fontSize:"10px", color:"var(--text2)", background:"var(--bg2)", padding:"3px 8px", borderRadius:"20px", border:"1px solid var(--border)" }}>{t}</span>)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {obAnalyzing ? (
+              <div style={{ textAlign:"center", padding:"20px" }}>
+                <div style={{ display:"flex", justifyContent:"center", gap:"6px", marginBottom:"16px" }}>
+                  <div className="dot"/><div className="dot"/><div className="dot"/>
+                </div>
+                <div style={{ fontSize:"13px", color:"var(--gold)" }}>{obAnalysisStep}</div>
+              </div>
+            ) : (
+              <div style={{ display:"flex", gap:"10px" }}>
+                <button className="btn-o" onClick={()=>setObStep(2)}>← Atrás</button>
+                <button className="btn-p" onClick={analyzeWithAI} disabled={!obPhotos.selfie||!obPhotos.front||!obPhotos.side} style={{ flex:1 }}>
+                  🧬 Analizar con IA
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* STEP 4: DNA Result */}
+        {obStep===4 && dna && (
+          <div className="fade">
+            <div style={{ textAlign:"center", marginBottom:"28px" }}>
+              <div style={{ fontSize:"40px", marginBottom:"12px" }}>🎉</div>
+              <div className="serif" style={{ fontSize:"28px", fontWeight:300, marginBottom:"8px" }}>Tu Avatar IA está listo</div>
+              <div style={{ fontSize:"12px", color:"var(--text2)" }}>Nivel de precisión: {dna.precisionLevel || 92}%</div>
+            </div>
+
+            {/* DNA Card */}
+            <div className="card card-gold" style={{ marginBottom:"14px" }}>
+              <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"16px" }}>✦ Fashion DNA™</div>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginBottom:"16px" }}>
+                {[
+                  { label:"Tipo de cuerpo", value:dna.bodyType },
+                  { label:"Tono de piel", value:dna.skinTone },
+                  { label:"Subtono", value:dna.skinUndertone },
+                  { label:"Forma de rostro", value:dna.faceShape },
+                  { label:"Cuello", value:dna.neckType },
+                  { label:"Postura", value:dna.posture },
+                ].map(item => (
+                  <div key={item.label} style={{ background:"var(--bg)", border:"1px solid var(--border)", borderRadius:"2px", padding:"10px" }}>
+                    <div style={{ fontSize:"9px", color:"var(--text3)", letterSpacing:"1px", textTransform:"uppercase", marginBottom:"4px" }}>{item.label}</div>
+                    <div style={{ fontSize:"12px", color:"var(--text)" }}>{item.value || "—"}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ marginBottom:"14px" }}>
+                <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"8px" }}>Colores ideales</div>
+                <div style={{ display:"flex", flexWrap:"wrap", gap:"4px" }}>
+                  {dna.idealColors?.map((c: string) => <span key={c} className="dna-tag dna-good">{c}</span>)}
+                </div>
+              </div>
+
+              <div style={{ marginBottom:"14px" }}>
+                <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"8px" }}>Estilos recomendados</div>
+                <div style={{ display:"flex", flexWrap:"wrap", gap:"4px" }}>
+                  {dna.recommendedStyles?.map((s: string) => <span key={s} className="dna-tag dna-style">{s}</span>)}
+                </div>
+              </div>
+
+              {dna.styleAdvice && (
+                <div style={{ background:"var(--bg)", borderLeft:"2px solid rgba(196,151,63,.3)", padding:"12px", borderRadius:"0 2px 2px 0" }}>
+                  <div style={{ fontSize:"12px", color:"var(--text2)", lineHeight:1.7 }}>{dna.styleAdvice}</div>
+                </div>
+              )}
+            </div>
+
+            <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
+              <button className="btn-p" onClick={()=>{ setScreen("app"); }}>Ver mi Armario →</button>
+              <button className="btn-o" onClick={()=>{ setTab("outfit"); setScreen("app"); }}>Crear mi primer outfit</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -512,13 +771,11 @@ export default function StyleVault() {
       {toast && <div className="toast">{toast}</div>}
       <input ref={fileRef} type="file" accept="image/*" style={{display:"none"}} onChange={handlePhoto} />
       <input ref={camRef} type="file" accept="image/*" capture="environment" style={{display:"none"}} onChange={handlePhoto} />
-      <input ref={avatarRef} type="file" accept="image/*" style={{display:"none"}} onChange={analyzeAvatar} />
 
-      {/* ── Header ── */}
       <header style={{ padding:"14px 16px 10px", borderBottom:"1px solid var(--border)", background:"#0a0a0a", display:"flex", justifyContent:"space-between", alignItems:"center", position:"sticky", top:0, zIndex:50 }}>
         <div>
-          <div className="serif" style={{ fontSize:"22px", letterSpacing:"6px", color:"#C4973F", fontWeight:300, lineHeight:1 }}>STYLE<em>VAULT</em></div>
-          <div style={{ fontSize:"7px", letterSpacing:"4px", color:"#2a2826", marginTop:"2px" }}>ARMARIO INTELIGENTE</div>
+          <div className="serif" style={{ fontSize:"22px", letterSpacing:"6px", color:"var(--gold)", fontWeight:300, lineHeight:1 }}>STYLE<em>VAULT</em></div>
+          <div style={{ fontSize:"7px", letterSpacing:"4px", color:"var(--text3)", marginTop:"2px" }}>ARMARIO INTELIGENTE</div>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:"10px" }}>
           {isPremium && <span className="premium-badge">Premium</span>}
@@ -529,19 +786,16 @@ export default function StyleVault() {
         </div>
       </header>
 
-      {/* ── Content ── */}
       <main style={{ padding:"16px 14px 90px", overflowY:"auto" }}>
 
         {/* HOME */}
         {tab==="home" && (
           <div className="fade">
-            {/* Welcome */}
             <div style={{ marginBottom:"20px" }}>
               <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>Hola, {profile?.name?.split(" ")[0]} 👋</div>
-              <div style={{ fontSize:"11px", color:"var(--text3)", marginTop:"4px" }}>Aquí está tu resumen de hoy</div>
+              {dna?.bodyType && <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"4px" }}>Tipo de cuerpo: <span style={{ color:"var(--gold)" }}>{dna.bodyType}</span></div>}
             </div>
 
-            {/* Stats */}
             <div style={{ display:"flex", gap:"10px", marginBottom:"18px" }}>
               {[
                 { label:"Prendas", value:clothes.length, icon:"👗" },
@@ -549,84 +803,177 @@ export default function StyleVault() {
                 { label:"Outfits", value:outfitR?1:0, icon:"✦" },
               ].map(s => (
                 <div key={s.label} className="stat-mini">
-                  <div style={{ fontSize:"22px", marginBottom:"4px" }}>{s.icon}</div>
+                  <div style={{ fontSize:"20px", marginBottom:"4px" }}>{s.icon}</div>
                   <div className="serif" style={{ fontSize:"22px", color:"var(--gold)", fontWeight:300 }}>{s.value}</div>
-                  <div style={{ fontSize:"8px", color:"var(--text3)", letterSpacing:"1.5px", textTransform:"uppercase", marginTop:"2px" }}>{s.label}</div>
+                  <div style={{ fontSize:"8px", color:"var(--text2)", letterSpacing:"1.5px", textTransform:"uppercase", marginTop:"2px" }}>{s.label}</div>
                 </div>
               ))}
             </div>
 
+            {/* DNA Preview */}
+            {dna?.bodyType && (
+              <div className="card card-gold" style={{ marginBottom:"14px" }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"12px" }}>
+                  <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase" }}>✦ Tu Fashion DNA™</div>
+                  <button className="btn-g" onClick={()=>setTab("dna")}>Ver completo →</button>
+                </div>
+                <div style={{ display:"flex", gap:"6px", flexWrap:"wrap" }}>
+                  {dna.idealColors?.slice(0,4).map((c: string) => <span key={c} className="dna-tag dna-good">{c}</span>)}
+                  {dna.recommendedStyles?.slice(0,2).map((s: string) => <span key={s} className="dna-tag dna-style">{s}</span>)}
+                </div>
+              </div>
+            )}
+
             {/* Outfit del día */}
             <div className="card card-gold" style={{ marginBottom:"14px" }}>
-              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"14px" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"12px" }}>
                 <div>
                   <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase" }}>✦ Outfit del día</div>
-                  <div style={{ fontSize:"12px", color:"var(--text3)", marginTop:"3px" }}>Generado por IA para ti</div>
+                  <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>Personalizado para ti</div>
                 </div>
                 <button className="btn-o" style={{ fontSize:"9px", padding:"7px 12px" }} onClick={()=>setTab("outfit")}>Crear →</button>
               </div>
               {outfitR ? (
                 <div>
-                  <div style={{ display:"flex", gap:"6px", flexWrap:"wrap", marginBottom:"10px" }}>
+                  <div style={{ display:"flex", gap:"6px", flexWrap:"wrap", marginBottom:"8px" }}>
                     {outfitR.outfit?.slice(0,3).map((item: any, i: number) => (
-                      <div key={i} style={{ background:"#0a0a0a", border:"1px solid var(--border)", borderRadius:"2px", padding:"8px 12px", fontSize:"12px" }}>
-                        {item.emoji} {item.name}
-                      </div>
+                      <div key={i} style={{ background:"var(--bg)", border:"1px solid var(--border)", borderRadius:"2px", padding:"7px 11px", fontSize:"12px" }}>{item.emoji} {item.name}</div>
                     ))}
                   </div>
-                  {outfitR.rating && <div className="stars">{renderStars(outfitR.rating)} <span style={{ fontSize:"11px", color:"var(--text3)" }}>{outfitR.rating}/5</span></div>}
+                  {outfitR.rating > 0 && <div className="stars">{renderStars(outfitR.rating)} <span style={{ fontSize:"11px", color:"var(--text3)" }}>{outfitR.rating}/5</span></div>}
                 </div>
               ) : (
-                <div style={{ textAlign:"center", padding:"20px", color:"var(--text3)", fontSize:"12px" }}>
-                  {clothes.length === 0 ? "Agrega prendas para generar outfits" : "Toca 'Crear' para generar tu outfit de hoy"}
+                <div style={{ textAlign:"center", padding:"16px", color:"var(--text3)", fontSize:"12px" }}>
+                  {clothes.length === 0 ? "Agrega prendas para generar outfits" : "Toca 'Crear' para generar tu outfit"}
                 </div>
               )}
             </div>
 
-            {/* Prueba Virtual promo */}
-            <div style={{ position:"relative", overflow:"hidden" }}>
-              <div className="card" style={{ background:"linear-gradient(135deg,#0e0e0e,#141414)", borderColor:"rgba(196,151,63,.2)" }}>
-                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
-                  <div>
-                    <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"6px" }}>✦ Prueba Virtual</div>
-                    <div style={{ fontSize:"14px", fontWeight:400, marginBottom:"6px" }}>Ve cómo te queda antes de vestirte</div>
-                    <div style={{ fontSize:"11px", color:"var(--text3)", lineHeight:1.5, marginBottom:"12px" }}>Crea tu avatar IA con una foto de cuerpo completo</div>
-                    <button className="btn-p" style={{ width:"auto", padding:"10px 18px" }} onClick={()=>setTab("avatar")}>
-                      {isPremium ? "Probar ahora →" : "Ver función Premium →"}
-                    </button>
-                  </div>
-                  <div style={{ fontSize:"48px", opacity:.3 }}>🧍</div>
+            {/* Virtual Try promo */}
+            <div className="card" style={{ marginBottom:"14px", background:"linear-gradient(135deg,var(--bg2),var(--bg3))", borderColor:"rgba(196,151,63,.2)" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"6px" }}>✦ Prueba Virtual</div>
+                  <div style={{ fontSize:"14px", fontWeight:400, marginBottom:"6px" }}>Ve cómo te queda el outfit</div>
+                  <div style={{ fontSize:"11px", color:"var(--text2)", lineHeight:1.5, marginBottom:"12px" }}>Basado en tu Fashion DNA™ personal</div>
+                  <button className="btn-p" style={{ width:"auto", padding:"10px 18px" }} onClick={()=>setTab("avatar")}>
+                    {isPremium ? "Probar ahora →" : "Ver función Premium →"}
+                  </button>
                 </div>
+                <div style={{ fontSize:"44px", opacity:.25 }}>🧍</div>
               </div>
             </div>
 
-            {/* Recent clothes */}
             {clothes.length > 0 && (
-              <div style={{ marginTop:"18px" }}>
+              <div>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"12px" }}>
-                  <div style={{ fontSize:"9px", color:"var(--text3)", letterSpacing:"2px", textTransform:"uppercase" }}>Prendas recientes</div>
+                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase" }}>Prendas recientes</div>
                   <button className="btn-g" onClick={()=>setTab("wardrobe")}>Ver todas →</button>
                 </div>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"8px" }}>
                   {clothes.slice(0,6).map(item => (
                     <div key={item.id} style={{ background:"var(--bg2)", border:"1px solid var(--border)", borderRadius:"2px", overflow:"hidden", position:"relative" }}>
-                      <button onClick={()=>toggleFav(item.id)} style={{ position:"absolute", top:"5px", right:"5px", background:"rgba(0,0,0,.6)", border:"none", fontSize:"12px", cursor:"pointer", width:"22px", height:"22px", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      <button onClick={()=>toggleFav(item.id)} style={{ position:"absolute", top:"4px", right:"4px", background:"rgba(0,0,0,.6)", border:"none", fontSize:"11px", cursor:"pointer", width:"20px", height:"20px", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center" }}>
                         {favorites.includes(item.id)?"❤️":"🤍"}
                       </button>
-                      {item.photo_url ? (
-                        <img src={item.photo_url} alt={item.name} style={{ width:"100%", aspectRatio:"1", objectFit:"cover" }} />
-                      ) : (
-                        <div style={{ width:"100%", aspectRatio:"1", background:"#0a0a0a", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"28px" }}>
-                          {CAT_ICON[item.category]||"👔"}
-                        </div>
-                      )}
-                      <div style={{ padding:"6px 8px" }}>
-                        <div style={{ fontSize:"10px", fontWeight:400, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{item.name}</div>
-                      </div>
+                      {item.photo_url ? <img src={item.photo_url} alt={item.name} style={{ width:"100%", aspectRatio:"1", objectFit:"cover" }} /> : <div style={{ width:"100%", aspectRatio:"1", background:"var(--bg)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"26px" }}>{CAT_ICON[item.category]||"👔"}</div>}
+                      <div style={{ padding:"6px 7px" }}><div style={{ fontSize:"10px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{item.name}</div></div>
                     </div>
                   ))}
                 </div>
               </div>
+            )}
+          </div>
+        )}
+
+        {/* DNA TAB */}
+        {tab==="dna" && (
+          <div className="fade">
+            <div style={{ marginBottom:"20px" }}>
+              <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>Fashion DNA™</div>
+              <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>Tu perfil de moda personalizado</div>
+            </div>
+
+            {!dna?.bodyType ? (
+              <div style={{ textAlign:"center", padding:"60px 20px" }}>
+                <div style={{ fontSize:"40px", marginBottom:"16px", opacity:.3 }}>🧬</div>
+                <div style={{ fontSize:"13px", color:"var(--text2)", marginBottom:"20px" }}>Aún no has creado tu Fashion DNA™</div>
+                <button className="btn-p" onClick={()=>setScreen("onboarding")}>Crear mi Fashion DNA™</button>
+              </div>
+            ) : (
+              <>
+                <div className="card card-gold" style={{ marginBottom:"14px" }}>
+                  <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"16px" }}>✦ Análisis corporal</div>
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px", marginBottom:"14px" }}>
+                    {[
+                      { label:"Tipo de cuerpo", value:dna.bodyType },
+                      { label:"Tono de piel", value:dna.skinTone },
+                      { label:"Subtono", value:dna.skinUndertone },
+                      { label:"Forma de rostro", value:dna.faceShape },
+                      { label:"Tipo de cuello", value:dna.neckType },
+                      { label:"Postura", value:dna.posture },
+                    ].map(item => (
+                      <div key={item.label} style={{ background:"var(--bg)", border:"1px solid var(--border)", borderRadius:"2px", padding:"10px" }}>
+                        <div style={{ fontSize:"9px", color:"var(--text3)", letterSpacing:"1px", textTransform:"uppercase", marginBottom:"4px" }}>{item.label}</div>
+                        <div style={{ fontSize:"12px" }}>{item.value || "—"}</div>
+                      </div>
+                    ))}
+                  </div>
+                  {dna.bodyProportions && (
+                    <div style={{ background:"var(--bg)", border:"1px solid var(--border)", borderRadius:"2px", padding:"12px", marginBottom:"14px" }}>
+                      <div style={{ fontSize:"9px", color:"var(--text3)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"10px" }}>Proporciones</div>
+                      {Object.entries(dna.bodyProportions).map(([k, v]) => (
+                        <div key={k} style={{ display:"flex", justifyContent:"space-between", padding:"5px 0", borderBottom:"1px solid var(--border)" }}>
+                          <span style={{ fontSize:"11px", color:"var(--text2)", textTransform:"capitalize" }}>{k}</span>
+                          <span style={{ fontSize:"11px" }}>{String(v)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="card" style={{ marginBottom:"14px" }}>
+                  <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"14px" }}>✦ Colores que te favorecen</div>
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:"6px", marginBottom:"14px" }}>
+                    {dna.idealColors?.map((c: string) => <span key={c} className="dna-tag dna-good">{c}</span>)}
+                  </div>
+                  <div style={{ fontSize:"9px", color:"var(--red)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"8px" }}>Colores a evitar</div>
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
+                    {dna.colorsToAvoid?.map((c: string) => <span key={c} className="dna-tag dna-avoid">{c}</span>)}
+                  </div>
+                </div>
+
+                <div className="card" style={{ marginBottom:"14px" }}>
+                  <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"14px" }}>✦ Prendas recomendadas</div>
+                  {dna.recommendedClothes?.map((r: string, i: number) => (
+                    <div key={i} style={{ display:"flex", gap:"8px", padding:"6px 0", borderBottom:"1px solid var(--border)" }}>
+                      <span style={{ color:"var(--green)" }}>✓</span>
+                      <span style={{ fontSize:"12px", color:"var(--text2)" }}>{r}</span>
+                    </div>
+                  ))}
+                  <div style={{ fontSize:"9px", color:"var(--red)", letterSpacing:"2px", textTransform:"uppercase", margin:"14px 0 10px" }}>Prendas a evitar</div>
+                  {dna.clothesToAvoid?.map((r: string, i: number) => (
+                    <div key={i} style={{ display:"flex", gap:"8px", padding:"6px 0", borderBottom:"1px solid var(--border)" }}>
+                      <span style={{ color:"var(--red)" }}>✗</span>
+                      <span style={{ fontSize:"12px", color:"var(--text2)" }}>{r}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {dna.topTips && (
+                  <div className="card card-gold" style={{ marginBottom:"14px" }}>
+                    <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"14px" }}>✦ Tips personalizados</div>
+                    {dna.topTips.map((tip: string, i: number) => (
+                      <div key={i} style={{ display:"flex", gap:"10px", padding:"8px 0", borderBottom:"1px solid var(--border)" }}>
+                        <span style={{ color:"var(--gold)", flexShrink:0 }}>✦</span>
+                        <span style={{ fontSize:"12px", color:"var(--text2)", lineHeight:1.6 }}>{tip}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <button className="btn-o" onClick={()=>setScreen("onboarding")} style={{ width:"100%" }}>🔄 Actualizar mi Fashion DNA™</button>
+              </>
             )}
           </div>
         )}
@@ -637,7 +984,7 @@ export default function StyleVault() {
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"18px" }}>
               <div>
                 <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>Mi Armario</div>
-                <div style={{ fontSize:"10px", color:"var(--text3)", marginTop:"3px" }}>{clothes.length} prendas</div>
+                <div style={{ fontSize:"10px", color:"var(--text2)", marginTop:"3px" }}>{clothes.length} prendas</div>
               </div>
               <button className="btn-o" onClick={()=>setSF(!showForm)}>+ Agregar</button>
             </div>
@@ -653,12 +1000,7 @@ export default function StyleVault() {
                     </div>
                   )}
                 </div>
-                {analyzing && (
-                  <div style={{ display:"flex", alignItems:"center", gap:"8px", padding:"6px 0", color:"var(--gold)", fontSize:"11px" }}>
-                    <div className="dot"/><div className="dot"/><div className="dot"/>
-                    <span style={{ marginLeft:"6px" }}>Analizando con IA...</span>
-                  </div>
-                )}
+                {analyzing && <div style={{ display:"flex", alignItems:"center", gap:"8px", padding:"6px 0", color:"var(--gold)", fontSize:"11px" }}><div className="dot"/><div className="dot"/><div className="dot"/><span style={{ marginLeft:"6px" }}>Analizando...</span></div>}
                 <div style={{ display:"flex", gap:"7px", marginBottom:"12px" }}>
                   <button className="btn-g" style={{ flex:1, border:"1px solid var(--border)", borderRadius:"1px" }} onClick={()=>fileRef.current?.click()}>📁 Galería</button>
                   <button className="btn-g" style={{ flex:1, border:"1px solid var(--border)", borderRadius:"1px" }} onClick={()=>camRef.current?.click()}>📷 Cámara</button>
@@ -683,46 +1025,32 @@ export default function StyleVault() {
               </div>
             )}
 
-            <div style={{ display:"flex", gap:"7px", overflowX:"auto", paddingBottom:"10px", marginBottom:"14px" }}>
+            <div style={{ display:"flex", gap:"7px", overflowX:"auto", paddingBottom:"10px", marginBottom:"14px", flexWrap:"nowrap" }}>
               {["Todo",...allCategories].map(c => <button key={c} className={`pill ${fc===c?"on":""}`} onClick={()=>setFc(c)}>{c}</button>)}
-              {customCats.map(c => (
-                <button key={c+"_del"} onClick={()=>removeCustomCategory(c)} style={{ padding:"4px 8px", background:"rgba(192,57,43,.08)", border:"1px solid rgba(192,57,43,.2)", borderRadius:"20px", color:"#e74c3c", fontSize:"9px", cursor:"pointer", flexShrink:0 }}>✕</button>
-              ))}
-              <button onClick={()=>setShowAddCat(!showAddCat)} className="pill" style={{ borderStyle:"dashed", color:"var(--gold)", borderColor:"rgba(196,151,63,.3)" }}>+ Nueva</button>
-              {showAddCat && (
-                <div style={{ display:"flex", gap:"6px", alignItems:"center", width:"100%" }}>
-                  <input className="inp" placeholder="Nombre categoría..." value={newCatInput} onChange={e=>setNewCatInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCustomCategory()} style={{ flex:1, padding:"8px 12px", fontSize:"12px" }} />
-                  <button onClick={addCustomCategory} className="btn-o" style={{ padding:"8px 12px", fontSize:"10px", flexShrink:0 }}>Agregar</button>
-                </div>
-              )}
+              {customCats.map(c => <button key={c+"_x"} onClick={()=>removeCustomCategory(c)} style={{ padding:"3px 7px", background:"rgba(231,76,60,.08)", border:"1px solid rgba(231,76,60,.2)", borderRadius:"20px", color:"var(--red)", fontSize:"9px", cursor:"pointer", flexShrink:0 }}>✕</button>)}
+              <button onClick={()=>setShowAddCat(!showAddCat)} className="pill" style={{ borderStyle:"dashed", color:"var(--gold)", borderColor:"rgba(196,151,63,.3)", flexShrink:0 }}>+ Cat</button>
             </div>
-
-            {cloading ? (
-              <div style={{ display:"flex", justifyContent:"center", gap:"6px", padding:"50px" }}><div className="dot"/><div className="dot"/><div className="dot"/></div>
-            ) : filtered.length===0 ? (
-              <div style={{ textAlign:"center", padding:"60px 20px", color:"var(--text3)", fontSize:"12px" }}>
-                {clothes.length===0?"Tu armario está vacío":"No hay prendas en esta categoría"}
+            {showAddCat && (
+              <div style={{ display:"flex", gap:"7px", marginBottom:"12px" }}>
+                <input className="inp" placeholder="Nueva categoría..." value={newCatInput} onChange={e=>setNewCatInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCustomCategory()} style={{ flex:1, padding:"9px 12px", fontSize:"12px" }} />
+                <button onClick={addCustomCategory} className="btn-o" style={{ padding:"9px 14px", fontSize:"10px" }}>+</button>
               </div>
-            ) : (
+            )}
+
+            {cloading ? <div style={{ display:"flex", justifyContent:"center", gap:"6px", padding:"50px" }}><div className="dot"/><div className="dot"/><div className="dot"/></div>
+            : filtered.length===0 ? <div style={{ textAlign:"center", padding:"60px 20px", color:"var(--text3)", fontSize:"12px" }}>{clothes.length===0?"Tu armario está vacío":"Sin prendas en esta categoría"}</div>
+            : (
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"11px" }}>
                 {filtered.map(item => (
                   <div key={item.id} className="card" style={{ padding:0, overflow:"hidden", position:"relative" }}>
                     <div style={{ position:"absolute", top:"7px", right:"7px", zIndex:2, display:"flex", gap:"4px" }}>
-                      <button onClick={()=>toggleFav(item.id)} style={{ background:"rgba(0,0,0,.7)", border:"none", fontSize:"12px", cursor:"pointer", width:"24px", height:"24px", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                        {favorites.includes(item.id)?"❤️":"🤍"}
-                      </button>
-                      <button onClick={()=>removeItem(item.id)} style={{ background:"rgba(0,0,0,.7)", border:"none", color:"#888", cursor:"pointer", fontSize:"10px", width:"24px", height:"24px", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+                      <button onClick={()=>toggleFav(item.id)} style={{ background:"rgba(0,0,0,.7)", border:"none", fontSize:"11px", cursor:"pointer", width:"22px", height:"22px", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center" }}>{favorites.includes(item.id)?"❤️":"🤍"}</button>
+                      <button onClick={()=>removeItem(item.id)} style={{ background:"rgba(0,0,0,.7)", border:"none", color:"var(--text2)", cursor:"pointer", fontSize:"10px", width:"22px", height:"22px", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
                     </div>
-                    {item.photo_url ? (
-                      <img src={item.photo_url} alt={item.name} style={{ width:"100%", aspectRatio:"1", objectFit:"cover" }} />
-                    ) : (
-                      <div style={{ width:"100%", aspectRatio:"1", background:"#0a0a0a", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"36px" }}>
-                        {CAT_ICON[item.category]||"👔"}
-                      </div>
-                    )}
+                    {item.photo_url ? <img src={item.photo_url} alt={item.name} style={{ width:"100%", aspectRatio:"1", objectFit:"cover" }} /> : <div style={{ width:"100%", aspectRatio:"1", background:"var(--bg)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"36px" }}>{CAT_ICON[item.category]||"👔"}</div>}
                     <div style={{ padding:"9px 11px" }}>
                       <div style={{ fontSize:"12px", fontWeight:400, marginBottom:"2px" }}>{item.name}</div>
-                      <div style={{ fontSize:"9px", color:"var(--text3)", letterSpacing:"1.5px", textTransform:"uppercase" }}>{item.category}</div>
+                      <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"1.5px", textTransform:"uppercase" }}>{item.category}</div>
                       {item.occasion && <div style={{ fontSize:"10px", color:"rgba(196,151,63,.5)", marginTop:"2px" }}>{item.occasion}</div>}
                     </div>
                   </div>
@@ -737,18 +1065,14 @@ export default function StyleVault() {
           <div className="fade">
             <div style={{ marginBottom:"20px" }}>
               <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>Outfit IA</div>
-              <div style={{ fontSize:"11px", color:"var(--text3)", marginTop:"3px" }}>La IA selecciona y califica tu look ideal</div>
+              <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>{dna?.bodyType ? `Personalizado para tu tipo ${dna.bodyType}` : "La IA selecciona el look ideal"}</div>
             </div>
-            {clothes.length===0 ? (
-              <div style={{ textAlign:"center", padding:"60px", color:"var(--text3)", fontSize:"13px" }}>Agrega prendas a tu armario primero</div>
-            ) : (
+            {clothes.length===0 ? <div style={{ textAlign:"center", padding:"60px", color:"var(--text3)", fontSize:"13px" }}>Agrega prendas a tu armario primero</div> : (
               <>
                 <div className="card" style={{ marginBottom:"12px" }}>
                   <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2.5px", textTransform:"uppercase", marginBottom:"12px" }}>¿Para qué evento?</div>
                   <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"7px" }}>
-                    {EVENTS.map(ev => (
-                      <button key={ev} onClick={()=>setSelEv(ev)} style={{ padding:"9px 7px", background:selEv===ev?"rgba(196,151,63,.1)":"#0e0e0e", color:selEv===ev?"var(--gold)":"var(--text3)", border:`1px solid ${selEv===ev?"rgba(196,151,63,.3)":"var(--border)"}`, borderRadius:"1px", cursor:"pointer", fontFamily:"'Jost',sans-serif", fontSize:"11px", textAlign:"left", transition:"all .2s" }}>{ev}</button>
-                    ))}
+                    {EVENTS.map(ev => <button key={ev} onClick={()=>setSelEv(ev)} style={{ padding:"9px 7px", background:selEv===ev?"rgba(196,151,63,.1)":"var(--bg)", color:selEv===ev?"var(--gold)":"var(--text2)", border:`1px solid ${selEv===ev?"rgba(196,151,63,.3)":"var(--border)"}`, borderRadius:"1px", cursor:"pointer", fontFamily:"'Jost',sans-serif", fontSize:"11px", textAlign:"left", transition:"all .2s" }}>{ev}</button>)}
                   </div>
                 </div>
                 <div className="card" style={{ marginBottom:"16px" }}>
@@ -765,7 +1089,7 @@ export default function StyleVault() {
                   <div className="fade">
                     <div className="divider"/>
                     {outfitR.rating > 0 && (
-                      <div style={{ background:"#0a0a0a", border:"1px solid rgba(196,151,63,.15)", borderRadius:"2px", padding:"14px", marginBottom:"14px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                      <div style={{ background:"var(--bg)", border:"1px solid rgba(196,151,63,.15)", borderRadius:"2px", padding:"14px", marginBottom:"14px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                         <div style={{ fontSize:"12px", color:"var(--text2)", flex:1 }}>{outfitR.ratingExplanation}</div>
                         <div style={{ textAlign:"right", marginLeft:"12px" }}>
                           <div className="stars">{renderStars(outfitR.rating)}</div>
@@ -773,26 +1097,16 @@ export default function StyleVault() {
                         </div>
                       </div>
                     )}
-                    {outfitR.colorPalette && (
-                      <div style={{ padding:"10px 14px", background:"#0a0a0a", border:"1px solid rgba(196,151,63,.08)", borderRadius:"2px", marginBottom:"14px" }}>
-                        <div style={{ fontSize:"9px", color:"var(--text3)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"4px" }}>Paleta</div>
-                        <div style={{ fontSize:"12px", color:"rgba(196,151,63,.7)", fontStyle:"italic" }}>{outfitR.colorPalette}</div>
-                      </div>
-                    )}
+                    {outfitR.colorPalette && <div style={{ padding:"10px 14px", background:"var(--bg)", border:"1px solid rgba(196,151,63,.08)", borderRadius:"2px", marginBottom:"14px" }}><div style={{ fontSize:"9px", color:"var(--text3)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"4px" }}>Paleta</div><div style={{ fontSize:"12px", color:"rgba(196,151,63,.7)", fontStyle:"italic" }}>{outfitR.colorPalette}</div></div>}
                     <div style={{ display:"flex", flexDirection:"column", gap:"9px", marginBottom:"16px" }}>
                       {outfitR.outfit?.map((item: any, i: number) => (
-                        <div key={i} style={{ display:"flex", gap:"12px", padding:"13px", background:"#0d0d0d", border:"1px solid var(--border)", borderRadius:"2px" }}>
+                        <div key={i} style={{ display:"flex", gap:"12px", padding:"13px", background:"var(--bg)", border:"1px solid var(--border)", borderRadius:"2px" }}>
                           <div style={{ fontSize:"26px", minWidth:"34px", textAlign:"center" }}>{item.emoji}</div>
                           <div><div style={{ fontSize:"13px", fontWeight:400, marginBottom:"4px" }}>{item.name}</div><div style={{ fontSize:"11px", color:"var(--text2)", lineHeight:1.6 }}>{item.why}</div></div>
                         </div>
                       ))}
                     </div>
-                    {outfitR.explanation && (
-                      <div style={{ background:"#0a0a0a", borderLeft:"2px solid rgba(196,151,63,.3)", padding:"14px" }}>
-                        <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"8px" }}>✦ Por qué funciona</div>
-                        <div style={{ fontSize:"12px", color:"var(--text2)", lineHeight:1.8 }}>{outfitR.explanation}</div>
-                      </div>
-                    )}
+                    {outfitR.explanation && <div style={{ background:"var(--bg)", borderLeft:"2px solid rgba(196,151,63,.3)", padding:"14px" }}><div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"2.5px", textTransform:"uppercase", marginBottom:"8px" }}>✦ Por qué funciona</div><div style={{ fontSize:"12px", color:"var(--text2)", lineHeight:1.8 }}>{outfitR.explanation}</div></div>}
                   </div>
                 )}
               </>
@@ -805,109 +1119,52 @@ export default function StyleVault() {
           <div className="fade">
             <div style={{ marginBottom:"20px" }}>
               <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>Prueba Virtual</div>
-              <div style={{ fontSize:"11px", color:"var(--text3)", marginTop:"3px" }}>
-                {isPremium ? "Crea tu avatar y prueba outfits virtualmente" : "Función exclusiva Premium"}
-              </div>
+              <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>{isPremium ? "Basada en tu Fashion DNA™" : "Función exclusiva Premium"}</div>
             </div>
-
             {!isPremium ? (
               <div className="card card-gold" style={{ textAlign:"center", padding:"32px 20px" }}>
                 <div style={{ fontSize:"48px", marginBottom:"16px" }}>👑</div>
                 <div className="serif" style={{ fontSize:"22px", fontWeight:300, marginBottom:"10px" }}>Función Premium</div>
-                <div style={{ fontSize:"13px", color:"var(--text2)", lineHeight:1.6, marginBottom:"20px" }}>
-                  Sube una foto de cuerpo completo para crear tu avatar IA personal y prueba virtualmente cualquier outfit de tu armario.
-                </div>
-                <div style={{ display:"flex", flexDirection:"column", gap:"8px", marginBottom:"20px", textAlign:"left" }}>
-                  {["✦ Avatar IA personalizado con tu cuerpo real", "✦ Prueba virtual de cualquier outfit", "✦ Análisis de tipo de cuerpo", "✦ Recomendaciones personalizadas"].map(f => (
-                    <div key={f} style={{ fontSize:"12px", color:"var(--text2)" }}>{f}</div>
-                  ))}
-                </div>
+                <div style={{ fontSize:"13px", color:"var(--text2)", lineHeight:1.6, marginBottom:"20px" }}>Prueba virtualmente cualquier outfit de tu armario basado en tu Fashion DNA™ personal.</div>
                 <button className="btn-p">✦  Mejorar a Premium — $299 MXN/mes</button>
+              </div>
+            ) : !dna?.bodyType ? (
+              <div style={{ textAlign:"center", padding:"60px 20px" }}>
+                <div style={{ fontSize:"40px", marginBottom:"16px", opacity:.3 }}>🧬</div>
+                <div style={{ fontSize:"13px", color:"var(--text2)", marginBottom:"20px" }}>Primero crea tu Fashion DNA™</div>
+                <button className="btn-p" onClick={()=>setScreen("onboarding")}>Crear mi Fashion DNA™</button>
               </div>
             ) : (
               <>
-                {/* Step 1: Upload photo */}
-                <div className="card" style={{ marginBottom:"14px" }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"12px" }}><div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase" }}>Paso 1 · Tu avatar personal</div>{avatarData && <span style={{ fontSize:"9px", color:"#2ecc71", border:"1px solid rgba(39,174,96,.3)", padding:"3px 8px", borderRadius:"20px" }}>✓ Configurado</span>}</div>
-                  <div className="pbox" style={{ height:"280px", marginBottom:"10px" }} onClick={()=>avatarRef.current?.click()}>
-                    {avatarPhoto ? (
-                      <img src={avatarPhoto} alt="avatar" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                    ) : (
-                      <div style={{ textAlign:"center", color:"var(--text3)" }}>
-                        <div style={{ fontSize:"40px", marginBottom:"8px" }}>🧍</div>
-                        <div style={{ fontSize:"11px", letterSpacing:"1px", marginBottom:"4px" }}>Sube foto de cuerpo completo</div>
-                        <div style={{ fontSize:"10px", color:"var(--text2)" }}>Se guarda automáticamente</div>
-                      </div>
-                    )}
+                <div className="card card-gold" style={{ marginBottom:"14px" }}>
+                  <div style={{ fontSize:"9px", color:"var(--green)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"10px" }}>✓ Fashion DNA™ detectado</div>
+                  <div style={{ display:"flex", gap:"8px", flexWrap:"wrap" }}>
+                    <span className="dna-tag dna-style">{dna.bodyType}</span>
+                    <span className="dna-tag dna-good">{dna.skinTone}</span>
+                    {dna.idealColors?.slice(0,2).map((c: string) => <span key={c} className="dna-tag dna-good">{c}</span>)}
                   </div>
-                  {avatarL && (
-                    <div style={{ display:"flex", alignItems:"center", gap:"8px", color:"var(--gold)", fontSize:"11px", padding:"6px 0" }}>
-                      <div className="dot"/><div className="dot"/><div className="dot"/>
-                      <span style={{ marginLeft:"6px" }}>Analizando tu perfil corporal...</span>
-                    </div>
-                  )}
-                  {avatarData && !avatarL && (
-                    <button onClick={()=>avatarRef.current?.click()} className="btn-g" style={{ fontSize:"10px", marginTop:"6px", letterSpacing:"1px" }}>🔄 Actualizar foto del avatar</button>
-                  )}
-                  {avatarData && !avatarL && (
-                    <div className="fade" style={{ marginTop:"12px" }}>
-                      <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"10px" }}>✦ Tu perfil corporal</div>
-                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px", marginBottom:"10px" }}>
-                        {[
-                          { label:"Tipo de cuerpo", value:avatarData.bodyType },
-                          { label:"Complexión", value:avatarData.build },
-                          { label:"Tono de piel", value:avatarData.skinTone },
-                        ].map(item => (
-                          <div key={item.label} style={{ background:"#0a0a0a", border:"1px solid var(--border)", borderRadius:"2px", padding:"10px" }}>
-                            <div style={{ fontSize:"9px", color:"var(--text3)", letterSpacing:"1px", textTransform:"uppercase", marginBottom:"4px" }}>{item.label}</div>
-                            <div style={{ fontSize:"12px" }}>{item.value}</div>
-                          </div>
-                        ))}
-                      </div>
-                      {avatarData.styleAdvice && (
-                        <div style={{ background:"#0a0a0a", borderLeft:"2px solid rgba(196,151,63,.3)", padding:"12px", marginBottom:"8px" }}>
-                          <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"6px" }}>✦ Consejo de estilo</div>
-                          <div style={{ fontSize:"12px", color:"var(--text2)", lineHeight:1.7 }}>{avatarData.styleAdvice}</div>
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </div>
 
-                {/* Step 2: Select clothes */}
-                {avatarData && (
-                  <div className="card" style={{ marginBottom:"14px" }}>
-                    <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"12px" }}>Paso 2 · Selecciona prendas para probar</div>
-                    {clothes.length === 0 ? (
-                      <div style={{ textAlign:"center", padding:"20px", color:"var(--text3)", fontSize:"12px" }}>Agrega prendas a tu armario primero</div>
-                    ) : (
-                      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"8px", maxHeight:"300px", overflowY:"auto" }}>
-                        {clothes.map(item => (
-                          <div key={item.id} onClick={()=>setSelectedForTry(prev=>prev.includes(item.id)?prev.filter(i=>i!==item.id):[...prev,item.id])}
-                            style={{ background:selectedForTry.includes(item.id)?"rgba(196,151,63,.1)":"#0a0a0a", border:`1px solid ${selectedForTry.includes(item.id)?"rgba(196,151,63,.4)":"var(--border)"}`, borderRadius:"2px", overflow:"hidden", cursor:"pointer", transition:"all .2s", position:"relative" }}>
-                            {selectedForTry.includes(item.id) && (
-                              <div style={{ position:"absolute", top:"4px", right:"4px", background:"var(--gold)", borderRadius:"50%", width:"16px", height:"16px", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"9px", color:"#080808", fontWeight:600, zIndex:1 }}>✓</div>
-                            )}
-                            {item.photo_url ? (
-                              <img src={item.photo_url} alt={item.name} style={{ width:"100%", aspectRatio:"1", objectFit:"cover" }} />
-                            ) : (
-                              <div style={{ width:"100%", aspectRatio:"1", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"24px" }}>{CAT_ICON[item.category]||"👔"}</div>
-                            )}
-                            <div style={{ padding:"5px 7px" }}>
-                              <div style={{ fontSize:"9px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{item.name}</div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    {selectedForTry.length > 0 && (
-                      <div style={{ marginTop:"12px", fontSize:"11px", color:"var(--gold)" }}>{selectedForTry.length} prenda{selectedForTry.length>1?"s":""} seleccionada{selectedForTry.length>1?"s":""}</div>
-                    )}
-                  </div>
-                )}
+                <div className="card" style={{ marginBottom:"14px" }}>
+                  <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"12px" }}>Selecciona prendas para probar</div>
+                  {clothes.length === 0 ? (
+                    <div style={{ textAlign:"center", padding:"20px", color:"var(--text3)", fontSize:"12px" }}>Agrega prendas a tu armario primero</div>
+                  ) : (
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"8px", maxHeight:"280px", overflowY:"auto" }}>
+                      {clothes.map(item => (
+                        <div key={item.id} onClick={()=>setSelectedForTry(prev=>prev.includes(item.id)?prev.filter(i=>i!==item.id):[...prev,item.id])}
+                          style={{ background:selectedForTry.includes(item.id)?"rgba(196,151,63,.1)":"var(--bg)", border:`1px solid ${selectedForTry.includes(item.id)?"rgba(196,151,63,.4)":"var(--border)"}`, borderRadius:"2px", overflow:"hidden", cursor:"pointer", transition:"all .2s", position:"relative" }}>
+                          {selectedForTry.includes(item.id) && <div style={{ position:"absolute", top:"3px", right:"3px", background:"var(--gold)", borderRadius:"50%", width:"14px", height:"14px", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"8px", color:"#080808", fontWeight:600, zIndex:1 }}>✓</div>}
+                          {item.photo_url ? <img src={item.photo_url} alt={item.name} style={{ width:"100%", aspectRatio:"1", objectFit:"cover" }} /> : <div style={{ width:"100%", aspectRatio:"1", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"22px" }}>{CAT_ICON[item.category]||"👔"}</div>}
+                          <div style={{ padding:"5px 7px" }}><div style={{ fontSize:"9px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{item.name}</div></div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {selectedForTry.length > 0 && <div style={{ marginTop:"10px", fontSize:"11px", color:"var(--gold)" }}>{selectedForTry.length} prenda{selectedForTry.length>1?"s":""} seleccionada{selectedForTry.length>1?"s":""}</div>}
+                </div>
 
-                {/* Step 3: Virtual try result */}
-                {avatarData && selectedForTry.length > 0 && (
+                {selectedForTry.length > 0 && (
                   <div>
                     <button className="btn-p" onClick={virtualTryOn} disabled={tryL} style={{ marginBottom:"16px" }}>
                       {tryL?"Generando prueba virtual...":"🧍 Probar outfit virtualmente"}
@@ -915,19 +1172,8 @@ export default function StyleVault() {
                     {tryL && <div style={{ display:"flex", justifyContent:"center", gap:"6px", padding:"24px" }}><div className="dot"/><div className="dot"/><div className="dot"/></div>}
                     {tryResult && !tryL && (
                       <div className="card card-gold fade">
-                        <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"12px" }}>✦ Cómo lucirías</div>
+                        <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"12px" }}>✦ Cómo luciría en ti</div>
                         <div style={{ fontSize:"13px", color:"var(--text2)", lineHeight:1.8 }}>{tryResult}</div>
-                        {avatarData.recommendations && (
-                          <div style={{ marginTop:"14px" }}>
-                            <div style={{ fontSize:"9px", color:"var(--text3)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"8px" }}>Recomendaciones adicionales</div>
-                            {avatarData.recommendations.slice(0,3).map((r: string, i: number) => (
-                              <div key={i} style={{ display:"flex", gap:"8px", padding:"5px 0", borderTop:"1px solid var(--border)" }}>
-                                <span style={{ color:"var(--gold)" }}>✦</span>
-                                <span style={{ fontSize:"12px", color:"var(--text2)" }}>{r}</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
                       </div>
                     )}
                   </div>
@@ -942,26 +1188,22 @@ export default function StyleVault() {
           <div className="fade">
             <div style={{ marginBottom:"18px" }}>
               <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>Favoritas</div>
-              <div style={{ fontSize:"10px", color:"var(--text3)", marginTop:"3px" }}>{favClothes.length} prendas guardadas</div>
+              <div style={{ fontSize:"10px", color:"var(--text2)", marginTop:"3px" }}>{favClothes.length} prendas guardadas</div>
             </div>
             {favClothes.length===0 ? (
               <div style={{ textAlign:"center", padding:"60px 20px" }}>
                 <div style={{ fontSize:"40px", marginBottom:"14px", opacity:.3 }}>❤️</div>
-                <div style={{ fontSize:"12px", color:"var(--text3)" }}>Aún no tienes favoritas. Toca ❤️ en cualquier prenda.</div>
+                <div style={{ fontSize:"12px", color:"var(--text3)" }}>Toca ❤️ en cualquier prenda para guardarla</div>
               </div>
             ) : (
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"11px" }}>
                 {favClothes.map(item => (
                   <div key={item.id} className="card" style={{ padding:0, overflow:"hidden", position:"relative" }}>
-                    <button onClick={()=>toggleFav(item.id)} style={{ position:"absolute", top:"7px", right:"7px", zIndex:2, background:"rgba(0,0,0,.7)", border:"none", fontSize:"12px", cursor:"pointer", width:"24px", height:"24px", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center" }}>❤️</button>
-                    {item.photo_url ? (
-                      <img src={item.photo_url} alt={item.name} style={{ width:"100%", aspectRatio:"1", objectFit:"cover" }} />
-                    ) : (
-                      <div style={{ width:"100%", aspectRatio:"1", background:"#0a0a0a", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"36px" }}>{CAT_ICON[item.category]||"👔"}</div>
-                    )}
+                    <button onClick={()=>toggleFav(item.id)} style={{ position:"absolute", top:"7px", right:"7px", zIndex:2, background:"rgba(0,0,0,.7)", border:"none", fontSize:"11px", cursor:"pointer", width:"22px", height:"22px", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center" }}>❤️</button>
+                    {item.photo_url ? <img src={item.photo_url} alt={item.name} style={{ width:"100%", aspectRatio:"1", objectFit:"cover" }} /> : <div style={{ width:"100%", aspectRatio:"1", background:"var(--bg)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"36px" }}>{CAT_ICON[item.category]||"👔"}</div>}
                     <div style={{ padding:"9px 11px" }}>
                       <div style={{ fontSize:"12px", fontWeight:400, marginBottom:"2px" }}>{item.name}</div>
-                      <div style={{ fontSize:"9px", color:"var(--text3)", letterSpacing:"1.5px", textTransform:"uppercase" }}>{item.category}</div>
+                      <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"1.5px", textTransform:"uppercase" }}>{item.category}</div>
                     </div>
                   </div>
                 ))}
@@ -975,7 +1217,7 @@ export default function StyleVault() {
           <div className="fade" style={{ display:"flex", flexDirection:"column", height:"calc(100vh - 180px)" }}>
             <div style={{ marginBottom:"14px" }}>
               <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>Asesor IA</div>
-              <div style={{ fontSize:"10px", color:"var(--text3)", marginTop:"3px" }}>Powered by Claude AI</div>
+              <div style={{ fontSize:"10px", color:"var(--text2)", marginTop:"3px" }}>Powered by Claude AI · Personalizado con tu DNA</div>
             </div>
             <div style={{ display:"flex", gap:"7px", overflowX:"auto", paddingBottom:"10px", marginBottom:"12px" }}>
               {suggestions.map(s => <button key={s} className="chip" onClick={()=>sendChat(s)}>{s}</button>)}
@@ -989,12 +1231,7 @@ export default function StyleVault() {
                   </div>
                 </div>
               ))}
-              {cload && (
-                <div style={{ display:"flex", gap:"7px", alignItems:"center" }}>
-                  <div style={{ color:"var(--gold)", fontSize:"12px", fontFamily:"'Cormorant Garamond',serif" }}>✦</div>
-                  <div className="bubble-a"><div style={{ display:"flex", gap:"4px", padding:"2px 0" }}><div className="dot"/><div className="dot"/><div className="dot"/></div></div>
-                </div>
-              )}
+              {cload && <div style={{ display:"flex", gap:"7px", alignItems:"center" }}><div style={{ color:"var(--gold)", fontSize:"12px", fontFamily:"'Cormorant Garamond',serif" }}>✦</div><div className="bubble-a"><div style={{ display:"flex", gap:"4px", padding:"2px 0" }}><div className="dot"/><div className="dot"/><div className="dot"/></div></div></div>}
               <div ref={chatEnd}/>
             </div>
             <div style={{ display:"flex", gap:"8px", paddingTop:"12px", borderTop:"1px solid var(--border)" }}>
@@ -1009,7 +1246,7 @@ export default function StyleVault() {
           <div className="fade">
             <div style={{ marginBottom:"20px" }}>
               <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>Planificador de Viaje</div>
-              <div style={{ fontSize:"11px", color:"var(--text3)", marginTop:"3px" }}>La IA organiza tu maleta con tu armario</div>
+              <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>La IA organiza tu maleta con tu armario</div>
             </div>
             <div className="card" style={{ marginBottom:"14px" }}>
               <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
@@ -1039,50 +1276,36 @@ export default function StyleVault() {
                 {tripR.llevar?.map((g: any, i: number) => (
                   <div key={i} className="card" style={{ marginBottom:"10px" }}>
                     <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"10px" }}>✦ {g.categoria}</div>
-                    {g.items?.map((item: string, j: number) => (
-                      <div key={j} style={{ display:"flex", alignItems:"center", gap:"9px", padding:"6px 0", borderBottom:"1px solid #141414" }}>
-                        <div style={{ width:"5px", height:"5px", borderRadius:"50%", background:"var(--gold)", flexShrink:0 }}/>
-                        <div style={{ fontSize:"13px" }}>{item}</div>
-                      </div>
-                    ))}
+                    {g.items?.map((item: string, j: number) => <div key={j} style={{ display:"flex", alignItems:"center", gap:"9px", padding:"6px 0", borderBottom:"1px solid var(--border)" }}><div style={{ width:"5px", height:"5px", borderRadius:"50%", background:"var(--gold)", flexShrink:0 }}/><div style={{ fontSize:"13px" }}>{item}</div></div>)}
                     {g.tip && <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"8px", fontStyle:"italic" }}>💡 {g.tip}</div>}
                   </div>
                 ))}
                 {tripR.faltan?.length > 0 && (
-                  <div className="card" style={{ marginBottom:"10px", borderColor:"rgba(192,57,43,.2)" }}>
+                  <div className="card" style={{ marginBottom:"10px", borderColor:"rgba(231,76,60,.2)" }}>
                     <div style={{ fontSize:"9px", color:"var(--red)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"10px" }}>⚠ Te falta comprar</div>
                     {tripR.faltan?.map((item: any, i: number) => (
-                      <div key={i} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 0", borderBottom:"1px solid #141414" }}>
-                        <div>
-                          <div style={{ fontSize:"13px" }}>{item.name}</div>
-                          <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"2px" }}>{item.why}</div>
-                        </div>
-                        {item.urgente && <span style={{ fontSize:"9px", color:"var(--red)", border:"1px solid rgba(192,57,43,.3)", padding:"3px 8px", borderRadius:"20px" }}>Urgente</span>}
+                      <div key={i} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 0", borderBottom:"1px solid var(--border)" }}>
+                        <div><div style={{ fontSize:"13px" }}>{item.name}</div><div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"2px" }}>{item.why}</div></div>
+                        {item.urgente && <span style={{ fontSize:"9px", color:"var(--red)", border:"1px solid rgba(231,76,60,.3)", padding:"3px 8px", borderRadius:"20px" }}>Urgente</span>}
                       </div>
                     ))}
                   </div>
                 )}
-                {tripR.consejo && (
-                  <div style={{ background:"#0a0a0a", borderLeft:"2px solid rgba(196,151,63,.3)", padding:"14px", borderRadius:"0 2px 2px 0" }}>
-                    <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"8px" }}>✦ Consejo del estilista</div>
-                    <div style={{ fontSize:"12px", color:"var(--text2)", lineHeight:1.8 }}>{tripR.consejo}</div>
-                  </div>
-                )}
+                {tripR.consejo && <div style={{ background:"var(--bg)", borderLeft:"2px solid rgba(196,151,63,.3)", padding:"14px" }}><div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"8px" }}>✦ Consejo del estilista</div><div style={{ fontSize:"12px", color:"var(--text2)", lineHeight:1.8 }}>{tripR.consejo}</div></div>}
               </div>
             )}
           </div>
         )}
-
       </main>
 
-      {/* ── Bottom Navigation ── */}
+      {/* Bottom Nav */}
       <nav className="bnav">
         {[
           { key:"home", icon:"🏠", label:"Inicio" },
+          { key:"dna", icon:"🧬", label:"DNA" },
           { key:"wardrobe", icon:"👗", label:"Armario" },
-          { key:"outfit", icon:"✦", label:"Outfit IA" },
+          { key:"outfit", icon:"✦", label:"Outfit" },
           { key:"avatar", icon:"🧍", label:"Virtual" },
-          { key:"favorites", icon:"❤️", label:"Favoritos" },
           { key:"advisor", icon:"💬", label:"Asesor" },
           { key:"trip", icon:"✈️", label:"Viajes" },
         ].map(item => (
