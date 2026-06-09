@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 
 // ─── CLAUDE AI HELPER ─────────────────────────────────────────────────────────
 const callClaude = async (systemPrompt: string, messages: {role: string, content: string}[]) => {
-  const res = await fetch("/api/claude", {
+  const res = await fetch("https://stylevault-api.121lunaoscar.workers.dev", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
