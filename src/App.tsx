@@ -383,9 +383,9 @@ export default function StyleVault() {
         const text = await callClaudeWithImage(AVATAR_SYSTEM, base64, f.type, "Analiza el cuerpo completo de esta persona para crear su perfil de moda.");
         const parsed = JSON.parse(text.replace(/```json|```/g,"").trim());
         setAvatarData(parsed);
-        setAvatarData(parsed);
         localStorage.setItem("sv_avatar_data", JSON.stringify(parsed));
         showToast("✦ Avatar guardado permanentemente");
+      } catch { showToast("Error al analizar. Intenta de nuevo."); }
       setAvatarL(false);
     };
     r.readAsDataURL(f);
