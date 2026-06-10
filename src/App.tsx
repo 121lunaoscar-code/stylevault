@@ -148,21 +148,21 @@ const CSS = `
   --header-bg:#1A2B1E;
 }
 
-/* ── DEFAULT (sin género) ── */
+/* ── DEFAULT NEUTRO (login/registro) ── */
 :root {
-  --accent:#8B3A52;
-  --accent2:#C4748A;
-  --accent-light:rgba(139,58,82,.1);
-  --accent-glow:rgba(139,58,82,.2);
-  --bg:#FBF7F4;
+  --accent:#2C2C2C;
+  --accent2:#555555;
+  --accent-light:rgba(44,44,44,.08);
+  --accent-glow:rgba(44,44,44,.15);
+  --bg:#F8F8F6;
   --bg2:#FFFFFF;
-  --bg3:#F5EEE9;
-  --border:#E8DDD6;
-  --border2:#D4C4BA;
-  --text:#2D1B1E;
-  --text2:#7A5C64;
-  --text3:#B09AA0;
-  --card-shadow:0 2px 16px rgba(139,58,82,.08);
+  --bg3:#F0F0EE;
+  --border:#E0E0DC;
+  --border2:#CACAC6;
+  --text:#1A1A1A;
+  --text2:#6B6B6B;
+  --text3:#ABABAB;
+  --card-shadow:0 2px 16px rgba(0,0,0,.06);
   --green:#2E7D52;
   --red:#C0392B;
   --font:'Poppins',sans-serif;
@@ -170,7 +170,7 @@ const CSS = `
   --radius:16px;
   --radius-sm:10px;
   --nav-bg:#FFFFFF;
-  --header-bg:#FBF7F4;
+  --header-bg:#F8F8F6;
 }
 
 ::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:var(--accent2);border-radius:1px}
@@ -278,7 +278,7 @@ export default function StyleVault() {
   const [resetMsg, setResetMsg] = useState("");
   const [resetL, setResetL] = useState(false);
   const [profile, setProfile] = useState<any>(null);
-  const [lf, setLf] = useState({ name:"", email:"", password:"" });
+  const [lf, setLf] = useState({ name:"", email:"", password:"", genero:"" });
   const [lmode, setLmode] = useState("login");
   const [lerr, setLerr] = useState("");
   const [aloading, setAL] = useState(false);
@@ -378,6 +378,9 @@ export default function StyleVault() {
     if (saved) {
       const p = JSON.parse(saved);
       setProfile(p);
+      const savedDna = localStorage.getItem("sv_dna");
+      const savedGenero = localStorage.getItem("sv_genero") || p.genero || "";
+      applyTheme(savedDna ? (JSON.parse(savedDna).genero || savedGenero) : savedGenero);
       setScreen("app");
     }
   }, []);
@@ -410,10 +413,12 @@ export default function StyleVault() {
       const auth = await sbSignUp(lf.email, lf.password);
       if (auth.error) { setLerr(auth.error.message || "Error al registrar."); setAL(false); return; }
       localStorage.setItem("sb_token", auth.access_token || SB_KEY);
-      const newProfile = { id: auth.user?.id, name: lf.name, email: lf.email, plan: "Basic", status: "active", created_at: new Date().toISOString() };
+      const newProfile = { id: auth.user?.id, name: lf.name, email: lf.email, plan: "Basic", status: "active", created_at: new Date().toISOString(), genero: lf.genero };
       await dbInsert("users", newProfile);
       localStorage.setItem("sb_profile", JSON.stringify(newProfile));
+      localStorage.setItem("sv_genero", lf.genero);
       setProfile(newProfile);
+      applyTheme(lf.genero);
       setScreen("app");
     } catch { setLerr("Error al crear cuenta."); }
     setAL(false);
@@ -616,6 +621,11 @@ export default function StyleVault() {
   const renderStars = (n: number) => "★".repeat(Math.min(5,Math.max(0,Math.round(n)))) + "☆".repeat(5-Math.min(5,Math.max(0,Math.round(n))));
   const suggestions = ["¿Qué colores van con mi tono de piel?","Armario cápsula para mi tipo de cuerpo","¿Cómo vestir para entrevista?","Prendas que me favorecen más"];
 
+  // Reset to neutral theme on login/reset screens
+  if (screen === "login" || screen === "reset") {
+    document.documentElement.className = "";
+  }
+
   // ── RESET PASSWORD ────────────────────────────────────────────────────────
   if (screen === "reset") return (
     <div style={{ fontFamily:"'Jost',sans-serif", background:"#080808", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"24px" }}>
@@ -657,7 +667,23 @@ export default function StyleVault() {
             ))}
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:"11px" }}>
-            {lmode==="register" && <input className="inp" placeholder="Tu nombre completo" value={lf.name} onChange={e=>setLf(p=>({...p,name:e.target.value}))} />}
+            {lmode==="register" && (
+              <>
+                <input className="inp" placeholder="Tu nombre completo" value={lf.name} onChange={e=>setLf(p=>({...p,name:e.target.value}))} />
+                <div>
+                  <div style={{ fontSize:"11px", color:"var(--text2)", fontWeight:600, marginBottom:"8px" }}>¿Cómo te identificas?</div>
+                  <div style={{ display:"flex", gap:"8px" }}>
+                    {[{id:"Mujer",icon:"👩",label:"Mujer"},{id:"Hombre",icon:"👨",label:"Hombre"},{id:"Otro",icon:"⭐",label:"Otro"}].map(g => (
+                      <button key={g.id} type="button" onClick={()=>setLf(p=>({...p,genero:g.id}))}
+                        style={{ flex:1, padding:"12px 6px", background:lf.genero===g.id?"var(--accent)":"var(--bg3)", color:lf.genero===g.id?"#fff":"var(--text2)", border:`2px solid ${lf.genero===g.id?"var(--accent)":"var(--border)"}`, borderRadius:"var(--radius-sm)", cursor:"pointer", fontFamily:"var(--font)", fontSize:"12px", fontWeight:600, transition:"all .2s" }}>
+                        <div style={{ fontSize:"18px", marginBottom:"2px" }}>{g.icon}</div>
+                        {g.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
             <input className="inp" placeholder="Correo electrónico" type="email" value={lf.email} onChange={e=>setLf(p=>({...p,email:e.target.value}))} />
             <input className="inp" placeholder="Contraseña" type="password" value={lf.password} onChange={e=>setLf(p=>({...p,password:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&(lmode==="login"?handleLogin():handleRegister())} />
             {lerr && <div style={{ color:"var(--red)", fontSize:"12px", textAlign:"center" }}>{lerr}</div>}
