@@ -95,74 +95,179 @@ function renderMd(text: string) {
 }
 
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&family=Poppins:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--gold:#C4973F;--bg:#080808;--bg2:#0e0e0e;--bg3:#141414;--border:#1c1c1c;--border2:#282828;--text:#ede8e0;--text2:#9a9088;--text3:#6a6258;--red:#e74c3c;--green:#2ecc71}
-::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:#8a6b2a;border-radius:1px}
-body{background:var(--bg);font-family:'Jost',sans-serif}
-.sv{background:var(--bg);min-height:100vh;color:var(--text);font-weight:300;max-width:430px;margin:0 auto;position:relative}
-.serif{font-family:'Cormorant Garamond',serif}
 
-.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#0a0a0a;border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
-.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;cursor:pointer;gap:3px;border:none;background:none;transition:all .2s}
-.bnav-icon{font-size:18px;transition:transform .2s}
-.bnav-label{font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);font-family:'Jost',sans-serif;transition:color .2s}
-.bnav-item.on .bnav-label{color:var(--gold)}
-.bnav-item.on .bnav-icon{transform:scale(1.15)}
+/* ── TEMA MUJER (rosa/crema) ── */
+:root.mujer {
+  --accent:#8B3A52;
+  --accent2:#C4748A;
+  --accent-light:rgba(139,58,82,.1);
+  --accent-glow:rgba(139,58,82,.2);
+  --bg:#FBF7F4;
+  --bg2:#FFFFFF;
+  --bg3:#F5EEE9;
+  --border:#E8DDD6;
+  --border2:#D4C4BA;
+  --text:#2D1B1E;
+  --text2:#7A5C64;
+  --text3:#B09AA0;
+  --card-shadow:0 2px 16px rgba(139,58,82,.08);
+  --green:#2E7D52;
+  --red:#C0392B;
+  --font:'Poppins',sans-serif;
+  --font-serif:'Cormorant Garamond',serif;
+  --radius:16px;
+  --radius-sm:10px;
+  --nav-bg:#FFFFFF;
+  --header-bg:#FBF7F4;
+}
 
-.btn-p{background:var(--gold);color:#080808;border:none;padding:14px 24px;border-radius:1px;cursor:pointer;font-family:'Jost',sans-serif;font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;width:100%;transition:filter .2s}
-.btn-p:hover{filter:brightness(1.1)}
-.btn-p:disabled{opacity:.3;cursor:not-allowed}
-.btn-o{background:transparent;color:var(--gold);border:1px solid rgba(196,151,63,.3);padding:10px 18px;border-radius:1px;cursor:pointer;font-family:'Jost',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;transition:all .2s}
-.btn-o:hover{background:rgba(196,151,63,.08)}
+/* ── TEMA HOMBRE (verde oscuro) ── */
+:root.hombre {
+  --accent:#2D5A3D;
+  --accent2:#4A8C5C;
+  --accent-light:rgba(45,90,61,.15);
+  --accent-glow:rgba(45,90,61,.25);
+  --bg:#1A2B1E;
+  --bg2:#243328;
+  --bg3:#1F2E23;
+  --border:#2E4035;
+  --border2:#3A5244;
+  --text:#F0EDE6;
+  --text2:#9DB89F;
+  --text3:#5A7A60;
+  --card-shadow:0 2px 16px rgba(0,0,0,.3);
+  --green:#4CAF70;
+  --red:#E74C3C;
+  --font:'Jost',sans-serif;
+  --font-serif:'Cormorant Garamond',serif;
+  --radius:12px;
+  --radius-sm:8px;
+  --nav-bg:#1A2B1E;
+  --header-bg:#1A2B1E;
+}
+
+/* ── DEFAULT (sin género) ── */
+:root {
+  --accent:#8B3A52;
+  --accent2:#C4748A;
+  --accent-light:rgba(139,58,82,.1);
+  --accent-glow:rgba(139,58,82,.2);
+  --bg:#FBF7F4;
+  --bg2:#FFFFFF;
+  --bg3:#F5EEE9;
+  --border:#E8DDD6;
+  --border2:#D4C4BA;
+  --text:#2D1B1E;
+  --text2:#7A5C64;
+  --text3:#B09AA0;
+  --card-shadow:0 2px 16px rgba(139,58,82,.08);
+  --green:#2E7D52;
+  --red:#C0392B;
+  --font:'Poppins',sans-serif;
+  --font-serif:'Cormorant Garamond',serif;
+  --radius:16px;
+  --radius-sm:10px;
+  --nav-bg:#FFFFFF;
+  --header-bg:#FBF7F4;
+}
+
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:var(--accent2);border-radius:1px}
+body{background:var(--bg);font-family:var(--font)}
+
+.sv{background:var(--bg);min-height:100vh;color:var(--text);font-weight:400;max-width:430px;margin:0 auto;position:relative;font-family:var(--font)}
+.serif{font-family:var(--font-serif)}
+
+/* Bottom Nav */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--nav-bg);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 20px rgba(0,0,0,.08)}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;cursor:pointer;gap:3px;border:none;background:none;transition:all .2s;position:relative}
+.bnav-icon{font-size:20px;transition:transform .2s}
+.bnav-label{font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);font-family:var(--font);transition:color .2s;font-weight:500}
+.bnav-item.on .bnav-label{color:var(--accent)}
+.bnav-item.on .bnav-icon{transform:scale(1.1)}
+.bnav-center{width:52px;height:52px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;margin-top:-20px;box-shadow:0 4px 16px var(--accent-glow);border:3px solid var(--bg);font-size:22px;cursor:pointer;transition:all .2s}
+.bnav-center:hover{transform:scale(1.05)}
+
+/* Buttons */
+.btn-p{background:var(--accent);color:#fff;border:none;padding:15px 24px;border-radius:var(--radius-sm);cursor:pointer;font-family:var(--font);font-size:13px;font-weight:600;letter-spacing:.5px;width:100%;transition:all .2s;box-shadow:0 4px 14px var(--accent-glow)}
+.btn-p:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn-p:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-o{background:transparent;color:var(--accent);border:1.5px solid var(--accent);padding:12px 20px;border-radius:var(--radius-sm);cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;letter-spacing:.3px;transition:all .2s}
+.btn-o:hover{background:var(--accent-light)}
 .btn-o:disabled{opacity:.3;cursor:not-allowed}
-.btn-g{background:transparent;border:none;color:var(--text2);cursor:pointer;font-family:'Jost',sans-serif;font-size:11px;padding:6px 10px;transition:color .2s}
-.btn-g:hover{color:var(--text)}
+.btn-g{background:transparent;border:none;color:var(--text2);cursor:pointer;font-family:var(--font);font-size:12px;padding:6px 10px;transition:color .2s;font-weight:500}
+.btn-g:hover{color:var(--accent)}
 
-.inp{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:13px 15px;border-radius:1px;font-family:'Jost',sans-serif;font-size:13px;font-weight:300;width:100%;outline:none;transition:border-color .2s}
-.inp:focus{border-color:rgba(196,151,63,.4)}
+/* Inputs */
+.inp{background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:14px 16px;border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;font-weight:400;width:100%;outline:none;transition:all .2s}
+.inp:focus{border-color:var(--accent);background:var(--bg2);box-shadow:0 0 0 3px var(--accent-light)}
 .inp::placeholder{color:var(--text3)}
-.sel{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:13px 15px;border-radius:1px;font-family:'Jost',sans-serif;font-size:13px;width:100%;cursor:pointer;outline:none}
+.sel{background:var(--bg3);border:1.5px solid var(--border);color:var(--text);padding:14px 16px;border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;width:100%;cursor:pointer;outline:none}
 
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:16px}
-.card-gold{border-color:rgba(196,151,63,.2)}
+/* Cards */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--card-shadow)}
+.card-accent{border-color:var(--accent2);background:var(--bg2)}
+.card-dark{background:var(--accent);color:#fff;border:none}
 
-.pill{padding:6px 14px;border-radius:20px;font-family:'Jost',sans-serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .2s;white-space:nowrap}
-.pill.on{background:var(--gold);color:#080808;border-color:var(--gold);font-weight:600}
-.pill:hover:not(.on){border-color:rgba(196,151,63,.3);color:var(--gold)}
+/* Pills */
+.pill{padding:8px 16px;border-radius:30px;font-family:var(--font);font-size:11px;letter-spacing:.3px;cursor:pointer;border:1.5px solid var(--border);background:var(--bg3);color:var(--text2);transition:all .2s;white-space:nowrap;font-weight:500}
+.pill.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;box-shadow:0 3px 10px var(--accent-glow)}
+.pill:hover:not(.on){border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
 
-.dot{width:5px;height:5px;border-radius:50%;background:var(--gold);animation:bop 1.2s ease-in-out infinite}
+/* Dots loader */
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:bop 1.2s ease-in-out infinite}
 .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
-@keyframes bop{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-7px);opacity:1}}
+@keyframes bop{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-8px);opacity:1}}
 
-.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(196,151,63,.15),transparent);margin:18px 0}
+.divider{height:1px;background:var(--border);margin:18px 0}
 .fade{animation:fu .3s ease both}
 @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid rgba(196,151,63,.3);color:var(--text);padding:10px 20px;border-radius:2px;font-size:11px;font-family:'Jost',sans-serif;letter-spacing:1.5px;z-index:999;animation:fu .3s ease;white-space:nowrap}
-.pbox{width:100%;border:1px dashed var(--border2);border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:var(--bg);transition:border-color .2s}
-.pbox:hover{border-color:rgba(196,151,63,.3)}
-.chip{padding:7px 12px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:20px;cursor:pointer;font-family:'Jost',sans-serif;font-size:11px;white-space:nowrap;transition:all .2s}
-.chip:hover{border-color:rgba(196,151,63,.3);color:var(--gold)}
-.stars{color:var(--gold);font-size:16px;letter-spacing:1px}
-.bubble-u{background:rgba(196,151,63,.08);border:1px solid rgba(196,151,63,.15);border-radius:16px 16px 3px 16px;padding:11px 14px;max-width:78%;margin-left:auto;font-size:13px;line-height:1.6}
-.bubble-a{background:var(--bg2);border:1px solid var(--border);border-radius:16px 16px 16px 3px;padding:13px 16px;max-width:86%;font-size:13px;line-height:1.7;color:var(--text2)}
-.bubble-a strong{color:var(--text);font-weight:500}
+
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:11px 22px;border-radius:30px;font-size:12px;font-family:var(--font);font-weight:500;letter-spacing:.3px;z-index:999;animation:fu .3s ease;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+
+.pbox{width:100%;border:2px dashed var(--border2);border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:var(--bg3);transition:all .2s}
+.pbox:hover{border-color:var(--accent);background:var(--accent-light)}
+
+.chip{padding:8px 14px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:30px;cursor:pointer;font-family:var(--font);font-size:12px;white-space:nowrap;transition:all .2s;font-weight:500}
+.chip:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+
+.stars{color:var(--accent);font-size:16px;letter-spacing:1px}
+
+.bubble-u{background:var(--accent);color:#fff;border-radius:18px 18px 4px 18px;padding:12px 16px;max-width:78%;margin-left:auto;font-size:13px;line-height:1.6;box-shadow:0 3px 10px var(--accent-glow)}
+.bubble-a{background:var(--bg2);border:1px solid var(--border);border-radius:18px 18px 18px 4px;padding:13px 16px;max-width:86%;font-size:13px;line-height:1.7;color:var(--text2);box-shadow:var(--card-shadow)}
+.bubble-a strong{color:var(--text);font-weight:600}
 .bubble-a ul{padding-left:16px;margin:6px 0}
 .bubble-a li{margin-bottom:4px}
 .bubble-a p{margin-bottom:8px}
 .bubble-a p:last-child{margin-bottom:0}
-.stat-mini{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:14px 10px;text-align:center;flex:1}
-.premium-badge{background:linear-gradient(135deg,#C4973F,#8a6b2a);color:#080808;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border-radius:20px;font-weight:600}
-.dna-tag{display:inline-block;padding:4px 10px;border-radius:20px;font-size:10px;letter-spacing:1px;margin:3px;font-family:'Jost',sans-serif}
-.dna-good{background:rgba(39,174,96,.1);color:#2ecc71;border:1px solid rgba(39,174,96,.2)}
-.dna-avoid{background:rgba(231,76,60,.1);color:#e74c3c;border:1px solid rgba(231,76,60,.2)}
-.dna-style{background:rgba(196,151,63,.1);color:var(--gold);border:1px solid rgba(196,151,63,.2)}
+
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 12px;text-align:center;flex:1;box-shadow:var(--card-shadow)}
+
+.premium-badge{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:30px;font-weight:600}
+
+.dna-tag{display:inline-block;padding:5px 12px;border-radius:30px;font-size:11px;letter-spacing:.3px;margin:3px;font-family:var(--font);font-weight:500}
+.dna-good{background:rgba(46,125,82,.12);color:var(--green);border:1px solid rgba(46,125,82,.25)}
+.dna-avoid{background:rgba(192,57,43,.1);color:var(--red);border:1px solid rgba(192,57,43,.2)}
+.dna-style{background:var(--accent-light);color:var(--accent);border:1px solid var(--accent-glow)}
+
 .onboard-step{display:flex;align-items:center;gap:8px;margin-bottom:32px}
 .onboard-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);transition:all .3s}
-.onboard-dot.on{background:var(--gold);width:24px;border-radius:4px}
-.photo-upload-box{border:1px dashed rgba(196,151,63,.3);border-radius:2px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg)}
-.photo-upload-box:hover{border-color:var(--gold);background:rgba(196,151,63,.03)}
-.photo-upload-box.done{border-color:rgba(39,174,96,.4);background:rgba(39,174,96,.05)}
+.onboard-dot.on{background:var(--accent);width:24px;border-radius:4px}
+
+.photo-upload-box{border:2px dashed var(--border2);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)}
+.photo-upload-box:hover{border-color:var(--accent);background:var(--accent-light)}
+.photo-upload-box.done{border-color:var(--green);background:rgba(46,125,82,.06)}
+
+/* Category icon grid */
+.cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.cat-item{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:10px 4px;border-radius:var(--radius-sm);transition:all .2s;background:var(--bg3);border:1px solid var(--border)}
+.cat-item.on{background:var(--accent-light);border-color:var(--accent)}
+.cat-item:hover{background:var(--accent-light)}
+
+/* Section header */
+.sec-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.sec-title{font-size:17px;font-weight:700;color:var(--text)}
 `;
 
 export default function StyleVault() {
@@ -180,7 +285,7 @@ export default function StyleVault() {
 
   // Onboarding
   const [obStep, setObStep] = useState(1);
-  const [obInfo, setObInfo] = useState({ nombre:"", edad:"", altura:"", peso:"", ojos:"", cabello:"Lacio" });
+  const [obInfo, setObInfo] = useState({ nombre:"", edad:"", altura:"", peso:"", ojos:"", cabello:"Lacio", genero:"" });
   const [obPhotos, setObPhotos] = useState<{selfie:string|null, front:string|null, side:string|null}>({ selfie:null, front:null, side:null });
   const [obPhotoFiles, setObPhotoFiles] = useState<{selfie:File|null, front:File|null, side:File|null}>({ selfie:null, front:null, side:null });
   const [obAnalyzing, setObAnalyzing] = useState(false);
@@ -194,6 +299,22 @@ export default function StyleVault() {
     const d = localStorage.getItem("sv_dna");
     return d ? JSON.parse(d) : null;
   });
+
+  // Apply theme based on gender
+  const applyTheme = (genero: string) => {
+    const root = document.documentElement;
+    if (genero === "Mujer") { root.className = "mujer"; }
+    else if (genero === "Hombre") { root.className = "hombre"; }
+    else { root.className = ""; }
+  };
+
+  useEffect(() => {
+    const savedDna = localStorage.getItem("sv_dna");
+    if (savedDna) {
+      const d = JSON.parse(savedDna);
+      applyTheme(d.genero || d.userInfo?.genero || "");
+    }
+  }, []);
 
   // App
   const [tab, setTab] = useState("home");
@@ -350,14 +471,15 @@ export default function StyleVault() {
         { base64: obPhotos.side.split(',')[1], type: obPhotoFiles.side!.type },
       ];
 
-      const userContext = `Datos del usuario: Nombre: ${obInfo.nombre}, Edad: ${obInfo.edad} años, Altura: ${obInfo.altura} cm, Peso: ${obInfo.peso} kg, Color de ojos: ${obInfo.ojos}, Tipo de cabello: ${obInfo.cabello}.`;
+      const userContext = `Datos del usuario: Nombre: ${obInfo.nombre}, Edad: ${obInfo.edad} años, Altura: ${obInfo.altura} cm, Peso: ${obInfo.peso} kg, Color de ojos: ${obInfo.ojos}, Tipo de cabello: ${obInfo.cabello}, Género: ${obInfo.genero}.`;
 
       const raw = await callClaudeVision(DNA_SYSTEM, images, userContext + " Analiza las 3 fotos y genera el Fashion DNA completo.");
       const parsed = JSON.parse(raw.replace(/```json|```/g,"").trim());
 
-      const dnaData = { ...parsed, userInfo: obInfo, createdAt: new Date().toISOString() };
+      const dnaData = { ...parsed, userInfo: obInfo, genero: obInfo.genero, createdAt: new Date().toISOString() };
       setDna(dnaData);
       localStorage.setItem("sv_dna", JSON.stringify(dnaData));
+      applyTheme(obInfo.genero);
 
       // Save to Supabase if possible
       try {
@@ -520,10 +642,11 @@ export default function StyleVault() {
     <div style={{ fontFamily:"'Jost',sans-serif", background:"#080808", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"24px" }}>
       <style>{CSS}</style>
       <div style={{ width:"100%", maxWidth:"360px" }}>
-        <div style={{ textAlign:"center", marginBottom:"48px" }}>
-          <div style={{ fontSize:"11px", letterSpacing:"6px", color:"var(--text3)", marginBottom:"14px" }}>✦</div>
-          <div className="serif" style={{ fontSize:"40px", letterSpacing:"10px", color:"var(--gold)", fontWeight:300 }}>STYLE<em>VAULT</em></div>
-          <div style={{ fontSize:"8px", letterSpacing:"6px", color:"var(--text3)", marginTop:"8px", textTransform:"uppercase" }}>Armario Inteligente con IA</div>
+        <div style={{ textAlign:"center", marginBottom:"40px" }}>
+          <div style={{ fontSize:"26px", fontWeight:800, color:"var(--text)", letterSpacing:"-0.5px", marginBottom:"4px" }}>
+            STYLE<span style={{ color:"var(--accent)" }}>VAULT</span>
+          </div>
+          <div style={{ fontSize:"11px", letterSpacing:"2px", color:"var(--text3)", textTransform:"uppercase", fontWeight:500 }}>Armario Inteligente con IA</div>
         </div>
         <div className="card">
           <div style={{ display:"flex", marginBottom:"24px", borderBottom:"1px solid var(--border)" }}>
@@ -561,7 +684,7 @@ export default function StyleVault() {
     <div className="sv fade">
       <style>{CSS}</style>
       {toast && <div className="toast">{toast}</div>}
-      <div style={{ padding:"20px 18px 40px", minHeight:"100vh" }}>
+      <div style={{ padding:"24px 20px 40px", minHeight:"100vh", background:"var(--bg)" }}>
 
         {/* Step indicators */}
         {obStep < 4 && (
@@ -605,7 +728,18 @@ export default function StyleVault() {
             </div>
             <div style={{ display:"flex", flexDirection:"column", gap:"12px", marginBottom:"24px" }}>
               <div>
-                <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"6px" }}>Nombre</div>
+                <div style={{ fontSize:"13px", fontWeight:600, color:"var(--text)", marginBottom:"12px" }}>¿Cómo te identificas?</div>
+                <div style={{ display:"flex", gap:"10px", marginBottom:"20px" }}>
+                  {["Mujer","Hombre","Prefiero no decir"].map(g => (
+                    <button key={g} onClick={()=>{ setObInfo(p=>({...p,genero:g})); applyTheme(g); }}
+                      style={{ flex:1, padding:"14px 8px", background:obInfo.genero===g?"var(--accent)":"var(--bg3)", color:obInfo.genero===g?"#fff":"var(--text2)", border:`2px solid ${obInfo.genero===g?"var(--accent)":"var(--border)"}`, borderRadius:"var(--radius-sm)", cursor:"pointer", fontFamily:"var(--font)", fontSize:"12px", fontWeight:600, transition:"all .2s" }}>
+                      {g==="Mujer"?"👩":g==="Hombre"?"👨":"⭐"} {g}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize:"11px", fontWeight:600, color:"var(--text2)", letterSpacing:".5px", marginBottom:"6px" }}>Nombre</div>
                 <input className="inp" placeholder="Tu nombre" value={obInfo.nombre} onChange={e=>setObInfo(p=>({...p,nombre:e.target.value}))} />
               </div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px" }}>
@@ -712,7 +846,7 @@ export default function StyleVault() {
             </div>
 
             {/* DNA Card */}
-            <div className="card card-gold" style={{ marginBottom:"14px" }}>
+            <div className="card card-accent" style={{ marginBottom:"14px" }}>
               <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"16px" }}>✦ Fashion DNA™</div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginBottom:"16px" }}>
                 {[
@@ -769,16 +903,18 @@ export default function StyleVault() {
       <input ref={fileRef} type="file" accept="image/*" style={{display:"none"}} onChange={handlePhoto} />
       <input ref={camRef} type="file" accept="image/*" capture="environment" style={{display:"none"}} onChange={handlePhoto} />
 
-      <header style={{ padding:"14px 16px 10px", borderBottom:"1px solid var(--border)", background:"#0a0a0a", display:"flex", justifyContent:"space-between", alignItems:"center", position:"sticky", top:0, zIndex:50 }}>
+      <header style={{ padding:"16px 18px 12px", background:"var(--header-bg)", display:"flex", justifyContent:"space-between", alignItems:"center", position:"sticky", top:0, zIndex:50, borderBottom:"1px solid var(--border)" }}>
         <div>
-          <div className="serif" style={{ fontSize:"22px", letterSpacing:"6px", color:"var(--gold)", fontWeight:300, lineHeight:1 }}>STYLE<em>VAULT</em></div>
-          <div style={{ fontSize:"7px", letterSpacing:"4px", color:"var(--text3)", marginTop:"2px" }}>ARMARIO INTELIGENTE</div>
+          <div style={{ fontSize:"18px", fontWeight:700, color:"var(--text)", letterSpacing:"-0.5px", fontFamily:"var(--font)" }}>
+            STYLE<span style={{ color:"var(--accent)" }}>VAULT</span>
+          </div>
+          <div style={{ fontSize:"9px", letterSpacing:"2px", color:"var(--text3)", marginTop:"1px", textTransform:"uppercase", fontWeight:500 }}>Armario Inteligente</div>
         </div>
-        <div style={{ display:"flex", alignItems:"center", gap:"10px" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:"12px" }}>
           {isPremium && <span className="premium-badge">Premium</span>}
-          <div style={{ textAlign:"right", cursor:"pointer" }} onClick={handleLogout}>
-            <div style={{ fontSize:"12px" }}>{profile?.name?.split(" ")[0]}</div>
-            <div style={{ fontSize:"8px", color:"rgba(196,151,63,.5)", letterSpacing:"1px", textTransform:"uppercase" }}>{profile?.plan} · Salir</div>
+          <div style={{ textAlign:"right", cursor:"pointer", padding:"6px 10px", background:"var(--bg3)", borderRadius:"30px", border:"1px solid var(--border)" }} onClick={handleLogout}>
+            <div style={{ fontSize:"12px", fontWeight:600, color:"var(--text)" }}>{profile?.name?.split(" ")[0]}</div>
+            <div style={{ fontSize:"9px", color:"var(--accent)", fontWeight:500 }}>Salir</div>
           </div>
         </div>
       </header>
@@ -788,28 +924,39 @@ export default function StyleVault() {
         {/* HOME */}
         {tab==="home" && (
           <div className="fade">
-            <div style={{ marginBottom:"20px" }}>
-              <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>Hola, {profile?.name?.split(" ")[0]} 👋</div>
-              {dna?.bodyType && <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"4px" }}>Tipo de cuerpo: <span style={{ color:"var(--gold)" }}>{dna.bodyType}</span></div>}
+            {/* Hero */}
+            <div style={{ background:`linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%)`, borderRadius:"var(--radius)", padding:"22px 20px", marginBottom:"18px", position:"relative", overflow:"hidden" }}>
+              <div style={{ position:"absolute", right:"-10px", top:"-10px", width:"120px", height:"120px", background:"rgba(255,255,255,.08)", borderRadius:"50%" }}/>
+              <div style={{ position:"absolute", right:"20px", bottom:"-20px", width:"80px", height:"80px", background:"rgba(255,255,255,.06)", borderRadius:"50%" }}/>
+              <div style={{ fontSize:"22px", fontWeight:700, color:"#fff", marginBottom:"4px" }}>Hola, {profile?.name?.split(" ")[0]} 👋</div>
+              <div style={{ fontSize:"13px", color:"rgba(255,255,255,.75)", marginBottom:"16px" }}>
+                {dna?.bodyType ? `Tu estilo personal está listo` : "Tu armario inteligente te espera"}
+              </div>
+              {dna?.bodyType && (
+                <div style={{ display:"inline-flex", alignItems:"center", gap:"6px", background:"rgba(255,255,255,.15)", borderRadius:"30px", padding:"6px 14px" }}>
+                  <span style={{ fontSize:"11px", color:"#fff", fontWeight:600 }}>✦ {dna.bodyType}</span>
+                </div>
+              )}
             </div>
 
+            {/* Stats */}
             <div style={{ display:"flex", gap:"10px", marginBottom:"18px" }}>
               {[
                 { label:"Prendas", value:clothes.length, icon:"👗" },
                 { label:"Favoritas", value:favClothes.length, icon:"❤️" },
-                { label:"Outfits", value:outfitR?1:0, icon:"✦" },
+                { label:"Outfits", value:outfitR?1:0, icon:"✨" },
               ].map(s => (
-                <div key={s.label} className="stat-mini">
-                  <div style={{ fontSize:"20px", marginBottom:"4px" }}>{s.icon}</div>
-                  <div className="serif" style={{ fontSize:"22px", color:"var(--gold)", fontWeight:300 }}>{s.value}</div>
-                  <div style={{ fontSize:"8px", color:"var(--text2)", letterSpacing:"1.5px", textTransform:"uppercase", marginTop:"2px" }}>{s.label}</div>
+                <div key={s.label} className="stat-card">
+                  <div style={{ fontSize:"22px", marginBottom:"6px" }}>{s.icon}</div>
+                  <div style={{ fontSize:"24px", fontWeight:700, color:"var(--accent)", marginBottom:"2px" }}>{s.value}</div>
+                  <div style={{ fontSize:"10px", color:"var(--text2)", fontWeight:500 }}>{s.label}</div>
                 </div>
               ))}
             </div>
 
             {/* DNA Preview */}
             {dna?.bodyType ? (
-              <div className="card card-gold" style={{ marginBottom:"14px" }}>
+              <div className="card card-accent" style={{ marginBottom:"14px" }}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"12px" }}>
                   <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase" }}>✦ Tu Fashion DNA™</div>
                   <button className="btn-g" onClick={()=>setTab("dna")}>Ver completo →</button>
@@ -832,11 +979,11 @@ export default function StyleVault() {
             )}
 
             {/* Outfit del día */}
-            <div className="card card-gold" style={{ marginBottom:"14px" }}>
+            <div className="card card-accent" style={{ marginBottom:"14px" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"12px" }}>
                 <div>
-                  <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase" }}>✦ Outfit del día</div>
-                  <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>Personalizado para ti</div>
+                  <div style={{ fontSize:"13px", fontWeight:700, color:"var(--text)" }}>Outfit del día</div>
+                  <div style={{ fontSize:"12px", color:"var(--text2)", marginTop:"2px" }}>Personalizado para ti ✦</div>
                 </div>
                 <button className="btn-o" style={{ fontSize:"9px", padding:"7px 12px" }} onClick={()=>setTab("outfit")}>Crear →</button>
               </div>
@@ -909,7 +1056,7 @@ export default function StyleVault() {
               </div>
             ) : (
               <>
-                <div className="card card-gold" style={{ marginBottom:"14px" }}>
+                <div className="card card-accent" style={{ marginBottom:"14px" }}>
                   <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"16px" }}>✦ Análisis corporal</div>
                   <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px", marginBottom:"14px" }}>
                     {[
@@ -968,7 +1115,7 @@ export default function StyleVault() {
                 </div>
 
                 {dna.topTips && (
-                  <div className="card card-gold" style={{ marginBottom:"14px" }}>
+                  <div className="card card-accent" style={{ marginBottom:"14px" }}>
                     <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"14px" }}>✦ Tips personalizados</div>
                     {dna.topTips.map((tip: string, i: number) => (
                       <div key={i} style={{ display:"flex", gap:"10px", padding:"8px 0", borderBottom:"1px solid var(--border)" }}>
@@ -1129,7 +1276,7 @@ export default function StyleVault() {
               <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>{isPremium ? "Basada en tu Fashion DNA™" : "Función exclusiva Premium"}</div>
             </div>
             {!isPremium ? (
-              <div className="card card-gold" style={{ textAlign:"center", padding:"32px 20px" }}>
+              <div className="card card-accent" style={{ textAlign:"center", padding:"32px 20px" }}>
                 <div style={{ fontSize:"48px", marginBottom:"16px" }}>👑</div>
                 <div className="serif" style={{ fontSize:"22px", fontWeight:300, marginBottom:"10px" }}>Función Premium</div>
                 <div style={{ fontSize:"13px", color:"var(--text2)", lineHeight:1.6, marginBottom:"20px" }}>Prueba virtualmente cualquier outfit de tu armario basado en tu Fashion DNA™ personal.</div>
@@ -1143,7 +1290,7 @@ export default function StyleVault() {
               </div>
             ) : (
               <>
-                <div className="card card-gold" style={{ marginBottom:"14px" }}>
+                <div className="card card-accent" style={{ marginBottom:"14px" }}>
                   <div style={{ fontSize:"9px", color:"var(--green)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"10px" }}>✓ Fashion DNA™ detectado</div>
                   <div style={{ display:"flex", gap:"8px", flexWrap:"wrap" }}>
                     <span className="dna-tag dna-style">{dna.bodyType}</span>
@@ -1307,20 +1454,25 @@ export default function StyleVault() {
 
       {/* Bottom Nav */}
       <nav className="bnav">
-        {[
-          { key:"home", icon:"🏠", label:"Inicio" },
-          { key:"dna", icon:"🧬", label:"DNA" },
-          { key:"wardrobe", icon:"👗", label:"Armario" },
-          { key:"outfit", icon:"✦", label:"Outfit" },
-          { key:"avatar", icon:"🧍", label:"Virtual" },
-          { key:"advisor", icon:"💬", label:"Asesor" },
-          { key:"trip", icon:"✈️", label:"Viajes" },
-        ].map(item => (
-          <button key={item.key} className={`bnav-item ${tab===item.key?"on":""}`} onClick={()=>setTab(item.key)}>
-            <span className="bnav-icon">{item.icon}</span>
-            <span className="bnav-label">{item.label}</span>
-          </button>
-        ))}
+        <button className={`bnav-item ${tab==="home"?"on":""}`} onClick={()=>setTab("home")}>
+          <span className="bnav-icon">🏠</span>
+          <span className="bnav-label">Inicio</span>
+        </button>
+        <button className={`bnav-item ${tab==="wardrobe"?"on":""}`} onClick={()=>setTab("wardrobe")}>
+          <span className="bnav-icon">👗</span>
+          <span className="bnav-label">Armario</span>
+        </button>
+        <button className="bnav-item" onClick={()=>{setSF(true);setTab("wardrobe");}}>
+          <div className="bnav-center">＋</div>
+        </button>
+        <button className={`bnav-item ${tab==="outfit"?"on":""}`} onClick={()=>setTab("outfit")}>
+          <span className="bnav-icon">✨</span>
+          <span className="bnav-label">Outfit IA</span>
+        </button>
+        <button className={`bnav-item ${tab==="advisor"?"on":""}`} onClick={()=>setTab("advisor")}>
+          <span className="bnav-icon">💬</span>
+          <span className="bnav-label">Asesor IA</span>
+        </button>
       </nav>
     </div>
   );
