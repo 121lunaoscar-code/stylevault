@@ -1777,6 +1777,10 @@ Crea el outfit perfecto y personalizado para esta persona.`
           <span className="bnav-icon">💬</span>
           <span className="bnav-label">Asesor IA</span>
         </button>
+        <button className={`bnav-item ${tab==="trip"?"on":""}`} onClick={()=>setTab("trip")}>
+          <span className="bnav-icon">✈️</span>
+          <span className="bnav-label">Viajes</span>
+        </button>
       </nav>
     </div>
   );
