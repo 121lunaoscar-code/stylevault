@@ -335,6 +335,14 @@ export default function StyleVault() {
   const [outfitR, setOR] = useState<any>(null);
   const [outfitL, setOL] = useState(false);
 
+  // New AI outfit generator
+  const [outfitPrompt, setOutfitPrompt] = useState("");
+  const [outfitSource, setOutfitSource] = useState("wardrobe");
+  const [smartOutfit, setSmartOutfit] = useState<any>(null);
+  const [smartOutfitL, setSmartOutfitL] = useState(false);
+  const [smartOutfitSteps, setSmartOutfitSteps] = useState("");
+  const [savedOutfits, setSavedOutfits] = useState<any[]>(() => JSON.parse(localStorage.getItem("sv_saved_outfits") || "[]"));
+
   const [msgs, setMsgs] = useState<{role:string;text:string}[]>([
     { role:"assistant", text:"Hola, soy tu **asesor de estilo personal**. Puedo ayudarte con combinaciones, dress codes, tendencias y mucho más.\n\n¿En qué te ayudo hoy?" }
   ]);
@@ -547,6 +555,77 @@ export default function StyleVault() {
   const toggleFav = (id: number) => {
     const next = favorites.includes(id) ? favorites.filter(f => f !== id) : [...favorites, id];
     setFavorites(next); localStorage.setItem("sv_favorites", JSON.stringify(next));
+  };
+
+  // Smart AI Outfit Generator
+  const generateSmartOutfit = async () => {
+    if (!outfitPrompt.trim()) return;
+    setSmartOutfitL(true); setSmartOutfit(null);
+
+    const dnaCtx = dna?.bodyType ? `Fashion DNA: Tipo de cuerpo: ${dna.bodyType}, Tono de piel: ${dna.skinTone} (${dna.skinUndertone}), Colores ideales: ${dna.idealColors?.join(", ")}, Altura: ${dna.userInfo?.altura}cm, Complexión: ${dna.build || "promedio"}, Estilo recomendado: ${dna.recommendedStyles?.slice(0,2).join(", ")}.` : "Sin Fashion DNA definido.";
+
+    const wardrobeCtx = outfitSource !== "new"
+      ? `Armario disponible: ${clothes.map(c => `${c.name} (${c.category}, ${c.color || ""}, ${c.occasion || ""})`).join(" | ")}`
+      : "No usar el armario del usuario, recomendar prendas nuevas.";
+
+    const season = ["Diciembre","Enero","Febrero"].includes(new Date().toLocaleString("es",{month:"long"})) ? "Invierno" :
+                   ["Marzo","Abril","Mayo"].includes(new Date().toLocaleString("es",{month:"long"})) ? "Primavera" :
+                   ["Junio","Julio","Agosto"].includes(new Date().toLocaleString("es",{month:"long"})) ? "Verano" : "Otoño";
+
+    const SMART_SYSTEM = `Eres el estilista personal más sofisticado del mundo. Analizas el perfil completo del usuario y creas outfits perfectamente personalizados.
+
+SOLO responde en JSON válido sin markdown:
+{
+  "greeting": string (mensaje cálido y personal del estilista, máx 2 oraciones),
+  "eventAnalysis": { "tipo": string, "formalidad": string, "clima": string, "estacion": string },
+  "outfit": [{ "categoria": string, "prenda": string, "color": string, "razon": string, "emoji": string, "esDeArmario": boolean }],
+  "accesorios": [{ "item": string, "razon": string, "emoji": string }],
+  "colores": { "principal": string, "complementario": string, "acento": string, "paleta": string },
+  "compatibility": number (0-100),
+  "compatibilityReasons": [string],
+  "stylistAdvice": string,
+  "alternativeOption": string,
+  "saveTitle": string
+}`;
+
+    try {
+      setSmartOutfitSteps("Analizando tu ocasión...");
+      await new Promise(r => setTimeout(r, 600));
+      setSmartOutfitSteps("Consultando tu Fashion DNA™...");
+      await new Promise(r => setTimeout(r, 500));
+      setSmartOutfitSteps("Seleccionando prendas perfectas...");
+
+      const raw = await callClaude(SMART_SYSTEM, [{
+        role: "user",
+        content: `Ocasión del usuario: "${outfitPrompt}"
+
+${dnaCtx}
+
+${wardrobeCtx}
+
+Fuente de outfit: ${outfitSource === "wardrobe" ? "SOLO usar prendas del armario" : outfitSource === "new" ? "Recomendar prendas nuevas de tendencia" : "Combinar armario con nuevas sugerencias"}
+
+Estación actual: ${season}
+Fecha: ${new Date().toLocaleDateString("es-MX", {weekday:"long", day:"numeric", month:"long"})}
+
+Crea el outfit perfecto y personalizado para esta persona.`
+      }]);
+
+      const parsed = JSON.parse(raw.replace(/```json|```/g,"").trim());
+      setSmartOutfit(parsed);
+    } catch { setSmartOutfit({ greeting: "Error al generar. Intenta de nuevo.", outfit: [], accesorios: [], compatibility: 0 }); }
+
+    setSmartOutfitL(false);
+    setSmartOutfitSteps("");
+  };
+
+  const saveSmartOutfit = () => {
+    if (!smartOutfit) return;
+    const saved = { ...smartOutfit, prompt: outfitPrompt, date: new Date().toISOString(), id: Date.now() };
+    const next = [saved, ...savedOutfits].slice(0, 20);
+    setSavedOutfits(next);
+    localStorage.setItem("sv_saved_outfits", JSON.stringify(next));
+    showToast("✦ Outfit guardado");
   };
 
   // Outfit
@@ -1243,58 +1322,193 @@ export default function StyleVault() {
         {/* OUTFIT */}
         {tab==="outfit" && (
           <div className="fade">
-            <div style={{ marginBottom:"20px" }}>
-              <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>Outfit IA</div>
-              <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>{dna?.bodyType ? `Personalizado para tu tipo ${dna.bodyType}` : "La IA selecciona el look ideal"}</div>
+
+            {/* Hero */}
+            <div style={{ background:`linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%)`, borderRadius:"var(--radius)", padding:"24px 20px 20px", marginBottom:"20px", position:"relative", overflow:"hidden" }}>
+              <div style={{ position:"absolute", right:"-20px", top:"-20px", width:"130px", height:"130px", background:"rgba(255,255,255,.07)", borderRadius:"50%" }}/>
+              <div style={{ fontSize:"22px", fontWeight:700, color:"#fff", marginBottom:"6px" }}>¿A dónde iremos hoy?</div>
+              <div style={{ fontSize:"13px", color:"rgba(255,255,255,.75)", lineHeight:1.5 }}>Cuéntame el lugar o evento y crearé el outfit perfecto para ti</div>
             </div>
-            {clothes.length===0 ? <div style={{ textAlign:"center", padding:"60px", color:"var(--text3)", fontSize:"13px" }}>Agrega prendas a tu armario primero</div> : (
-              <>
-                <div className="card" style={{ marginBottom:"12px" }}>
-                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2.5px", textTransform:"uppercase", marginBottom:"12px" }}>¿Para qué evento?</div>
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"7px" }}>
-                    {EVENTS.map(ev => <button key={ev} onClick={()=>setSelEv(ev)} style={{ padding:"9px 7px", background:selEv===ev?"rgba(196,151,63,.1)":"var(--bg)", color:selEv===ev?"var(--gold)":"var(--text2)", border:`1px solid ${selEv===ev?"rgba(196,151,63,.3)":"var(--border)"}`, borderRadius:"1px", cursor:"pointer", fontFamily:"'Jost',sans-serif", fontSize:"11px", textAlign:"left", transition:"all .2s" }}>{ev}</button>)}
-                  </div>
-                </div>
-                <div className="card" style={{ marginBottom:"16px" }}>
-                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"10px" }}>Temporada</div>
-                  <div style={{ display:"flex", gap:"7px", flexWrap:"wrap" }}>
-                    {SEASONS.map(s => <button key={s} className={`pill ${selSe===s?"on":""}`} onClick={()=>setSelSe(s)}>{s}</button>)}
-                  </div>
-                </div>
-                <button className="btn-p" onClick={generateOutfit} disabled={!selEv||outfitL} style={{ marginBottom:"18px" }}>
-                  {outfitL?"Creando outfit...":"✦  Generar Outfit con IA"}
-                </button>
-                {outfitL && <div style={{ display:"flex", justifyContent:"center", gap:"6px", padding:"24px" }}><div className="dot"/><div className="dot"/><div className="dot"/></div>}
-                {outfitR && !outfitL && (
-                  <div className="fade">
-                    <div className="divider"/>
-                    {outfitR.rating > 0 && (
-                      <div style={{ background:"var(--bg)", border:"1px solid rgba(196,151,63,.15)", borderRadius:"2px", padding:"14px", marginBottom:"14px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                        <div style={{ fontSize:"12px", color:"var(--text2)", flex:1 }}>{outfitR.ratingExplanation}</div>
-                        <div style={{ textAlign:"right", marginLeft:"12px" }}>
-                          <div className="stars">{renderStars(outfitR.rating)}</div>
-                          <div style={{ fontSize:"9px", color:"var(--gold)", marginTop:"3px" }}>{outfitR.rating}/5</div>
-                        </div>
+
+            {/* Input */}
+            <div className="card" style={{ marginBottom:"16px" }}>
+              <textarea
+                className="inp"
+                placeholder={"Ej: Cena romántica en restaurante elegante
+Entrevista de trabajo para gerente
+Fiesta en la playa
+Viaje a Nueva York por 5 días..."}
+                value={outfitPrompt}
+                onChange={e=>setOutfitPrompt(e.target.value)}
+                style={{ resize:"none", minHeight:"100px", lineHeight:1.6, borderRadius:"var(--radius-sm)" }}
+              />
+              <div style={{ display:"flex", gap:"7px", flexWrap:"wrap", marginTop:"12px" }}>
+                {["Cena romántica","Entrevista de trabajo","Fiesta elegante","Día casual","Reunión de negocios","Viaje"].map(s => (
+                  <button key={s} onClick={()=>setOutfitPrompt(s)} className="pill" style={{ fontSize:"11px", padding:"6px 12px" }}>{s}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Source selector */}
+            <div className="card" style={{ marginBottom:"18px" }}>
+              <div style={{ fontSize:"13px", fontWeight:600, color:"var(--text)", marginBottom:"14px" }}>¿Con qué armario creamos el outfit?</div>
+              <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
+                {[
+                  { id:"wardrobe", icon:"👔", label:"Con mi armario", desc:"Usar únicamente las prendas que tengo guardadas" },
+                  { id:"new", icon:"✨", label:"Sin mi armario", desc:"Generar recomendaciones con prendas nuevas y tendencias" },
+                  { id:"mixed", icon:"🔥", label:"Mi armario + IA", desc:"Combinar mis prendas con nuevas sugerencias", premium:true },
+                ].map(opt => (
+                  <button key={opt.id} onClick={()=>(!opt.premium||isPremium)&&setOutfitSource(opt.id)}
+                    style={{ display:"flex", alignItems:"center", gap:"14px", padding:"14px", background:outfitSource===opt.id?"var(--accent-light)":"var(--bg3)", border:`2px solid ${outfitSource===opt.id?"var(--accent)":"var(--border)"}`, borderRadius:"var(--radius-sm)", cursor:opt.premium&&!isPremium?"not-allowed":"pointer", transition:"all .2s", opacity:opt.premium&&!isPremium?.6:1, textAlign:"left", width:"100%" }}>
+                    <div style={{ fontSize:"26px", flexShrink:0 }}>{opt.icon}</div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:"8px", marginBottom:"3px" }}>
+                        <span style={{ fontSize:"13px", fontWeight:600, color:outfitSource===opt.id?"var(--accent)":"var(--text)" }}>{opt.label}</span>
+                        {opt.premium && !isPremium && <span style={{ fontSize:"9px", background:"var(--accent)", color:"#fff", padding:"2px 7px", borderRadius:"20px", fontWeight:600 }}>PREMIUM</span>}
                       </div>
-                    )}
-                    {outfitR.colorPalette && <div style={{ padding:"10px 14px", background:"var(--bg)", border:"1px solid rgba(196,151,63,.08)", borderRadius:"2px", marginBottom:"14px" }}><div style={{ fontSize:"9px", color:"var(--text3)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"4px" }}>Paleta</div><div style={{ fontSize:"12px", color:"rgba(196,151,63,.7)", fontStyle:"italic" }}>{outfitR.colorPalette}</div></div>}
-                    <div style={{ display:"flex", flexDirection:"column", gap:"9px", marginBottom:"16px" }}>
-                      {outfitR.outfit?.map((item: any, i: number) => (
-                        <div key={i} style={{ display:"flex", gap:"12px", padding:"13px", background:"var(--bg)", border:"1px solid var(--border)", borderRadius:"2px" }}>
-                          <div style={{ fontSize:"26px", minWidth:"34px", textAlign:"center" }}>{item.emoji}</div>
-                          <div><div style={{ fontSize:"13px", fontWeight:400, marginBottom:"4px" }}>{item.name}</div><div style={{ fontSize:"11px", color:"var(--text2)", lineHeight:1.6 }}>{item.why}</div></div>
+                      <div style={{ fontSize:"11px", color:"var(--text2)", lineHeight:1.4 }}>{opt.desc}</div>
+                    </div>
+                    {outfitSource===opt.id && <div style={{ color:"var(--accent)", fontSize:"18px", flexShrink:0 }}>✓</div>}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button className="btn-p" onClick={generateSmartOutfit} disabled={!outfitPrompt.trim()||smartOutfitL} style={{ marginBottom:"20px" }}>
+              {smartOutfitL ? (
+                <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"10px" }}>
+                  <span>{smartOutfitSteps || "Generando tu outfit..."}</span>
+                </span>
+              ) : "✨ Generar mi Outfit Perfecto"}
+            </button>
+
+            {smartOutfitL && (
+              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:"16px", padding:"32px 20px" }}>
+                <div style={{ display:"flex", gap:"6px" }}><div className="dot"/><div className="dot"/><div className="dot"/></div>
+                <div style={{ fontSize:"13px", color:"var(--accent)", fontWeight:500 }}>{smartOutfitSteps}</div>
+              </div>
+            )}
+
+            {/* Result */}
+            {smartOutfit && !smartOutfitL && (
+              <div className="fade">
+                <div className="divider"/>
+
+                {/* Stylist greeting */}
+                {smartOutfit.greeting && (
+                  <div style={{ background:"var(--accent-light)", border:"1px solid var(--accent-glow)", borderRadius:"var(--radius)", padding:"16px 18px", marginBottom:"16px", borderLeft:"4px solid var(--accent)" }}>
+                    <div style={{ fontSize:"11px", fontWeight:600, color:"var(--accent)", marginBottom:"6px", textTransform:"uppercase", letterSpacing:"1px" }}>✦ Tu Estilista Personal</div>
+                    <div style={{ fontSize:"14px", color:"var(--text)", lineHeight:1.6, fontStyle:"italic" }}>"{smartOutfit.greeting}"</div>
+                  </div>
+                )}
+
+                {/* Compatibility score */}
+                {smartOutfit.compatibility > 0 && (
+                  <div className="card" style={{ marginBottom:"16px", textAlign:"center" }}>
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"20px" }}>
+                      <div>
+                        <div style={{ fontSize:"48px", fontWeight:800, color:"var(--accent)", lineHeight:1 }}>{smartOutfit.compatibility}%</div>
+                        <div style={{ fontSize:"12px", fontWeight:600, color:"var(--text2)", marginTop:"4px" }}>Compatible contigo</div>
+                      </div>
+                      <div style={{ flex:1, textAlign:"left" }}>
+                        {smartOutfit.compatibilityReasons?.slice(0,3).map((r: string, i: number) => (
+                          <div key={i} style={{ display:"flex", alignItems:"flex-start", gap:"6px", marginBottom:"6px" }}>
+                            <span style={{ color:"var(--green)", fontSize:"13px", flexShrink:0 }}>✓</span>
+                            <span style={{ fontSize:"11px", color:"var(--text2)", lineHeight:1.4 }}>{r}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Outfit items */}
+                <div style={{ fontSize:"14px", fontWeight:700, color:"var(--text)", marginBottom:"12px" }}>Tu outfit completo</div>
+                <div style={{ display:"flex", flexDirection:"column", gap:"10px", marginBottom:"16px" }}>
+                  {smartOutfit.outfit?.map((item: any, i: number) => (
+                    <div key={i} style={{ display:"flex", gap:"14px", padding:"14px 16px", background:"var(--bg2)", border:"1px solid var(--border)", borderRadius:"var(--radius-sm)", boxShadow:"var(--card-shadow)", alignItems:"flex-start" }}>
+                      <div style={{ fontSize:"32px", flexShrink:0 }}>{item.emoji}</div>
+                      <div style={{ flex:1 }}>
+                        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"4px" }}>
+                          <div style={{ fontSize:"14px", fontWeight:600, color:"var(--text)" }}>{item.prenda}</div>
+                          {item.esDeArmario && (
+                            <span style={{ fontSize:"9px", background:"var(--accent-light)", color:"var(--accent)", padding:"2px 8px", borderRadius:"20px", fontWeight:600, flexShrink:0, marginLeft:"8px" }}>Tu armario</span>
+                          )}
+                        </div>
+                        <div style={{ fontSize:"11px", color:"var(--accent)", fontWeight:500, marginBottom:"4px" }}>{item.color}</div>
+                        <div style={{ fontSize:"12px", color:"var(--text2)", lineHeight:1.5 }}>{item.razon}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Accessories */}
+                {smartOutfit.accesorios?.length > 0 && (
+                  <div style={{ marginBottom:"16px" }}>
+                    <div style={{ fontSize:"13px", fontWeight:700, color:"var(--text)", marginBottom:"10px" }}>Accesorios recomendados</div>
+                    <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px" }}>
+                      {smartOutfit.accesorios.map((acc: any, i: number) => (
+                        <div key={i} style={{ padding:"12px", background:"var(--bg3)", border:"1px solid var(--border)", borderRadius:"var(--radius-sm)", textAlign:"center" }}>
+                          <div style={{ fontSize:"24px", marginBottom:"4px" }}>{acc.emoji}</div>
+                          <div style={{ fontSize:"12px", fontWeight:600, color:"var(--text)", marginBottom:"3px" }}>{acc.item}</div>
+                          <div style={{ fontSize:"10px", color:"var(--text2)" }}>{acc.razon}</div>
                         </div>
                       ))}
                     </div>
-                    {outfitR.explanation && <div style={{ background:"var(--bg)", borderLeft:"2px solid rgba(196,151,63,.3)", padding:"14px" }}><div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"2.5px", textTransform:"uppercase", marginBottom:"8px" }}>✦ Por qué funciona</div><div style={{ fontSize:"12px", color:"var(--text2)", lineHeight:1.8 }}>{outfitR.explanation}</div></div>}
                   </div>
                 )}
-              </>
+
+                {/* Color palette */}
+                {smartOutfit.colores && (
+                  <div className="card" style={{ marginBottom:"16px" }}>
+                    <div style={{ fontSize:"12px", fontWeight:700, color:"var(--text)", marginBottom:"12px" }}>Paleta de colores</div>
+                    <div style={{ display:"flex", gap:"8px", marginBottom:"10px" }}>
+                      {[smartOutfit.colores.principal, smartOutfit.colores.complementario, smartOutfit.colores.acento].filter(Boolean).map((c: string, i: number) => (
+                        <div key={i} style={{ flex:1, textAlign:"center" }}>
+                          <div style={{ height:"40px", background:"var(--accent-light)", borderRadius:"var(--radius-sm)", marginBottom:"6px", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"11px", fontWeight:600, color:"var(--accent)", border:"1px solid var(--border)" }}>{c}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {smartOutfit.colores.paleta && <div style={{ fontSize:"12px", color:"var(--text2)", fontStyle:"italic" }}>{smartOutfit.colores.paleta}</div>}
+                  </div>
+                )}
+
+                {/* Stylist advice */}
+                {smartOutfit.stylistAdvice && (
+                  <div style={{ background:"var(--accent-light)", borderRadius:"var(--radius)", padding:"16px", marginBottom:"16px", borderLeft:"3px solid var(--accent)" }}>
+                    <div style={{ fontSize:"11px", fontWeight:600, color:"var(--accent)", marginBottom:"6px", textTransform:"uppercase", letterSpacing:"1px" }}>Consejo de tu estilista</div>
+                    <div style={{ fontSize:"13px", color:"var(--text)", lineHeight:1.6 }}>{smartOutfit.stylistAdvice}</div>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginBottom:"10px" }}>
+                  <button className="btn-p" onClick={saveSmartOutfit}>💾 Guardar outfit</button>
+                  <button className="btn-o" onClick={()=>{setSmartOutfit(null);setOutfitPrompt("");}}>🔄 Nuevo outfit</button>
+                </div>
+                <button className="btn-o" onClick={generateSmartOutfit} style={{ width:"100%" }}>✨ Generar otra opción</button>
+
+                {/* Divider to saved */}
+                {savedOutfits.length > 0 && (
+                  <div style={{ marginTop:"24px" }}>
+                    <div className="divider"/>
+                    <div style={{ fontSize:"14px", fontWeight:700, color:"var(--text)", marginBottom:"12px" }}>Outfits guardados</div>
+                    <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
+                      {savedOutfits.slice(0,3).map((s: any, i: number) => (
+                        <div key={i} className="card" style={{ padding:"12px 14px" }}>
+                          <div style={{ fontSize:"12px", fontWeight:600, color:"var(--text)", marginBottom:"4px" }}>{s.saveTitle || s.prompt}</div>
+                          <div style={{ fontSize:"10px", color:"var(--text2)" }}>{new Date(s.date).toLocaleDateString("es-MX")} · {s.compatibility}% compatible</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         )}
 
-        {/* AVATAR / VIRTUAL TRY */}
+        {/* AVATAR / VIRTUAL TRY */}        {/* AVATAR / VIRTUAL TRY */}
         {tab==="avatar" && (
           <div className="fade">
             <div style={{ marginBottom:"20px" }}>
