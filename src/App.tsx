@@ -257,9 +257,7 @@ export default function StyleVault() {
     if (saved) {
       const p = JSON.parse(saved);
       setProfile(p);
-      // Check if DNA exists
-      const savedDna = localStorage.getItem("sv_dna");
-      setScreen(savedDna ? "app" : "onboarding");
+      setScreen("app");
     }
   }, []);
 
@@ -279,8 +277,7 @@ export default function StyleVault() {
       if (p.status === "blocked") { setLerr("Tu cuenta está bloqueada."); setAL(false); return; }
       localStorage.setItem("sb_profile", JSON.stringify(p));
       setProfile(p);
-      const savedDna = localStorage.getItem("sv_dna");
-      setScreen(savedDna ? "app" : "onboarding");
+      setScreen("app");
     } catch { setLerr("Error de conexión."); }
     setAL(false);
   };
@@ -296,7 +293,7 @@ export default function StyleVault() {
       await dbInsert("users", newProfile);
       localStorage.setItem("sb_profile", JSON.stringify(newProfile));
       setProfile(newProfile);
-      setScreen("onboarding");
+      setScreen("app");
     } catch { setLerr("Error al crear cuenta."); }
     setAL(false);
   };
@@ -593,8 +590,8 @@ export default function StyleVault() {
               ))}
             </div>
             <button className="btn-p" onClick={()=>setObStep(2)}>Comenzar →</button>
-            <button onClick={()=>{ setDna({}); setScreen("app"); }} style={{ background:"none", border:"none", color:"var(--text3)", fontSize:"10px", cursor:"pointer", letterSpacing:"1px", fontFamily:"'Jost',sans-serif", textDecoration:"underline", textAlign:"center", width:"100%", marginTop:"16px", padding:"8px" }}>
-              Omitir por ahora
+            <button onClick={()=>{ setScreen("app"); }} style={{ background:"none", border:"none", color:"var(--text2)", fontSize:"11px", cursor:"pointer", letterSpacing:"1px", fontFamily:"'Jost',sans-serif", textDecoration:"underline", textAlign:"center", width:"100%", marginTop:"16px", padding:"8px" }}>
+              Omitir — configurar después
             </button>
           </div>
         )}
@@ -811,7 +808,7 @@ export default function StyleVault() {
             </div>
 
             {/* DNA Preview */}
-            {dna?.bodyType && (
+            {dna?.bodyType ? (
               <div className="card card-gold" style={{ marginBottom:"14px" }}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"12px" }}>
                   <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase" }}>✦ Tu Fashion DNA™</div>
@@ -820,6 +817,16 @@ export default function StyleVault() {
                 <div style={{ display:"flex", gap:"6px", flexWrap:"wrap" }}>
                   {dna.idealColors?.slice(0,4).map((c: string) => <span key={c} className="dna-tag dna-good">{c}</span>)}
                   {dna.recommendedStyles?.slice(0,2).map((s: string) => <span key={s} className="dna-tag dna-style">{s}</span>)}
+                </div>
+              </div>
+            ) : (
+              <div className="card" style={{ marginBottom:"14px", borderColor:"rgba(196,151,63,.15)" }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                  <div>
+                    <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"6px" }}>🧬 Fashion DNA™</div>
+                    <div style={{ fontSize:"12px", color:"var(--text2)", lineHeight:1.5 }}>Crea tu perfil para recomendaciones personalizadas</div>
+                  </div>
+                  <button className="btn-o" style={{ fontSize:"9px", padding:"7px 12px", flexShrink:0, marginLeft:"12px" }} onClick={()=>setScreen("onboarding")}>Crear →</button>
                 </div>
               </div>
             )}
