@@ -1334,10 +1334,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
             <div className="card" style={{ marginBottom:"16px" }}>
               <textarea
                 className="inp"
-                placeholder={"Ej: Cena romántica en restaurante elegante
-Entrevista de trabajo para gerente
-Fiesta en la playa
-Viaje a Nueva York por 5 días..."}
+                placeholder={"Ej: Cena romántica en restaurante elegante\nEntrevista de trabajo para gerente\nFiesta en la playa\nViaje a Nueva York por 5 días..."}
                 value={outfitPrompt}
                 onChange={e=>setOutfitPrompt(e.target.value)}
                 style={{ resize:"none", minHeight:"100px", lineHeight:1.6, borderRadius:"var(--radius-sm)" }}
