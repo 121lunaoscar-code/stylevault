@@ -1505,6 +1505,73 @@ Viaje a Nueva York por 5 días..."}
                 )}
               </div>
             )}
+
+            {/* ── GENERADOR CLÁSICO (original) ── */}
+            <div className="divider" style={{ margin:"24px 0 20px" }}/>
+            <div style={{ fontSize:"14px", fontWeight:700, color:"var(--text)", marginBottom:"4px" }}>Generador por evento</div>
+            <div style={{ fontSize:"12px", color:"var(--text2)", marginBottom:"16px" }}>Selecciona el evento y temporada</div>
+
+            {clothes.length===0 ? (
+              <div style={{ textAlign:"center", padding:"40px", color:"var(--text3)", fontSize:"13px" }}>Agrega prendas a tu armario primero</div>
+            ) : (
+              <>
+                <div className="card" style={{ marginBottom:"12px" }}>
+                  <div style={{ fontSize:"12px", fontWeight:600, color:"var(--text2)", marginBottom:"12px" }}>¿Para qué evento?</div>
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"7px" }}>
+                    {EVENTS.map(ev => (
+                      <button key={ev} onClick={()=>setSelEv(ev)} style={{ padding:"10px 8px", background:selEv===ev?"var(--accent-light)":"var(--bg3)", color:selEv===ev?"var(--accent)":"var(--text2)", border:`2px solid ${selEv===ev?"var(--accent)":"var(--border)"}`, borderRadius:"var(--radius-sm)", cursor:"pointer", fontFamily:"var(--font)", fontSize:"11px", textAlign:"left", transition:"all .2s", fontWeight:selEv===ev?600:400 }}>{ev}</button>
+                    ))}
+                  </div>
+                </div>
+                <div className="card" style={{ marginBottom:"16px" }}>
+                  <div style={{ fontSize:"12px", fontWeight:600, color:"var(--text2)", marginBottom:"10px" }}>Temporada</div>
+                  <div style={{ display:"flex", gap:"7px", flexWrap:"wrap" }}>
+                    {SEASONS.map(s => <button key={s} className={`pill ${selSe===s?"on":""}`} onClick={()=>setSelSe(s)}>{s}</button>)}
+                  </div>
+                </div>
+                <button className="btn-p" onClick={generateOutfit} disabled={!selEv||outfitL} style={{ marginBottom:"18px" }}>
+                  {outfitL?"Creando outfit...":"✦  Generar Outfit con IA"}
+                </button>
+                {outfitL && <div style={{ display:"flex", justifyContent:"center", gap:"6px", padding:"24px" }}><div className="dot"/><div className="dot"/><div className="dot"/></div>}
+                {outfitR && !outfitL && (
+                  <div className="fade">
+                    <div className="divider"/>
+                    {outfitR.rating > 0 && (
+                      <div style={{ background:"var(--bg3)", border:"1px solid var(--accent-glow)", borderRadius:"var(--radius-sm)", padding:"14px", marginBottom:"14px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                        <div style={{ fontSize:"12px", color:"var(--text2)", flex:1 }}>{outfitR.ratingExplanation}</div>
+                        <div style={{ textAlign:"right", marginLeft:"12px" }}>
+                          <div className="stars">{renderStars(outfitR.rating)}</div>
+                          <div style={{ fontSize:"10px", color:"var(--accent)", marginTop:"3px" }}>{outfitR.rating}/5</div>
+                        </div>
+                      </div>
+                    )}
+                    {outfitR.colorPalette && (
+                      <div style={{ padding:"10px 14px", background:"var(--bg3)", border:"1px solid var(--border)", borderRadius:"var(--radius-sm)", marginBottom:"14px" }}>
+                        <div style={{ fontSize:"10px", color:"var(--text3)", letterSpacing:"1.5px", textTransform:"uppercase", marginBottom:"4px" }}>Paleta</div>
+                        <div style={{ fontSize:"12px", color:"var(--accent)", fontStyle:"italic" }}>{outfitR.colorPalette}</div>
+                      </div>
+                    )}
+                    <div style={{ display:"flex", flexDirection:"column", gap:"9px", marginBottom:"16px" }}>
+                      {outfitR.outfit?.map((item: any, i: number) => (
+                        <div key={i} style={{ display:"flex", gap:"12px", padding:"13px", background:"var(--bg2)", border:"1px solid var(--border)", borderRadius:"var(--radius-sm)", boxShadow:"var(--card-shadow)" }}>
+                          <div style={{ fontSize:"26px", minWidth:"34px", textAlign:"center" }}>{item.emoji}</div>
+                          <div>
+                            <div style={{ fontSize:"13px", fontWeight:600, color:"var(--text)", marginBottom:"4px" }}>{item.name}</div>
+                            <div style={{ fontSize:"11px", color:"var(--text2)", lineHeight:1.6 }}>{item.why}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {outfitR.explanation && (
+                      <div style={{ background:"var(--accent-light)", borderLeft:"3px solid var(--accent)", padding:"14px", borderRadius:"0 var(--radius-sm) var(--radius-sm) 0" }}>
+                        <div style={{ fontSize:"10px", fontWeight:600, color:"var(--accent)", letterSpacing:"1.5px", textTransform:"uppercase", marginBottom:"8px" }}>✦ Por qué funciona</div>
+                        <div style={{ fontSize:"12px", color:"var(--text2)", lineHeight:1.8 }}>{outfitR.explanation}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
 
