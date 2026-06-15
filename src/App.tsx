@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { LANGUAGES, T, LangCode, detectLanguage, saveLanguage } from "./i18n";
 
 const API_URL = "https://stylevault-api.121lunaoscar.workers.dev";
 const MODEL = "claude-sonnet-4-5";
@@ -59,12 +60,16 @@ const EVENTS = ["Trabajo / Oficina","Cita romántica","Reunión de negocios","Ev
 const CAT_ICON: Record<string,string> = { Tops:"👕", Pantalones:"👖", Vestidos:"👗", Zapatos:"👟", Accesorios:"💍", Abrigos:"🧥", Deportivo:"🏃" };
 
 // System prompts
-const ADVISOR_SYSTEM = `Eres StyleVault, asesor de moda experto y sofisticado. Usa markdown: **negrita**, listas. Sé conciso (máx 4 párrafos). Responde en español. Termina con pregunta de seguimiento.`;
-const OUTFIT_SYSTEM = `Eres experto en moda. SOLO JSON sin markdown: { outfit: [{emoji,name,why}], explanation: string, colorPalette: string, rating: number 1-5, ratingExplanation: string }`;
-const PHOTO_SYSTEM = `Analiza esta prenda. SOLO JSON: { name: string, category: "Tops"|"Pantalones"|"Vestidos"|"Zapatos"|"Accesorios"|"Abrigos"|"Deportivo", color: string, occasion: "Casual"|"Trabajo"|"Formal"|"Deportivo"|"Fiesta"|"Viaje", season: "Todo el año"|"Primavera"|"Verano"|"Otoño"|"Invierno" }`;
-const TRIP_SYSTEM = `Eres experto en moda y viajes. SOLO JSON: { intro: string, llevar: [{categoria: string, items: [string], tip: string}], faltan: [{name: string, why: string, urgente: boolean}], consejo: string }`;
+const getAdvisorSystem = (lang: LangCode, dnaCtx: string, wardrobeCtx: string) =>
+  `You are StyleVault, a sophisticated personal fashion advisor. Use markdown: **bold**, lists. Be concise (max 4 paragraphs). ALWAYS respond in the user's language (language code: ${lang}). End with a follow-up question.${dnaCtx}${wardrobeCtx}`;
+const getOutfitSystem = (lang: LangCode) =>
+  `You are a fashion expert. ONLY JSON without markdown. Respond with all text values in language code: ${lang}: { outfit: [{emoji,name,why}], explanation: string, colorPalette: string, rating: number 1-5, ratingExplanation: string }`;
+const getPhotoSystem = (lang: LangCode) =>
+  `Analyze this garment. ONLY JSON with name and color in language ${lang}: { name: string, category: "Tops"|"Pantalones"|"Vestidos"|"Zapatos"|"Accesorios"|"Abrigos"|"Deportivo", color: string, occasion: "Casual"|"Trabajo"|"Formal"|"Deportivo"|"Fiesta"|"Viaje", season: "Todo el año"|"Primavera"|"Verano"|"Otoño"|"Invierno" }`;
+const getTripSystem = (lang: LangCode) =>
+  `You are a fashion and travel expert. Respond in language code: ${lang}. ONLY JSON: { intro: string, llevar: [{categoria: string, items: [string], tip: string}], faltan: [{name: string, why: string, urgente: boolean}], consejo: string }`;
 
-const DNA_SYSTEM = `Eres experto en análisis de imagen personal y moda. Analiza estas fotos (selfie frontal, cuerpo completo frontal, cuerpo completo lateral) junto con los datos del usuario.
+const DNA_SYSTEM = `You are an expert in personal image analysis and fashion. Analiza estas fotos (selfie frontal, cuerpo completo frontal, cuerpo completo lateral) junto con los datos del usuario.
 
 SOLO responde en JSON válido sin markdown:
 {
@@ -88,7 +93,8 @@ SOLO responde en JSON válido sin markdown:
   "topTips": [string]
 }`;
 
-const VIRTUAL_SYSTEM = `Eres estilista virtual experto. Dado el Fashion DNA del usuario y las prendas seleccionadas, describe detalladamente cómo luciría el outfit en esa persona específicamente. Incluye: cómo cada prenda favorece su tipo de cuerpo, qué colores complementan su tono de piel, y cómo se ve el conjunto completo. Máx 3 párrafos. En español.`;
+const getVirtualSystem = (lang: LangCode) =>
+  `You are an expert virtual stylist. Given the user's Fashion DNA and selected items, describe in detail how the outfit would look on that specific person. Include: how each item flatters their body type, what colors complement their skin tone, and how the complete look comes together. Max 3 paragraphs. Respond in language code: ${lang}.`;
 
 function renderMd(text: string) {
   return text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').replace(/^- (.*?)$/gm,'<li>$1</li>').replace(/(<li>.*<\/li>\n?)+/g,m=>`<ul>${m}</ul>`).replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br/>');
@@ -273,6 +279,17 @@ body{background:var(--bg);font-family:var(--font)}
 export default function StyleVault() {
   // Auth
   const [screen, setScreen] = useState("login");
+  const [lang, setLang] = useState<LangCode>(() => detectLanguage());
+  const [showLangMenu, setShowLangMenu] = useState(false);
+  const t = T[lang];
+
+  const changeLang = (code: LangCode) => {
+    setLang(code);
+    saveLanguage(code);
+    setShowLangMenu(false);
+    const isRtl = LANGUAGES.find(l => l.code === code)?.dir === "rtl";
+    document.documentElement.setAttribute("dir", isRtl ? "rtl" : "ltr");
+  };
   const [resetToken, setResetToken] = useState<string|null>(null);
   const [newPassword, setNewPassword] = useState("");
   const [resetMsg, setResetMsg] = useState("");
@@ -314,6 +331,9 @@ export default function StyleVault() {
       const d = JSON.parse(savedDna);
       applyTheme(d.genero || d.userInfo?.genero || "");
     }
+    // Set RTL if Arabic saved
+    const savedLang = localStorage.getItem("sv_lang");
+    if (savedLang === "ar") document.documentElement.setAttribute("dir", "rtl");
   }, []);
 
   // App
@@ -344,7 +364,7 @@ export default function StyleVault() {
   const [savedOutfits, setSavedOutfits] = useState<any[]>(() => JSON.parse(localStorage.getItem("sv_saved_outfits") || "[]"));
 
   const [msgs, setMsgs] = useState<{role:string;text:string}[]>([
-    { role:"assistant", text:"Hola, soy tu **asesor de estilo personal**. Puedo ayudarte con combinaciones, dress codes, tendencias y mucho más.\n\n¿En qué te ayudo hoy?" }
+    { role:"assistant", text:"Hi, I'm your personal style advisor. How can I help?" }
   ]);
   const [cin, setCin] = useState("");
   const [cload, setCload] = useState(false);
@@ -368,6 +388,9 @@ export default function StyleVault() {
   const camRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { chatEnd.current?.scrollIntoView({ behavior:"smooth" }); }, [msgs]);
+  useEffect(() => {
+    setMsgs([{ role:"assistant", text: T[lang].advisorGreeting }]);
+  }, [lang]);
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2600); };
 
   useEffect(() => {
@@ -526,10 +549,10 @@ export default function StyleVault() {
       try {
         const base64 = dataUrl.split(',')[1];
         const images = [{ base64, type: f.type }];
-        const text = await callClaudeVision(PHOTO_SYSTEM, images, "Analiza esta prenda.");
+        const text = await callClaudeVision(getPhotoSystem(lang), images, "Analyze this garment.");
         const parsed = JSON.parse(text.replace(/```json|```/g,"").trim());
         setNi(prev => ({ ...prev, name: parsed.name||prev.name, category: parsed.category||prev.category, season: parsed.season||prev.season, occasion: parsed.occasion||prev.occasion }));
-        showToast("✦ Prenda analizada con IA");
+        showToast(t.itemAnalyzed);
       } catch {}
       setAnalyzing(false);
     };
@@ -543,7 +566,7 @@ export default function StyleVault() {
       const item = inserted?.[0] || { id: Date.now(), user_id: profile.id, ...ni, photo_url: pp };
       setClothes([item, ...clothes]);
       setNi({ name:"", category:"Tops", color:"#C4973F", season:"Todo el año", occasion:"" });
-      setPp(null); setSF(false); showToast("✦ Prenda guardada");
+      setPp(null); setSF(false); showToast(t.itemSaved);
     } catch { showToast("Error al guardar."); }
   };
 
@@ -572,9 +595,9 @@ export default function StyleVault() {
                    ["Marzo","Abril","Mayo"].includes(new Date().toLocaleString("es",{month:"long"})) ? "Primavera" :
                    ["Junio","Julio","Agosto"].includes(new Date().toLocaleString("es",{month:"long"})) ? "Verano" : "Otoño";
 
-    const SMART_SYSTEM = `Eres el estilista personal más sofisticado del mundo. Analizas el perfil completo del usuario y creas outfits perfectamente personalizados.
+    const SMART_SYSTEM = `You are the world's most sophisticated personal stylist. Respond with ALL text in language code: ${lang}.
 
-SOLO responde en JSON válido sin markdown:
+ONLY valid JSON without markdown:
 {
   "greeting": string (mensaje cálido y personal del estilista, máx 2 oraciones),
   "eventAnalysis": { "tipo": string, "formalidad": string, "clima": string, "estacion": string },
@@ -589,11 +612,11 @@ SOLO responde en JSON válido sin markdown:
 }`;
 
     try {
-      setSmartOutfitSteps("Analizando tu ocasión...");
+      setSmartOutfitSteps(t.step1);
       await new Promise(r => setTimeout(r, 600));
-      setSmartOutfitSteps("Consultando tu Fashion DNA™...");
+      setSmartOutfitSteps(t.step2);
       await new Promise(r => setTimeout(r, 500));
-      setSmartOutfitSteps("Seleccionando prendas perfectas...");
+      setSmartOutfitSteps(t.step3);
 
       const raw = await callClaude(SMART_SYSTEM, [{
         role: "user",
@@ -625,7 +648,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
     const next = [saved, ...savedOutfits].slice(0, 20);
     setSavedOutfits(next);
     localStorage.setItem("sv_saved_outfits", JSON.stringify(next));
-    showToast("✦ Outfit guardado");
+    showToast(t.outfitSaved);
   };
 
   // Outfit
@@ -635,7 +658,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
     const list = clothes.map(c => `${c.name} (${c.category}, ${c.occasion||""})`).join("\n");
     const dnaCtx = dna ? `\nFashion DNA del usuario: Tipo de cuerpo: ${dna.bodyType}, Tono: ${dna.skinTone}, Subtono: ${dna.skinUndertone}, Colores ideales: ${dna.idealColors?.join(", ")}.` : "";
     try {
-      const raw = await callClaude(OUTFIT_SYSTEM, [{ role:"user", content:`Armario:\n${list}\n\nEvento: ${selEv}\nTemporada: ${selSe}${dnaCtx}\n\nCrea el outfit ideal personalizado para este usuario y califícalo.` }]);
+      const raw = await callClaude(getOutfitSystem(lang), [{ role:"user", content:`Armario:\n${list}\n\nEvento: ${selEv}\nTemporada: ${selSe}${dnaCtx}\n\nCrea el outfit ideal personalizado para este usuario y califícalo.` }]);
       setOR(JSON.parse(raw.replace(/```json|```/g,"").trim()));
       showToast("✦ Outfit creado");
     } catch { setOR({ outfit:[], explanation:"Error.", colorPalette:"", rating:0, ratingExplanation:"" }); }
@@ -647,10 +670,10 @@ Crea el outfit perfecto y personalizado para esta persona.`
     const m = msg || cin; if (!m.trim()) return;
     const next = [...msgs, { role:"user", text:m }];
     setMsgs(next); setCin(""); setCload(true);
-    const dnaCtx = dna ? `\nFashion DNA: Tipo de cuerpo: ${dna.bodyType}, Tono: ${dna.skinTone}, Subtono: ${dna.skinUndertone}, Colores ideales: ${dna.idealColors?.join(", ")}, Prendas recomendadas: ${dna.recommendedClothes?.slice(0,5).join(", ")}.` : "";
-    const wardrobeCtx = clothes.length > 0 ? `\nArmario: ${clothes.slice(0,15).map(c=>`${c.name} (${c.category})`).join(", ")}` : "";
+    const dnaCtx = dna ? `\nFashion DNA: Body type: ${dna.bodyType}, Skin tone: ${dna.skinTone} (${dna.skinUndertone}), Ideal colors: ${dna.idealColors?.join(", ")}, Recommended clothes: ${dna.recommendedClothes?.slice(0,5).join(", ")}.` : "";
+    const wardrobeCtx = clothes.length > 0 ? `\nWardrobe: ${clothes.slice(0,15).map(c=>`${c.name} (${c.category})`).join(", ")}` : "";
     try {
-      const reply = await callClaude(ADVISOR_SYSTEM + dnaCtx + wardrobeCtx, next.map(x=>({ role:x.role==="assistant"?"assistant":"user", content:x.text })));
+      const reply = await callClaude(getAdvisorSystem(lang, dnaCtx, wardrobeCtx), next.map(x=>({ role:x.role==="assistant"?"assistant":"user", content:x.text })));
       setMsgs([...next, { role:"assistant", text:reply }]);
     } catch { setMsgs([...next, { role:"assistant", text:"Error de conexión." }]); }
     setCload(false);
@@ -663,7 +686,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
     const prendas = clothes.filter(c => selectedForTry.includes(c.id)).map(c => `${c.name} (${c.category}, color: ${c.color})`).join(", ");
     const perfil = `Tipo de cuerpo: ${dna.bodyType}, Proporciones: hombros ${dna.bodyProportions?.shoulders}, cintura ${dna.bodyProportions?.waist}, caderas ${dna.bodyProportions?.hips}. Tono de piel: ${dna.skinTone} (${dna.skinUndertone}). Colores ideales: ${dna.idealColors?.join(", ")}.`;
     try {
-      const result = await callClaude(VIRTUAL_SYSTEM, [{ role:"user", content:`Fashion DNA:\n${perfil}\n\nOutfit seleccionado:\n${prendas}\n\nDescribe cómo luciría este outfit en esta persona específicamente.` }]);
+      const result = await callClaude(getVirtualSystem(lang), [{ role:"user", content:`Fashion DNA:\n${perfil}\n\nOutfit seleccionado:\n${prendas}\n\nDescribe cómo luciría este outfit en esta persona específicamente.` }]);
       setTryResult(result);
     } catch { setTryResult("Error al procesar."); }
     setTryL(false);
@@ -675,7 +698,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
     setTripL(true); setTripR(null);
     const armario = clothes.length > 0 ? clothes.map(c => `${c.name} (${c.category})`).join(", ") : "Sin prendas";
     try {
-      const raw = await callClaude(TRIP_SYSTEM, [{ role:"user", content:`Destino: ${tripDest}\nDías: ${tripDays}\nClima: ${tripClima||"templado"}\nTipo: ${tripTipo||"turismo"}\nArmario: ${armario}` }]);
+      const raw = await callClaude(getTripSystem(lang), [{ role:"user", content:`Destino: ${tripDest}\nDías: ${tripDays}\nClima: ${tripClima||"templado"}\nTipo: ${tripTipo||"turismo"}\nArmario: ${armario}` }]);
       setTripR(JSON.parse(raw.replace(/```json|```/g,"").trim()));
     } catch { setTripR({ intro:"Error.", llevar:[], faltan:[], consejo:"" }); }
     setTripL(false);
@@ -698,7 +721,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
   const favClothes = clothes.filter(c => favorites.includes(c.id));
   const isPremium = profile?.plan === "Premium" || profile?.plan === "Admin";
   const renderStars = (n: number) => "★".repeat(Math.min(5,Math.max(0,Math.round(n)))) + "☆".repeat(5-Math.min(5,Math.max(0,Math.round(n))));
-  const suggestions = ["¿Qué colores van con mi tono de piel?","Armario cápsula para mi tipo de cuerpo","¿Cómo vestir para entrevista?","Prendas que me favorecen más"];
+  const suggestions = [t.s1, t.s2, t.s3, t.s4];
 
   // Reset to neutral theme on login/reset screens
   if (screen === "login" || screen === "reset") {
@@ -707,7 +730,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
 
   // ── RESET PASSWORD ────────────────────────────────────────────────────────
   if (screen === "reset") return (
-    <div style={{ fontFamily:"'Jost',sans-serif", background:"#080808", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"24px" }}>
+    <div style={{ fontFamily:"'Jost',sans-serif", background:"var(--bg)", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"24px" }}>
       <style>{CSS}</style>
       <div style={{ width:"100%", maxWidth:"360px" }}>
         <div style={{ textAlign:"center", marginBottom:"40px" }}>
@@ -728,20 +751,28 @@ Crea el outfit perfecto y personalizado para esta persona.`
 
   // ── LOGIN ─────────────────────────────────────────────────────────────────
   if (screen === "login") return (
-    <div style={{ fontFamily:"'Jost',sans-serif", background:"#080808", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"24px" }}>
+    <div style={{ fontFamily:"'Jost',sans-serif", background:"var(--bg)", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"24px" }}>
       <style>{CSS}</style>
       <div style={{ width:"100%", maxWidth:"360px" }}>
         <div style={{ textAlign:"center", marginBottom:"40px" }}>
           <div style={{ fontSize:"26px", fontWeight:800, color:"var(--text)", letterSpacing:"-0.5px", marginBottom:"4px" }}>
             STYLE<span style={{ color:"var(--accent)" }}>VAULT</span>
           </div>
-          <div style={{ fontSize:"11px", letterSpacing:"2px", color:"var(--text3)", textTransform:"uppercase", fontWeight:500 }}>Armario Inteligente con IA</div>
+          <div style={{ fontSize:"11px", letterSpacing:"2px", color:"var(--text3)", textTransform:"uppercase", fontWeight:500 }}>{t.appSub}</div>
+          <div style={{ display:"flex", justifyContent:"center", gap:"8px", flexWrap:"wrap", marginTop:"16px" }}>
+            {LANGUAGES.map(l => (
+              <button key={l.code} onClick={()=>changeLang(l.code as LangCode)}
+                style={{ padding:"6px 10px", background:lang===l.code?"var(--accent)":"var(--bg3)", border:`1px solid ${lang===l.code?"var(--accent)":"var(--border)"}`, borderRadius:"20px", cursor:"pointer", fontSize:"16px", transition:"all .2s" }}>
+                {l.flag}
+              </button>
+            ))}
+          </div>
         </div>
         <div className="card">
           <div style={{ display:"flex", marginBottom:"24px", borderBottom:"1px solid var(--border)" }}>
             {["login","register"].map(m => (
               <button key={m} onClick={()=>{setLmode(m);setLerr("");}} style={{ flex:1, padding:"11px", background:"none", border:"none", borderBottom:`2px solid ${lmode===m?"var(--gold)":"transparent"}`, color:lmode===m?"var(--gold)":"var(--text3)", cursor:"pointer", fontFamily:"'Jost',sans-serif", fontSize:"9px", letterSpacing:"3px", textTransform:"uppercase", fontWeight:500 }}>
-                {m==="login"?"Iniciar Sesión":"Registrarse"}
+                {m==="login"?t.login:t.register}
               </button>
             ))}
           </div>
@@ -767,7 +798,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
             <input className="inp" placeholder="Contraseña" type="password" value={lf.password} onChange={e=>setLf(p=>({...p,password:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&(lmode==="login"?handleLogin():handleRegister())} />
             {lerr && <div style={{ color:"var(--red)", fontSize:"12px", textAlign:"center" }}>{lerr}</div>}
             <button className="btn-p" style={{ marginTop:"6px" }} onClick={lmode==="login"?handleLogin:handleRegister} disabled={aloading}>
-              {aloading?"...":lmode==="login"?"✦  Entrar":"✦  Crear Cuenta"}
+              {aloading?"...":lmode==="login"?`✦  ${t.enter}`:`✦  ${t.createAccount}`}
             </button>
             {lmode==="login" && (
               <button onClick={async()=>{
@@ -804,7 +835,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
             <div style={{ textAlign:"center", marginBottom:"40px" }}>
               <div className="serif" style={{ fontSize:"22px", letterSpacing:"6px", color:"var(--gold)", fontWeight:300, marginBottom:"24px" }}>STYLE<em>VAULT</em></div>
               <div style={{ fontSize:"48px", marginBottom:"20px" }}>🧬</div>
-              <div className="serif" style={{ fontSize:"32px", fontWeight:300, marginBottom:"12px" }}>Crea tu Avatar IA</div>
+              <div className="serif" style={{ fontSize:"32px", fontWeight:300, marginBottom:"12px" }}>{t.createAvatar}</div>
               <div style={{ fontSize:"14px", color:"var(--text2)", lineHeight:1.7, maxWidth:"320px", margin:"0 auto" }}>
                 Tu estilista personal necesita conocerte para crear una versión digital de ti y darte recomendaciones perfectas.
               </div>
@@ -817,7 +848,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                 </div>
               ))}
             </div>
-            <button className="btn-p" onClick={()=>setObStep(2)}>Comenzar →</button>
+            <button className="btn-p" onClick={()=>setObStep(2)}>{t.begin}</button>
             <button onClick={()=>{ setScreen("app"); }} style={{ background:"none", border:"none", color:"var(--text2)", fontSize:"11px", cursor:"pointer", letterSpacing:"1px", fontFamily:"'Jost',sans-serif", textDecoration:"underline", textAlign:"center", width:"100%", marginTop:"16px", padding:"8px" }}>
               Omitir — configurar después
             </button>
@@ -828,7 +859,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
         {obStep===2 && (
           <div className="fade">
             <div style={{ marginBottom:"28px" }}>
-              <div className="serif" style={{ fontSize:"28px", fontWeight:300, marginBottom:"8px" }}>Información básica</div>
+              <div className="serif" style={{ fontSize:"28px", fontWeight:300, marginBottom:"8px" }}>{t.basicInfo}</div>
               <div style={{ fontSize:"12px", color:"var(--text2)" }}>Solo lo que la IA no puede detectar por sí sola</div>
             </div>
             <div style={{ display:"flex", flexDirection:"column", gap:"12px", marginBottom:"24px" }}>
@@ -870,7 +901,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
               <div>
                 <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"10px" }}>Tipo de cabello</div>
                 <div style={{ display:"flex", gap:"8px", flexWrap:"wrap" }}>
-                  {["Lacio","Ondulado","Rizado","Afro"].map(t => (
+                  {[t.straight,t.wavy,t.curly,t.afro].map(hair => (
                     <button key={t} className={`pill ${obInfo.cabello===t?"on":""}`} onClick={()=>setObInfo(p=>({...p,cabello:t}))}>{t}</button>
                   ))}
                 </div>
@@ -887,7 +918,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
         {obStep===3 && (
           <div className="fade">
             <div style={{ marginBottom:"24px" }}>
-              <div className="serif" style={{ fontSize:"28px", fontWeight:300, marginBottom:"8px" }}>Escaneo Inteligente</div>
+              <div className="serif" style={{ fontSize:"28px", fontWeight:300, marginBottom:"8px" }}>{t.smartScan}</div>
               <div style={{ fontSize:"12px", color:"var(--text2)" }}>3 fotos para crear tu avatar con máxima precisión</div>
             </div>
 
@@ -1013,13 +1044,31 @@ Crea el outfit perfecto y personalizado para esta persona.`
           <div style={{ fontSize:"18px", fontWeight:700, color:"var(--text)", letterSpacing:"-0.5px", fontFamily:"var(--font)" }}>
             STYLE<span style={{ color:"var(--accent)" }}>VAULT</span>
           </div>
-          <div style={{ fontSize:"9px", letterSpacing:"2px", color:"var(--text3)", marginTop:"1px", textTransform:"uppercase", fontWeight:500 }}>Armario Inteligente</div>
+          <div style={{ fontSize:"9px", letterSpacing:"2px", color:"var(--text3)", marginTop:"1px", textTransform:"uppercase", fontWeight:500 }}>{t.armarioInteligente}</div>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:"12px" }}>
           {isPremium && <span className="premium-badge">Premium</span>}
+          {/* Language selector */}
+          <div style={{ position:"relative" }}>
+            <button onClick={()=>setShowLangMenu(!showLangMenu)} style={{ background:"var(--bg3)", border:"1px solid var(--border)", borderRadius:"30px", padding:"6px 12px", cursor:"pointer", fontSize:"18px", display:"flex", alignItems:"center", gap:"4px" }}>
+              {LANGUAGES.find(l=>l.code===lang)?.flag}
+              <span style={{ fontSize:"9px", color:"var(--text2)", fontWeight:600 }}>▾</span>
+            </button>
+            {showLangMenu && (
+              <div style={{ position:"absolute", top:"calc(100% + 8px)", right:0, background:"var(--bg2)", border:"1px solid var(--border)", borderRadius:"var(--radius-sm)", padding:"6px", zIndex:200, minWidth:"160px", boxShadow:"var(--card-shadow)" }}>
+                {LANGUAGES.map(l => (
+                  <button key={l.code} onClick={()=>changeLang(l.code as LangCode)}
+                    style={{ display:"flex", alignItems:"center", gap:"10px", width:"100%", padding:"8px 10px", background:lang===l.code?"var(--accent-light)":"transparent", border:"none", borderRadius:"6px", cursor:"pointer", fontFamily:"var(--font)", fontSize:"12px", color:lang===l.code?"var(--accent)":"var(--text)", fontWeight:lang===l.code?600:400, textAlign:"left" }}>
+                    <span style={{ fontSize:"18px" }}>{l.flag}</span>
+                    <span>{l.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <div style={{ textAlign:"right", cursor:"pointer", padding:"6px 10px", background:"var(--bg3)", borderRadius:"30px", border:"1px solid var(--border)" }} onClick={handleLogout}>
             <div style={{ fontSize:"12px", fontWeight:600, color:"var(--text)" }}>{profile?.name?.split(" ")[0]}</div>
-            <div style={{ fontSize:"9px", color:"var(--accent)", fontWeight:500 }}>Salir</div>
+            <div style={{ fontSize:"9px", color:"var(--accent)", fontWeight:500 }}>{t.exit}</div>
           </div>
         </div>
       </header>
@@ -1047,9 +1096,9 @@ Crea el outfit perfecto y personalizado para esta persona.`
             {/* Stats */}
             <div style={{ display:"flex", gap:"10px", marginBottom:"18px" }}>
               {[
-                { label:"Prendas", value:clothes.length, icon:"👗" },
-                { label:"Favoritas", value:favClothes.length, icon:"❤️" },
-                { label:"Outfits", value:outfitR?1:0, icon:"✨" },
+                { label:t.items, value:clothes.length, icon:"👗" },
+                { label:t.favorites, value:favClothes.length, icon:"❤️" },
+                { label:t.outfits, value:outfitR?1:0, icon:"✨" },
               ].map(s => (
                 <div key={s.label} className="stat-card">
                   <div style={{ fontSize:"22px", marginBottom:"6px" }}>{s.icon}</div>
@@ -1242,10 +1291,10 @@ Crea el outfit perfecto y personalizado para esta persona.`
           <div className="fade">
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"18px" }}>
               <div>
-                <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>Mi Armario</div>
+                <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>{t.myWardrobe}</div>
                 <div style={{ fontSize:"10px", color:"var(--text2)", marginTop:"3px" }}>{clothes.length} prendas</div>
               </div>
-              <button className="btn-o" onClick={()=>setSF(!showForm)}>+ Agregar</button>
+              <button className="btn-o" onClick={()=>setSF(!showForm)}>{t.addItem}</button>
             </div>
 
             {showForm && (
@@ -1277,8 +1326,8 @@ Crea el outfit perfecto y personalizado para esta persona.`
                     {SEASONS.map(s=><option key={s}>{s}</option>)}
                   </select>
                   <div style={{ display:"flex", gap:"9px", marginTop:"4px" }}>
-                    <button className="btn-p" onClick={addItem} style={{ flex:1 }}>Guardar</button>
-                    <button className="btn-o" onClick={()=>{setSF(false);setPp(null);}}>Cancelar</button>
+                    <button className="btn-p" onClick={addItem} style={{ flex:1 }}>{t.save}</button>
+                    <button className="btn-o" onClick={()=>{setSF(false);setPp(null);}}>{t.cancel}</button>
                   </div>
                 </div>
               </div>
@@ -1297,7 +1346,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
             )}
 
             {cloading ? <div style={{ display:"flex", justifyContent:"center", gap:"6px", padding:"50px" }}><div className="dot"/><div className="dot"/><div className="dot"/></div>
-            : filtered.length===0 ? <div style={{ textAlign:"center", padding:"60px 20px", color:"var(--text3)", fontSize:"12px" }}>{clothes.length===0?"Tu armario está vacío":"Sin prendas en esta categoría"}</div>
+            : filtered.length===0 ? <div style={{ textAlign:"center", padding:"60px 20px", color:"var(--text3)", fontSize:"12px" }}>{clothes.length===0?t.wardrobeEmpty:t.noItemsInCat}</div>
             : (
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"11px" }}>
                 {filtered.map(item => (
@@ -1326,8 +1375,8 @@ Crea el outfit perfecto y personalizado para esta persona.`
             {/* Hero */}
             <div style={{ background:`linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%)`, borderRadius:"var(--radius)", padding:"24px 20px 20px", marginBottom:"20px", position:"relative", overflow:"hidden" }}>
               <div style={{ position:"absolute", right:"-20px", top:"-20px", width:"130px", height:"130px", background:"rgba(255,255,255,.07)", borderRadius:"50%" }}/>
-              <div style={{ fontSize:"22px", fontWeight:700, color:"#fff", marginBottom:"6px" }}>¿A dónde iremos hoy?</div>
-              <div style={{ fontSize:"13px", color:"rgba(255,255,255,.75)", lineHeight:1.5 }}>Cuéntame el lugar o evento y crearé el outfit perfecto para ti</div>
+              <div style={{ fontSize:"22px", fontWeight:700, color:"#fff", marginBottom:"6px" }}>{t.whereTo}</div>
+              <div style={{ fontSize:"13px", color:"rgba(255,255,255,.75)", lineHeight:1.5 }}>{t.whereToSub}</div>
             </div>
 
             {/* Input */}
@@ -1351,9 +1400,9 @@ Crea el outfit perfecto y personalizado para esta persona.`
               <div style={{ fontSize:"13px", fontWeight:600, color:"var(--text)", marginBottom:"14px" }}>¿Con qué armario creamos el outfit?</div>
               <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
                 {[
-                  { id:"wardrobe", icon:"👔", label:"Con mi armario", desc:"Usar únicamente las prendas que tengo guardadas" },
-                  { id:"new", icon:"✨", label:"Sin mi armario", desc:"Generar recomendaciones con prendas nuevas y tendencias" },
-                  { id:"mixed", icon:"🔥", label:"Mi armario + IA", desc:"Combinar mis prendas con nuevas sugerencias", premium:true },
+                  { id:"wardrobe", icon:"👔", label:t.withMyWardrobe, desc:t.withMyWardrobeDesc },
+                  { id:"new", icon:"✨", label:t.noWardrobe, desc:t.noWardrobeDesc },
+                  { id:"mixed", icon:"🔥", label:t.mixedWardrobe, desc:t.mixedWardrobeDesc, premium:true },
                 ].map(opt => (
                   <button key={opt.id} onClick={()=>(!opt.premium||isPremium)&&setOutfitSource(opt.id)}
                     style={{ display:"flex", alignItems:"center", gap:"14px", padding:"14px", background:outfitSource===opt.id?"var(--accent-light)":"var(--bg3)", border:`2px solid ${outfitSource===opt.id?"var(--accent)":"var(--border)"}`, borderRadius:"var(--radius-sm)", cursor:opt.premium&&!isPremium?"not-allowed":"pointer", transition:"all .2s", opacity:opt.premium&&!isPremium?.6:1, textAlign:"left", width:"100%" }}>
@@ -1376,7 +1425,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                 <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"10px" }}>
                   <span>{smartOutfitSteps || "Generando tu outfit..."}</span>
                 </span>
-              ) : "✨ Generar mi Outfit Perfecto"}
+              ) : t.generateOutfit}
             </button>
 
             {smartOutfitL && (
@@ -1576,7 +1625,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
         {tab==="avatar" && (
           <div className="fade">
             <div style={{ marginBottom:"20px" }}>
-              <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>Prueba Virtual</div>
+              <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>{t.virtualTryTitle}</div>
               <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>{isPremium ? "Basada en tu Fashion DNA™" : "Función exclusiva Premium"}</div>
             </div>
             {!isPremium ? (
@@ -1625,7 +1674,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                 {selectedForTry.length > 0 && (
                   <div>
                     <button className="btn-p" onClick={virtualTryOn} disabled={tryL} style={{ marginBottom:"16px" }}>
-                      {tryL?"Generando prueba virtual...":"🧍 Probar outfit virtualmente"}
+                      {tryL?t.generatingVirtual:t.tryVirtually}
                     </button>
                     {tryL && <div style={{ display:"flex", justifyContent:"center", gap:"6px", padding:"24px" }}><div className="dot"/><div className="dot"/><div className="dot"/></div>}
                     {tryResult && !tryL && (
@@ -1674,7 +1723,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
         {tab==="advisor" && (
           <div className="fade" style={{ display:"flex", flexDirection:"column", height:"calc(100vh - 180px)" }}>
             <div style={{ marginBottom:"14px" }}>
-              <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>Asesor IA</div>
+              <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>{t.advisorTitle}</div>
               <div style={{ fontSize:"10px", color:"var(--text2)", marginTop:"3px" }}>Powered by Claude AI · Personalizado con tu DNA</div>
             </div>
             <div style={{ display:"flex", gap:"7px", overflowX:"auto", paddingBottom:"10px", marginBottom:"12px" }}>
@@ -1693,8 +1742,8 @@ Crea el outfit perfecto y personalizado para esta persona.`
               <div ref={chatEnd}/>
             </div>
             <div style={{ display:"flex", gap:"8px", paddingTop:"12px", borderTop:"1px solid var(--border)" }}>
-              <input className="inp" style={{ flex:1 }} placeholder="Pregunta sobre moda, estilo, tendencias..." value={cin} onChange={e=>setCin(e.target.value)} onKeyDown={e=>e.key==="Enter"&&!cload&&sendChat()} />
-              <button className="btn-o" style={{ flexShrink:0 }} onClick={()=>sendChat()} disabled={cload||!cin.trim()}>Enviar</button>
+              <input className="inp" style={{ flex:1 }} placeholder={t.askAboutFashion} value={cin} onChange={e=>setCin(e.target.value)} onKeyDown={e=>e.key==="Enter"&&!cload&&sendChat()} />
+              <button className="btn-o" style={{ flexShrink:0 }} onClick={()=>sendChat()} disabled={cload||!cin.trim()}>{t.send}</button>
             </div>
           </div>
         )}
@@ -1703,12 +1752,12 @@ Crea el outfit perfecto y personalizado para esta persona.`
         {tab==="trip" && (
           <div className="fade">
             <div style={{ marginBottom:"20px" }}>
-              <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>Planificador de Viaje</div>
+              <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>{t.tripTitle}</div>
               <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>La IA organiza tu maleta con tu armario</div>
             </div>
             <div className="card" style={{ marginBottom:"14px" }}>
               <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
-                <input className="inp" placeholder="¿A dónde vas? (París, Cancún...)" value={tripDest} onChange={e=>setTripDest(e.target.value)} />
+                <input className="inp" placeholder={t.destination} value={tripDest} onChange={e=>setTripDest(e.target.value)} />
                 <div style={{ display:"flex", gap:"10px" }}>
                   <input className="inp" placeholder="Días" type="number" min="1" max="30" value={tripDays} onChange={e=>setTripDays(e.target.value)} style={{ width:"90px" }} />
                   <select className="sel" value={tripClima} onChange={e=>setTripClima(e.target.value)}>
@@ -1724,7 +1773,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
               </div>
             </div>
             <button className="btn-p" onClick={planTrip} disabled={!tripDest||tripL} style={{ marginBottom:"18px" }}>
-              {tripL?"Planificando...":"✈  Planificar Maleta con IA"}
+              {tripL?t.planning:t.planBag}
             </button>
             {tripL && <div style={{ display:"flex", justifyContent:"center", gap:"6px", padding:"30px" }}><div className="dot"/><div className="dot"/><div className="dot"/></div>}
             {tripR && !tripL && (
@@ -1760,26 +1809,26 @@ Crea el outfit perfecto y personalizado para esta persona.`
       <nav className="bnav">
         <button className={`bnav-item ${tab==="home"?"on":""}`} onClick={()=>setTab("home")}>
           <span className="bnav-icon">🏠</span>
-          <span className="bnav-label">Inicio</span>
+          <span className="bnav-label">{t.home}</span>
         </button>
         <button className={`bnav-item ${tab==="wardrobe"?"on":""}`} onClick={()=>setTab("wardrobe")}>
           <span className="bnav-icon">👗</span>
-          <span className="bnav-label">Armario</span>
+          <span className="bnav-label">{t.wardrobe}</span>
         </button>
         <button className="bnav-item" onClick={()=>{setSF(true);setTab("wardrobe");}}>
           <div className="bnav-center">＋</div>
         </button>
         <button className={`bnav-item ${tab==="outfit"?"on":""}`} onClick={()=>setTab("outfit")}>
           <span className="bnav-icon">✨</span>
-          <span className="bnav-label">Outfit IA</span>
+          <span className="bnav-label">{t.outfitIA}</span>
         </button>
         <button className={`bnav-item ${tab==="advisor"?"on":""}`} onClick={()=>setTab("advisor")}>
           <span className="bnav-icon">💬</span>
-          <span className="bnav-label">Asesor IA</span>
+          <span className="bnav-label">{t.advisorIA}</span>
         </button>
         <button className={`bnav-item ${tab==="trip"?"on":""}`} onClick={()=>setTab("trip")}>
           <span className="bnav-icon">✈️</span>
-          <span className="bnav-label">Viajes</span>
+          <span className="bnav-label">{t.trips}</span>
         </button>
       </nav>
     </div>
