@@ -1368,31 +1368,31 @@ export default function StyleVault() {
     setLerr(""); setAL(true);
     try {
       const auth = await sbSignIn(lf.email, lf.password);
-      if (auth.error || !auth.access_token) { setLerr("Correo o contraseña incorrectos."); setAL(false); return; }
+      if (auth.error || !auth.access_token) { setLerr(t.wrongCredentials as string); setAL(false); return; }
       localStorage.setItem("sb_token", auth.access_token);
       const res = await fetch(`${SB_URL}/rest/v1/users?email=eq.${encodeURIComponent(lf.email)}&limit=1`, {
         headers: { apikey: SB_KEY, Authorization: `Bearer ${auth.access_token}`, "Content-Type": "application/json" }
       });
       const users = await res.json();
-      if (!users?.length) { setLerr("Perfil no encontrado."); setAL(false); return; }
+      if (!users?.length) { setLerr(t.profileNotFound as string); setAL(false); return; }
       const p = users[0];
-      if (p.status === "blocked") { setLerr("Tu cuenta está bloqueada."); setAL(false); return; }
+      if (p.status === "blocked") { setLerr(t.blocked as string); setAL(false); return; }
       localStorage.setItem("sb_profile", JSON.stringify(p));
       setProfile(p);
       const savedDna = localStorage.getItem("sv_dna");
       const savedGenero = localStorage.getItem("sv_genero") || p.genero || "";
       applyTheme(savedDna ? (JSON.parse(savedDna).genero || savedGenero) : savedGenero);
       setScreen("app");
-    } catch { setLerr("Error de conexión."); }
+    } catch { setLerr(t.connectionError as string); }
     setAL(false);
   };
 
   const handleRegister = async () => {
     setLerr(""); setAL(true);
-    if (!lf.name || !lf.email || !lf.password) { setLerr("Completa todos los campos."); setAL(false); return; }
+    if (!lf.name || !lf.email || !lf.password) { setLerr(t.fillAll as string); setAL(false); return; }
     try {
       const auth = await sbSignUp(lf.email, lf.password);
-      if (auth.error) { setLerr(auth.error.message || "Error al registrar."); setAL(false); return; }
+      if (auth.error) { setLerr(auth.error.message || t.connectionError as string); setAL(false); return; }
       localStorage.setItem("sb_token", auth.access_token || SB_KEY);
       const newProfile = { id: auth.user?.id, name: lf.name, email: lf.email, plan: "Basic", status: "active", created_at: new Date().toISOString(), genero: lf.genero };
       await dbInsert("users", newProfile);
@@ -1401,12 +1401,12 @@ export default function StyleVault() {
       setProfile(newProfile);
       applyTheme(lf.genero);
       setScreen("app");
-    } catch { setLerr("Error al crear cuenta."); }
+    } catch { setLerr(t.connectionError as string); }
     setAL(false);
   };
 
   const handleResetPassword = async () => {
-    if (!newPassword || newPassword.length < 6) { setResetMsg("La contraseña debe tener al menos 6 caracteres."); return; }
+    if (!newPassword || newPassword.length < 6) { setResetMsg(t.newPasswordPlaceholder as string); return; }
     setResetL(true);
     try {
       const res = await fetch(`${SB_URL}/auth/v1/user`, {
@@ -1414,9 +1414,9 @@ export default function StyleVault() {
         headers: { "Content-Type": "application/json", apikey: SB_KEY, Authorization: `Bearer ${resetToken}` },
         body: JSON.stringify({ password: newPassword }),
       });
-      if (res.ok) { setResetMsg("✅ Contraseña actualizada. Ahora puedes iniciar sesión."); setTimeout(() => setScreen("login"), 2500); }
-      else setResetMsg("Error al actualizar. El link puede haber expirado.");
-    } catch { setResetMsg("Error de conexión."); }
+      if (res.ok) { setResetMsg(t.passwordUpdated as string); setTimeout(() => setScreen("login"), 2500); }
+      else setResetMsg(t.passwordError as string);
+    } catch { setResetMsg(t.connectionError as string); }
     setResetL(false);
   };
 
@@ -1625,7 +1625,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
     try {
       const reply = await callClaude(getAdvisorSystem(lang, dnaCtx, wardrobeCtx), next.map(x=>({ role:x.role==="assistant"?"assistant":"user", content:x.text })));
       setMsgs([...next, { role:"assistant", text:reply }]);
-    } catch { setMsgs([...next, { role:"assistant", text:"Error de conexión." }]); }
+    } catch { setMsgs([...next, { role:"assistant", text:t.connectionError as string }]); }
     setCload(false);
   };
 
@@ -1692,12 +1692,12 @@ Crea el outfit perfecto y personalizado para esta persona.`
           <div className="serif" style={{ fontSize:"36px", letterSpacing:"8px", color:"#C4973F", fontWeight:300 }}>STYLE<em>VAULT</em></div>
         </div>
         <div className="card">
-          <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"20px" }}>✦ Nueva Contraseña</div>
+          <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"20px" }}>✦ {t.newPassword}</div>
           <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
-            <input className="inp" placeholder="Nueva contraseña (mínimo 6 caracteres)" type="password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleResetPassword()} />
+            <input className="inp" placeholder={t.newPasswordPlaceholder as string} type="password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleResetPassword()} />
             {resetMsg && <div style={{ color:resetMsg.startsWith("✅")?"var(--green)":"var(--red)", fontSize:"12px", textAlign:"center" }}>{resetMsg}</div>}
-            <button className="btn-p" onClick={handleResetPassword} disabled={resetL}>{resetL?"Actualizando...":"✦  Actualizar Contraseña"}</button>
-            <button onClick={()=>setScreen("login")} style={{ background:"none", border:"none", color:"var(--text3)", fontSize:"10px", cursor:"pointer", letterSpacing:"1.5px", fontFamily:"'Jost',sans-serif", textDecoration:"underline", textAlign:"center" }}>Volver al inicio</button>
+            <button className="btn-p" onClick={handleResetPassword} disabled={resetL}>{resetL ? t.updating : `✦  ${t.updatePassword}`}</button>
+            <button onClick={()=>setScreen("login")} style={{ background:"none", border:"none", color:"var(--text3)", fontSize:"10px", cursor:"pointer", letterSpacing:"1.5px", fontFamily:"'Jost',sans-serif", textDecoration:"underline", textAlign:"center" }}>{t.backToLogin}</button>
           </div>
         </div>
       </div>
@@ -1717,8 +1717,8 @@ Crea el outfit perfecto y personalizado para esta persona.`
           <div style={{ display:"flex", justifyContent:"center", gap:"8px", flexWrap:"wrap", marginTop:"16px" }}>
             {LANGUAGES.map(l => (
               <button key={l.code} onClick={()=>changeLang(l.code as LangCode)}
-                style={{ padding:"6px 10px", background:lang===l.code?"var(--accent)":"var(--bg3)", border:`1px solid ${lang===l.code?"var(--accent)":"var(--border)"}`, borderRadius:"20px", cursor:"pointer", fontSize:"16px", transition:"all .2s" }}>
-                {l.flag}
+                style={{ padding:"6px 10px", background:lang===l.code?"var(--accent)":"var(--bg3)", border:`1px solid ${lang===l.code?"var(--accent)":"var(--border)"}`, borderRadius:"20px", cursor:"pointer", fontSize:"11px", fontWeight:700, letterSpacing:"0.5px", color:lang===l.code?"#fff":"var(--text2)", transition:"all .2s", fontFamily:"var(--font)" }}>
+                {l.code.toUpperCase()}
               </button>
             ))}
           </div>
@@ -1734,11 +1734,11 @@ Crea el outfit perfecto y personalizado para esta persona.`
           <div style={{ display:"flex", flexDirection:"column", gap:"11px" }}>
             {lmode==="register" && (
               <>
-                <input className="inp" placeholder="Tu nombre completo" value={lf.name} onChange={e=>setLf(p=>({...p,name:e.target.value}))} />
+                <input className="inp" placeholder={t.fullName as string} value={lf.name} onChange={e=>setLf(p=>({...p,name:e.target.value}))} />
                 <div>
-                  <div style={{ fontSize:"11px", color:"var(--text2)", fontWeight:600, marginBottom:"8px" }}>¿Cómo te identificas?</div>
+                  <div style={{ fontSize:"11px", color:"var(--text2)", fontWeight:600, marginBottom:"8px" }}>{t.howDoYouIdentify}</div>
                   <div style={{ display:"flex", gap:"8px" }}>
-                    {[{id:"Mujer",icon:"👩",label:"Mujer"},{id:"Hombre",icon:"👨",label:"Hombre"},{id:"Otro",icon:"⭐",label:"Otro"}].map(g => (
+                    {[{id:"Mujer",icon:"👩",label:t.woman},{id:"Hombre",icon:"👨",label:t.man},{id:"Otro",icon:"⭐",label:t.other}].map(g => (
                       <button key={g.id} type="button" onClick={()=>setLf(p=>({...p,genero:g.id}))}
                         style={{ flex:1, padding:"12px 6px", background:lf.genero===g.id?"var(--accent)":"var(--bg3)", color:lf.genero===g.id?"#fff":"var(--text2)", border:`2px solid ${lf.genero===g.id?"var(--accent)":"var(--border)"}`, borderRadius:"var(--radius-sm)", cursor:"pointer", fontFamily:"var(--font)", fontSize:"12px", fontWeight:600, transition:"all .2s" }}>
                         <div style={{ fontSize:"18px", marginBottom:"2px" }}>{g.icon}</div>
@@ -1749,19 +1749,19 @@ Crea el outfit perfecto y personalizado para esta persona.`
                 </div>
               </>
             )}
-            <input className="inp" placeholder="Correo electrónico" type="email" value={lf.email} onChange={e=>setLf(p=>({...p,email:e.target.value}))} />
-            <input className="inp" placeholder="Contraseña" type="password" value={lf.password} onChange={e=>setLf(p=>({...p,password:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&(lmode==="login"?handleLogin():handleRegister())} />
+            <input className="inp" placeholder={t.email as string} type="email" value={lf.email} onChange={e=>setLf(p=>({...p,email:e.target.value}))} />
+            <input className="inp" placeholder={t.password as string} type="password" value={lf.password} onChange={e=>setLf(p=>({...p,password:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&(lmode==="login"?handleLogin():handleRegister())} />
             {lerr && <div style={{ color:"var(--red)", fontSize:"12px", textAlign:"center" }}>{lerr}</div>}
             <button className="btn-p" style={{ marginTop:"6px" }} onClick={lmode==="login"?handleLogin:handleRegister} disabled={aloading}>
               {aloading?"...":lmode==="login"?`✦  ${t.enter}`:`✦  ${t.createAccount}`}
             </button>
             {lmode==="login" && (
               <button onClick={async()=>{
-                if (!lf.email) { setLerr("Escribe tu correo primero"); return; }
+                if (!lf.email) { setLerr(t.fillAll as string); return; }
                 const res = await fetch(`${SB_URL}/auth/v1/recover`, { method:"POST", headers:{"Content-Type":"application/json", apikey:SB_KEY, Authorization:`Bearer ${SB_KEY}`}, body:JSON.stringify({ email:lf.email }) });
-                setLerr(res.ok?"✅ Revisa tu correo para recuperar tu contraseña":"Error al enviar.");
+                setLerr(res.ok ? t.recoverEmail as string : t.connectionError as string);
               }} style={{ background:"none", border:"none", color:"var(--text3)", fontSize:"10px", cursor:"pointer", letterSpacing:"1.5px", fontFamily:"'Jost',sans-serif", textDecoration:"underline", textAlign:"center" }}>
-                ¿Olvidaste tu contraseña?
+                {t.forgotPassword}
               </button>
             )}
           </div>
