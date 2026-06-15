@@ -15,7 +15,7 @@ const LANGUAGES = [
 
 type LangCode = "es"|"en"|"pt"|"fr"|"de"|"zh"|"ar"|"hi"|"ja"|"ru";
 
-const T: Record<LangCode, Record<string,string>> = {
+const T: Record<LangCode, Record<string, string | string[]>> = {
   es: {
     // Auth
     appName:"STYLEVAULT", appSub:"Armario Inteligente con IA",
@@ -105,6 +105,12 @@ const T: Record<LangCode, Record<string,string>> = {
     urgent:"Urgente", stylistTip:"✦ Consejo del estilista",
     // Premium
     premium:"Premium", basic:"Basic",
+    all:"Todo",
+    withWardrobeQuestion:"¿Con qué armario creamos el outfit?",
+    outfitPlaceholder:"Ej: Cena romántica en restaurante elegante\nEntrevista de trabajo para gerente\nFiesta en la playa\nViaje a Nueva York por 5 días...",
+    outfitChips:["Cena romántica","Entrevista de trabajo","Fiesta elegante","Día casual","Reunión de negocios","Viaje"],
+    climateOptions:["Caluroso","Templado","Frío","Lluvioso","Variable"],
+    tripTypes:["Turismo","Playa","Montaña","Negocios","Romántico","Aventura"],
   },
   en: {
     appName:"STYLEVAULT", appSub:"AI Smart Wardrobe",
@@ -182,6 +188,12 @@ const T: Record<LangCode, Record<string,string>> = {
     planBag:"✈  Plan my bag with AI", planning:"Planning...", missingItems:"⚠ You need to buy",
     urgent:"Urgent", stylistTip:"✦ Stylist tip",
     premium:"Premium", basic:"Basic",
+    all:"All",
+    withWardrobeQuestion:"Which wardrobe do we use for the outfit?",
+    outfitPlaceholder:"e.g. Romantic dinner at elegant restaurant\nJob interview for manager\nBeach party\nTrip to New York for 5 days...",
+    outfitChips:["Romantic dinner","Job interview","Elegant party","Casual day","Business meeting","Travel"],
+    climateOptions:["Hot","Mild","Cold","Rainy","Variable"],
+    tripTypes:["Tourism","Beach","Mountain","Business","Romantic","Adventure"],
   },
   pt: {
     appName:"STYLEVAULT", appSub:"Guarda-Roupa Inteligente com IA",
@@ -259,6 +271,12 @@ const T: Record<LangCode, Record<string,string>> = {
     planBag:"✈  Planejar mala com IA", planning:"Planejando...", missingItems:"⚠ Você precisa comprar",
     urgent:"Urgente", stylistTip:"✦ Dica do estilista",
     premium:"Premium", basic:"Basic",
+    all:"Todos",
+    withWardrobeQuestion:"Com qual guarda-roupa criamos o outfit?",
+    outfitPlaceholder:"Ex: Jantar romântico em restaurante elegante\nEntrevista de emprego\nFesta na praia\nViagem ao Rio por 5 dias...",
+    outfitChips:["Jantar romântico","Entrevista de trabalho","Festa elegante","Dia casual","Reunião de negócios","Viagem"],
+    climateOptions:["Quente","Temperado","Frio","Chuvoso","Variável"],
+    tripTypes:["Turismo","Praia","Montanha","Negócios","Romântico","Aventura"],
   },
   fr: {
     appName:"STYLEVAULT", appSub:"Garde-Robe Intelligente par IA",
@@ -336,6 +354,12 @@ const T: Record<LangCode, Record<string,string>> = {
     planBag:"✈  Planifier ma valise avec IA", planning:"Planification...", missingItems:"⚠ Il vous manque",
     urgent:"Urgent", stylistTip:"✦ Conseil du styliste",
     premium:"Premium", basic:"Basic",
+    all:"Tout",
+    withWardrobeQuestion:"Quelle garde-robe utilisons-nous pour la tenue?",
+    outfitPlaceholder:"Ex: Dîner romantique au restaurant élégant\nEntretien d'embauche\nFête sur la plage\nVoyage à Paris pour 5 jours...",
+    outfitChips:["Dîner romantique","Entretien d'embauche","Soirée élégante","Jour décontracté","Réunion d'affaires","Voyage"],
+    climateOptions:["Chaud","Tempéré","Froid","Pluvieux","Variable"],
+    tripTypes:["Tourisme","Plage","Montagne","Affaires","Romantique","Aventure"],
   },
   de: {
     appName:"STYLEVAULT", appSub:"KI-gestützter Smart-Kleiderschrank",
@@ -413,6 +437,12 @@ const T: Record<LangCode, Record<string,string>> = {
     planBag:"✈  Reisetasche mit KI planen", planning:"Planung...", missingItems:"⚠ Sie müssen kaufen",
     urgent:"Dringend", stylistTip:"✦ Stilisten-Tipp",
     premium:"Premium", basic:"Basic",
+    all:"Alle",
+    withWardrobeQuestion:"Welchen Kleiderschrank verwenden wir für das Outfit?",
+    outfitPlaceholder:"z.B. Romantisches Abendessen im eleganten Restaurant\nVorstellungsgespräch\nStrandparty\nReise nach Berlin für 5 Tage...",
+    outfitChips:["Romantisches Abendessen","Vorstellungsgespräch","Elegante Party","Lässiger Tag","Geschäftstreffen","Reise"],
+    climateOptions:["Heiß","Gemäßigt","Kalt","Regnerisch","Variabel"],
+    tripTypes:["Tourismus","Strand","Berge","Geschäft","Romantisch","Abenteuer"],
   },
   zh: {
     appName:"STYLEVAULT", appSub:"AI 智能衣橱",
@@ -490,6 +520,12 @@ const T: Record<LangCode, Record<string,string>> = {
     planBag:"✈  用AI规划行李", planning:"规划中...", missingItems:"⚠ 您需要购买",
     urgent:"紧急", stylistTip:"✦ 造型师建议",
     premium:"高级版", basic:"基础版",
+    all:"全部",
+    withWardrobeQuestion:"我们用哪个衣橱搭配服装？",
+    outfitPlaceholder:"例：高档餐厅浪漫晚餐\n经理职位面试\n海滩派对\n去东京5天的旅行...",
+    outfitChips:["浪漫晚餐","工作面试","优雅派对","休闲日","商务会议","旅行"],
+    climateOptions:["炎热","温和","寒冷","多雨","多变"],
+    tripTypes:["观光","海滩","山地","商务","浪漫","冒险"],
   },
   ar: {
     appName:"STYLEVAULT", appSub:"خزانة ملابس ذكية بالذكاء الاصطناعي",
@@ -567,6 +603,12 @@ const T: Record<LangCode, Record<string,string>> = {
     planBag:"✈  تخطيط الحقيبة بالذكاء الاصطناعي", planning:"جارٍ التخطيط...", missingItems:"⚠ تحتاج إلى شراء",
     urgent:"عاجل", stylistTip:"✦ نصيحة المصمم",
     premium:"Premium", basic:"Basic",
+    all:"الكل",
+    withWardrobeQuestion:"أي خزانة نستخدم لتنسيق الملابس؟",
+    outfitPlaceholder:"مثال: عشاء رومانسي في مطعم أنيق\nمقابلة عمل\nحفلة على الشاطئ\nرحلة إلى دبي لمدة 5 أيام...",
+    outfitChips:["عشاء رومانسي","مقابلة عمل","حفلة أنيقة","يوم عادي","اجتماع عمل","سفر"],
+    climateOptions:["حار","معتدل","بارد","ممطر","متغير"],
+    tripTypes:["سياحة","شاطئ","جبال","أعمال","رومانسي","مغامرة"],
   },
   hi: {
     appName:"STYLEVAULT", appSub:"AI स्मार्ट वॉर्डरोब",
@@ -644,6 +686,12 @@ const T: Record<LangCode, Record<string,string>> = {
     planBag:"✈  AI से बैग योजना बनाएं", planning:"योजना बना रहे हैं...", missingItems:"⚠ आपको खरीदना है",
     urgent:"जरूरी", stylistTip:"✦ स्टाइलिस्ट की सलाह",
     premium:"प्रीमियम", basic:"बेसिक",
+    all:"सभी",
+    withWardrobeQuestion:"आउटफिट के लिए कौन सी वॉर्डरोब उपयोग करें?",
+    outfitPlaceholder:"उदा: एलीगेंट रेस्टोरेंट में रोमांटिक डिनर\nनौकरी का इंटरव्यू\nबीच पार्टी\nदिल्ली की 5 दिन की यात्रा...",
+    outfitChips:["रोमांटिक डिनर","नौकरी इंटरव्यू","एलीगेंट पार्टी","कैजुअल दिन","बिजनेस मीटिंग","यात्रा"],
+    climateOptions:["गर्म","समशीतोष्ण","ठंडा","बरसाती","परिवर्तनशील"],
+    tripTypes:["पर्यटन","समुद्र तट","पहाड़","व्यापार","रोमांटिक","साहसिक"],
   },
   ja: {
     appName:"STYLEVAULT", appSub:"AIスマートワードローブ",
@@ -721,6 +769,12 @@ const T: Record<LangCode, Record<string,string>> = {
     planBag:"✈  AIで荷物を計画", planning:"計画中...", missingItems:"⚠ 購入が必要",
     urgent:"緊急", stylistTip:"✦ スタイリストのヒント",
     premium:"プレミアム", basic:"ベーシック",
+    all:"すべて",
+    withWardrobeQuestion:"コーデにはどのワードローブを使いますか？",
+    outfitPlaceholder:"例：エレガントなレストランでのロマンチックなディナー\n就職面接\nビーチパーティー\n東京への5日間の旅行...",
+    outfitChips:["ロマンチックなディナー","就職面接","エレガントなパーティー","カジュアルな日","ビジネス会議","旅行"],
+    climateOptions:["暑い","温暖","寒い","雨","変わりやすい"],
+    tripTypes:["観光","ビーチ","山","ビジネス","ロマンチック","アドベンチャー"],
   },
   ru: {
     appName:"STYLEVAULT", appSub:"Умный гардероб с ИИ",
@@ -798,6 +852,12 @@ const T: Record<LangCode, Record<string,string>> = {
     planBag:"✈  Планировать сумку с ИИ", planning:"Планирование...", missingItems:"⚠ Вам нужно купить",
     urgent:"Срочно", stylistTip:"✦ Совет стилиста",
     premium:"Premium", basic:"Basic",
+    all:"Все",
+    withWardrobeQuestion:"Какой гардероб использовать для образа?",
+    outfitPlaceholder:"Напр.: Романтический ужин в элегантном ресторане\nСобеседование на работу\nВечеринка на пляже\nПоездка в Москву на 5 дней...",
+    outfitChips:["Романтический ужин","Собеседование","Элегантная вечеринка","Casual день","Деловая встреча","Путешествие"],
+    climateOptions:["Жаркий","Умеренный","Холодный","Дождливый","Переменный"],
+    tripTypes:["Туризм","Пляж","Горы","Бизнес","Романтическое","Приключение"],
   },
 };
 
@@ -1159,7 +1219,7 @@ export default function StyleVault() {
   const [newCatInput, setNewCatInput] = useState("");
   const [showAddCat, setShowAddCat] = useState(false);
   const [favorites, setFavorites] = useState<number[]>(() => JSON.parse(localStorage.getItem("sv_favorites") || "[]"));
-  const [fc, setFc] = useState("Todo");
+  const [fc, setFc] = useState("__ALL__");
   const [showForm, setSF] = useState(false);
   const [ni, setNi] = useState({ name:"", category:"Tops", color:"#C4973F", season:"Todo el año", occasion:"" });
   const [pp, setPp] = useState<string|null>(null);
@@ -1533,7 +1593,8 @@ Crea el outfit perfecto y personalizado para esta persona.`
     setCustomCats(next); localStorage.setItem("sv_custom_cats", JSON.stringify(next));
   };
 
-  const filtered = clothes.filter(c => fc === "Todo" || c.category === fc);
+  const ALL_FILTER = "__ALL__";
+  const filtered = clothes.filter(c => fc === ALL_FILTER || c.category === fc);
   const favClothes = clothes.filter(c => favorites.includes(c.id));
   const isPremium = profile?.plan === "Premium" || profile?.plan === "Admin";
   const renderStars = (n: number) => "★".repeat(Math.min(5,Math.max(0,Math.round(n)))) + "☆".repeat(5-Math.min(5,Math.max(0,Math.round(n))));
@@ -1744,9 +1805,9 @@ Crea el outfit perfecto y personalizado para esta persona.`
 
             <div style={{ display:"flex", flexDirection:"column", gap:"14px", marginBottom:"24px" }}>
               {[
-                { key:"selfie", ref:selfieRef, label:"Foto 1 · Selfie frontal", tips:["Buena iluminación","Sin lentes oscuros","Rostro completamente visible"], icon:"🤳" },
-                { key:"front", ref:frontRef, label:"Foto 2 · Cuerpo completo frontal", tips:["De pie","Brazos relajados","Fondo simple"], icon:"🧍" },
-                { key:"side", ref:sideRef, label:"Foto 3 · Cuerpo completo lateral", tips:["Perfil completo","Fondo simple"], icon:"🚶" },
+                { key:"selfie", ref:selfieRef, label:t.photo1, tips:(t.photoTips1 as string[] | undefined) ?? ["Buena iluminación","Sin lentes oscuros","Rostro completamente visible"], icon:"🤳" },
+                { key:"front", ref:frontRef, label:t.photo2, tips:(t.photoTips2 as string[] | undefined) ?? ["De pie","Brazos relajados","Fondo simple"], icon:"🧍" },
+                { key:"side", ref:sideRef, label:t.photo3, tips:(t.photoTips3 as string[] | undefined) ?? ["Perfil completo","Fondo simple"], icon:"🚶" },
               ].map(({ key, ref, label, tips, icon }) => (
                 <div key={key} className={`photo-upload-box ${obPhotos[key as keyof typeof obPhotos]?"done":""}`} onClick={()=>ref.current?.click()}>
                   {obPhotos[key as keyof typeof obPhotos] ? (
@@ -1754,7 +1815,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                       <img src={obPhotos[key as keyof typeof obPhotos]!} alt={key} style={{ width:"60px", height:"60px", objectFit:"cover", borderRadius:"2px" }} />
                       <div>
                         <div style={{ fontSize:"12px", color:"var(--green)", marginBottom:"4px" }}>✓ {label}</div>
-                        <div style={{ fontSize:"10px", color:"var(--text2)" }}>Toca para cambiar</div>
+                        <div style={{ fontSize:"10px", color:"var(--text2)" }}>{t.tapToChange}</div>
                       </div>
                     </div>
                   ) : (
@@ -1802,12 +1863,12 @@ Crea el outfit perfecto y personalizado para esta persona.`
               <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"16px" }}>✦ Fashion DNA™</div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginBottom:"16px" }}>
                 {[
-                  { label:"Tipo de cuerpo", value:dna.bodyType },
-                  { label:"Tono de piel", value:dna.skinTone },
-                  { label:"Subtono", value:dna.skinUndertone },
-                  { label:"Forma de rostro", value:dna.faceShape },
-                  { label:"Cuello", value:dna.neckType },
-                  { label:"Postura", value:dna.posture },
+                  { label:t.bodyType, value:dna.bodyType },
+                  { label:t.skinTone, value:dna.skinTone },
+                  { label:t.undertone, value:dna.skinUndertone },
+                  { label:t.faceShape, value:dna.faceShape },
+                  { label:t.neckType, value:dna.neckType },
+                  { label:t.posture, value:dna.posture },
                 ].map(item => (
                   <div key={item.label} style={{ background:"var(--bg)", border:"1px solid var(--border)", borderRadius:"2px", padding:"10px" }}>
                     <div style={{ fontSize:"9px", color:"var(--text3)", letterSpacing:"1px", textTransform:"uppercase", marginBottom:"4px" }}>{item.label}</div>
@@ -1898,9 +1959,9 @@ Crea el outfit perfecto y personalizado para esta persona.`
             <div style={{ background:`linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%)`, borderRadius:"var(--radius)", padding:"22px 20px", marginBottom:"18px", position:"relative", overflow:"hidden" }}>
               <div style={{ position:"absolute", right:"-10px", top:"-10px", width:"120px", height:"120px", background:"rgba(255,255,255,.08)", borderRadius:"50%" }}/>
               <div style={{ position:"absolute", right:"20px", bottom:"-20px", width:"80px", height:"80px", background:"rgba(255,255,255,.06)", borderRadius:"50%" }}/>
-              <div style={{ fontSize:"22px", fontWeight:700, color:"#fff", marginBottom:"4px" }}>Hola, {profile?.name?.split(" ")[0]} 👋</div>
+              <div style={{ fontSize:"22px", fontWeight:700, color:"#fff", marginBottom:"4px" }}>{t.hello} {profile?.name?.split(" ")[0]} 👋</div>
               <div style={{ fontSize:"13px", color:"rgba(255,255,255,.75)", marginBottom:"16px" }}>
-                {dna?.bodyType ? t.styleReady : "Tu armario inteligente te espera"}
+                {dna?.bodyType ? t.styleReady : t.wardrobeReady}
               </div>
               {dna?.bodyType && (
                 <div style={{ display:"inline-flex", alignItems:"center", gap:"6px", background:"rgba(255,255,255,.15)", borderRadius:"30px", padding:"6px 14px" }}>
@@ -1928,7 +1989,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
             {dna?.bodyType ? (
               <div className="card card-accent" style={{ marginBottom:"14px" }}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"12px" }}>
-                  <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase" }}>✦ Tu Fashion DNA™</div>
+                  <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase" }}>{t.yourDNA}</div>
                   <button className="btn-g" onClick={()=>setTab("dna")}>{t.viewComplete}</button>
                 </div>
                 <div style={{ display:"flex", gap:"6px", flexWrap:"wrap" }}>
@@ -1943,7 +2004,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                     <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"6px" }}>🧬 Fashion DNA™</div>
                     <div style={{ fontSize:"12px", color:"var(--text2)", lineHeight:1.5 }}>{t.createProfile}</div>
                   </div>
-                  <button className="btn-o" style={{ fontSize:"9px", padding:"7px 12px", flexShrink:0, marginLeft:"12px" }} onClick={()=>setScreen("onboarding")}>Crear →</button>
+                  <button className="btn-o" style={{ fontSize:"9px", padding:"7px 12px", flexShrink:0, marginLeft:"12px" }} onClick={()=>setScreen("onboarding")}>{t.create}</button>
                 </div>
               </div>
             )}
@@ -1955,7 +2016,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                   <div style={{ fontSize:"13px", fontWeight:700, color:"var(--text)" }}>{t.outfitOfDay}</div>
                   <div style={{ fontSize:"12px", color:"var(--text2)", marginTop:"2px" }}>{t.personalizedForYou}</div>
                 </div>
-                <button className="btn-o" style={{ fontSize:"9px", padding:"7px 12px" }} onClick={()=>setTab("outfit")}>Crear →</button>
+                <button className="btn-o" style={{ fontSize:"9px", padding:"7px 12px" }} onClick={()=>setTab("outfit")}>{t.create}</button>
               </div>
               {outfitR ? (
                 <div>
@@ -1968,7 +2029,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                 </div>
               ) : (
                 <div style={{ textAlign:"center", padding:"16px", color:"var(--text3)", fontSize:"12px" }}>
-                  {clothes.length === 0 ? "Agrega prendas para generar outfits" : "Toca 'Crear' para generar tu outfit"}
+                  {clothes.length === 0 ? t.addItemsFirst : t.tapCreate}
                 </div>
               )}
             </div>
@@ -1977,11 +2038,11 @@ Crea el outfit perfecto y personalizado para esta persona.`
             <div className="card" style={{ marginBottom:"14px", background:"linear-gradient(135deg,var(--bg2),var(--bg3))", borderColor:"rgba(196,151,63,.2)" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
                 <div style={{ flex:1 }}>
-                  <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"6px" }}>✦ Prueba Virtual</div>
+                  <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"6px" }}>{t.virtualTry}</div>
                   <div style={{ fontSize:"14px", fontWeight:400, marginBottom:"6px" }}>{t.seeHowItFits}</div>
                   <div style={{ fontSize:"11px", color:"var(--text2)", lineHeight:1.5, marginBottom:"12px" }}>{t.basedOnDNA}</div>
                   <button className="btn-p" style={{ width:"auto", padding:"10px 18px" }} onClick={()=>setTab("avatar")}>
-                    {isPremium ? "Probar ahora →" : "Ver función Premium →"}
+                    {isPremium ? t.tryNow : t.seePremium}
                   </button>
                 </div>
                 <div style={{ fontSize:"44px", opacity:.25 }}>🧍</div>
@@ -1991,7 +2052,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
             {clothes.length > 0 && (
               <div>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"12px" }}>
-                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase" }}>Prendas recientes</div>
+                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase" }}>{t.recentItems}</div>
                   <button className="btn-g" onClick={()=>setTab("wardrobe")}>{t.viewAll}</button>
                 </div>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"8px" }}>
@@ -2027,15 +2088,15 @@ Crea el outfit perfecto y personalizado para esta persona.`
             ) : (
               <>
                 <div className="card card-accent" style={{ marginBottom:"14px" }}>
-                  <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"16px" }}>✦ Análisis corporal</div>
+                  <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"16px" }}>{t.bodyAnalysis}</div>
                   <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px", marginBottom:"14px" }}>
                     {[
-                      { label:"Tipo de cuerpo", value:dna.bodyType },
-                      { label:"Tono de piel", value:dna.skinTone },
-                      { label:"Subtono", value:dna.skinUndertone },
-                      { label:"Forma de rostro", value:dna.faceShape },
-                      { label:"Tipo de cuello", value:dna.neckType },
-                      { label:"Postura", value:dna.posture },
+                      { label:t.bodyType, value:dna.bodyType },
+                      { label:t.skinTone, value:dna.skinTone },
+                      { label:t.undertone, value:dna.skinUndertone },
+                      { label:t.faceShape, value:dna.faceShape },
+                      { label:t.neckType, value:dna.neckType },
+                      { label:t.posture, value:dna.posture },
                     ].map(item => (
                       <div key={item.label} style={{ background:"var(--bg)", border:"1px solid var(--border)", borderRadius:"2px", padding:"10px" }}>
                         <div style={{ fontSize:"9px", color:"var(--text3)", letterSpacing:"1px", textTransform:"uppercase", marginBottom:"4px" }}>{item.label}</div>
@@ -2150,13 +2211,13 @@ Crea el outfit perfecto y personalizado para esta persona.`
             )}
 
             <div style={{ display:"flex", gap:"7px", overflowX:"auto", paddingBottom:"10px", marginBottom:"14px", flexWrap:"nowrap" }}>
-              {["Todo",...allCategories].map(c => <button key={c} className={`pill ${fc===c?"on":""}`} onClick={()=>setFc(c)}>{c}</button>)}
+              {[{key:"__ALL__", label:t.all ?? "Todo"},...allCategories.map(c=>({key:c,label:c}))].map(({key,label}) => <button key={key} className={`pill ${fc===key?"on":""}`} onClick={()=>setFc(key)}>{label}</button>)}
               {customCats.map(c => <button key={c+"_x"} onClick={()=>removeCustomCategory(c)} style={{ padding:"3px 7px", background:"rgba(231,76,60,.08)", border:"1px solid rgba(231,76,60,.2)", borderRadius:"20px", color:"var(--red)", fontSize:"9px", cursor:"pointer", flexShrink:0 }}>✕</button>)}
-              <button onClick={()=>setShowAddCat(!showAddCat)} className="pill" style={{ borderStyle:"dashed", color:"var(--gold)", borderColor:"rgba(196,151,63,.3)", flexShrink:0 }}>+ Cat</button>
+              <button onClick={()=>setShowAddCat(!showAddCat)} className="pill" style={{ borderStyle:"dashed", color:"var(--gold)", borderColor:"rgba(196,151,63,.3)", flexShrink:0 }}>{t.addCat}</button>
             </div>
             {showAddCat && (
               <div style={{ display:"flex", gap:"7px", marginBottom:"12px" }}>
-                <input className="inp" placeholder="Nueva categoría..." value={newCatInput} onChange={e=>setNewCatInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCustomCategory()} style={{ flex:1, padding:"9px 12px", fontSize:"12px" }} />
+                <input className="inp" placeholder={t.newCategory as string} value={newCatInput} onChange={e=>setNewCatInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCustomCategory()} style={{ flex:1, padding:"9px 12px", fontSize:"12px" }} />
                 <button onClick={addCustomCategory} className="btn-o" style={{ padding:"9px 14px", fontSize:"10px" }}>+</button>
               </div>
             )}
@@ -2199,13 +2260,13 @@ Crea el outfit perfecto y personalizado para esta persona.`
             <div className="card" style={{ marginBottom:"16px" }}>
               <textarea
                 className="inp"
-                placeholder={"Ej: Cena romántica en restaurante elegante\nEntrevista de trabajo para gerente\nFiesta en la playa\nViaje a Nueva York por 5 días..."}
+                placeholder={t.outfitPlaceholder ?? "Ej: Cena romántica en restaurante elegante\nEntrevista de trabajo para gerente\nFiesta en la playa\nViaje a Nueva York por 5 días..."}
                 value={outfitPrompt}
                 onChange={e=>setOutfitPrompt(e.target.value)}
                 style={{ resize:"none", minHeight:"100px", lineHeight:1.6, borderRadius:"var(--radius-sm)" }}
               />
               <div style={{ display:"flex", gap:"7px", flexWrap:"wrap", marginTop:"12px" }}>
-                {["Cena romántica","Entrevista de trabajo","Fiesta elegante","Día casual","Reunión de negocios","Viaje"].map(s => (
+                {(t.outfitChips ?? ["Cena romántica","Entrevista de trabajo","Fiesta elegante","Día casual","Reunión de negocios","Viaje"]).map((s: string) => (
                   <button key={s} onClick={()=>setOutfitPrompt(s)} className="pill" style={{ fontSize:"11px", padding:"6px 12px" }}>{s}</button>
                 ))}
               </div>
@@ -2213,7 +2274,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
 
             {/* Source selector */}
             <div className="card" style={{ marginBottom:"18px" }}>
-              <div style={{ fontSize:"13px", fontWeight:600, color:"var(--text)", marginBottom:"14px" }}>¿Con qué armario creamos el outfit?</div>
+              <div style={{ fontSize:"13px", fontWeight:600, color:"var(--text)", marginBottom:"14px" }}>{t.withWardrobeQuestion ?? (lang==="es" ? "¿Con qué armario creamos el outfit?" : lang==="en" ? "Which wardrobe do we use?" : lang==="pt" ? "Com qual guarda-roupa criamos o outfit?" : lang==="fr" ? "Quelle garde-robe utilisons-nous?" : lang==="de" ? "Welchen Kleiderschrank verwenden wir?" : "¿Con qué armario creamos el outfit?")}</div>
               <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
                 {[
                   { id:"wardrobe", icon:"👔", label:t.withMyWardrobe, desc:t.withMyWardrobeDesc },
@@ -2540,7 +2601,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
           <div className="fade" style={{ display:"flex", flexDirection:"column", height:"calc(100vh - 180px)" }}>
             <div style={{ marginBottom:"14px" }}>
               <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>{t.advisorTitle}</div>
-              <div style={{ fontSize:"10px", color:"var(--text2)", marginTop:"3px" }}>Powered by Claude AI · Personalizado con tu DNA</div>
+              <div style={{ fontSize:"10px", color:"var(--text2)", marginTop:"3px" }}>{t.advisorSub}</div>
             </div>
             <div style={{ display:"flex", gap:"7px", overflowX:"auto", paddingBottom:"10px", marginBottom:"12px" }}>
               {suggestions.map(s => <button key={s} className="chip" onClick={()=>sendChat(s)}>{s}</button>)}
@@ -2569,21 +2630,21 @@ Crea el outfit perfecto y personalizado para esta persona.`
           <div className="fade">
             <div style={{ marginBottom:"20px" }}>
               <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>{t.tripTitle}</div>
-              <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>La IA organiza tu maleta con tu armario</div>
+              <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>{t.tripSub}</div>
             </div>
             <div className="card" style={{ marginBottom:"14px" }}>
               <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
                 <input className="inp" placeholder={t.destination} value={tripDest} onChange={e=>setTripDest(e.target.value)} />
                 <div style={{ display:"flex", gap:"10px" }}>
-                  <input className="inp" placeholder="Días" type="number" min="1" max="30" value={tripDays} onChange={e=>setTripDays(e.target.value)} style={{ width:"90px" }} />
+                  <input className="inp" placeholder={t.days} type="number" min="1" max="30" value={tripDays} onChange={e=>setTripDays(e.target.value)} style={{ width:"90px" }} />
                   <select className="sel" value={tripClima} onChange={e=>setTripClima(e.target.value)}>
-                    <option value="">Clima</option>
-                    {["Caluroso","Templado","Frío","Lluvioso","Variable"].map(c=><option key={c}>{c}</option>)}
+                    <option value="">{t.climate}</option>
+                    {(t.climateOptions ?? ["Caluroso","Templado","Frío","Lluvioso","Variable"]).map((c: string)=><option key={c}>{c}</option>)}
                   </select>
                 </div>
                 <div style={{ display:"flex", gap:"7px", flexWrap:"wrap" }}>
-                  {["Turismo","Playa","Montaña","Negocios","Romántico","Aventura"].map(t => (
-                    <button key={t} className={`pill ${tripTipo===t?"on":""}`} onClick={()=>setTripTipo(tripTipo===t?"":t)}>{t}</button>
+                  {(t.tripTypes ?? ["Turismo","Playa","Montaña","Negocios","Romántico","Aventura"]).map((tp: string) => (
+                    <button key={tp} className={`pill ${tripTipo===tp?"on":""}`} onClick={()=>setTripTipo(tripTipo===tp?"":tp)}>{tp}</button>
                   ))}
                 </div>
               </div>
@@ -2650,4 +2711,3 @@ Crea el outfit perfecto y personalizado para esta persona.`
     </div>
   );
 }
-
