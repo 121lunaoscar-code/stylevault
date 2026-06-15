@@ -111,6 +111,12 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     outfitChips:["Cena romántica","Entrevista de trabajo","Fiesta elegante","Día casual","Reunión de negocios","Viaje"],
     climateOptions:["Caluroso","Templado","Frío","Lluvioso","Variable"],
     tripTypes:["Turismo","Playa","Montaña","Negocios","Romántico","Aventura"],
+    cats:["Tops","Pantalones","Vestidos","Zapatos","Accesorios","Abrigos","Deportivo"],
+    occasions:["Casual","Trabajo","Formal","Deportivo","Fiesta","Viaje"],
+    seasons:["Todo el año","Primavera","Verano","Otoño","Invierno"],
+    events:["Trabajo / Oficina","Cita romántica","Reunión de negocios","Evento formal","Día casual","Fiesta / Antro","Deporte / Gym","Viaje"],
+    analyzingText:"Analizando...",
+    newItemLabel:"✦ NUEVA PRENDA",
   },
   en: {
     appName:"STYLEVAULT", appSub:"AI Smart Wardrobe",
@@ -194,6 +200,12 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     outfitChips:["Romantic dinner","Job interview","Elegant party","Casual day","Business meeting","Travel"],
     climateOptions:["Hot","Mild","Cold","Rainy","Variable"],
     tripTypes:["Tourism","Beach","Mountain","Business","Romantic","Adventure"],
+    cats:["Tops","Pants","Dresses","Shoes","Accessories","Coats","Sportswear"],
+    occasions:["Casual","Work","Formal","Sport","Party","Travel"],
+    seasons:["All year","Spring","Summer","Autumn","Winter"],
+    events:["Work / Office","Romantic date","Business meeting","Formal event","Casual day","Party","Sport / Gym","Travel"],
+    analyzingText:"Analyzing...",
+    newItemLabel:"✦ NEW ITEM",
   },
   pt: {
     appName:"STYLEVAULT", appSub:"Guarda-Roupa Inteligente com IA",
@@ -277,6 +289,12 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     outfitChips:["Jantar romântico","Entrevista de trabalho","Festa elegante","Dia casual","Reunião de negócios","Viagem"],
     climateOptions:["Quente","Temperado","Frio","Chuvoso","Variável"],
     tripTypes:["Turismo","Praia","Montanha","Negócios","Romântico","Aventura"],
+    cats:["Tops","Calças","Vestidos","Sapatos","Acessórios","Casacos","Esportivo"],
+    occasions:["Casual","Trabalho","Formal","Esportivo","Festa","Viagem"],
+    seasons:["O ano todo","Primavera","Verão","Outono","Inverno"],
+    events:["Trabalho / Escritório","Encontro romântico","Reunião de negócios","Evento formal","Dia casual","Festa","Esporte / Academia","Viagem"],
+    analyzingText:"Analisando...",
+    newItemLabel:"✦ NOVA PEÇA",
   },
   fr: {
     appName:"STYLEVAULT", appSub:"Garde-Robe Intelligente par IA",
@@ -360,6 +378,12 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     outfitChips:["Dîner romantique","Entretien d'embauche","Soirée élégante","Jour décontracté","Réunion d'affaires","Voyage"],
     climateOptions:["Chaud","Tempéré","Froid","Pluvieux","Variable"],
     tripTypes:["Tourisme","Plage","Montagne","Affaires","Romantique","Aventure"],
+    cats:["Tops","Pantalons","Robes","Chaussures","Accessoires","Manteaux","Sport"],
+    occasions:["Casual","Travail","Formel","Sport","Soirée","Voyage"],
+    seasons:["Toute l'année","Printemps","Été","Automne","Hiver"],
+    events:["Travail / Bureau","Rendez-vous romantique","Réunion d'affaires","Événement formel","Jour casual","Soirée","Sport / Salle","Voyage"],
+    analyzingText:"Analyse en cours...",
+    newItemLabel:"✦ NOUVELLE PIÈCE",
   },
   de: {
     appName:"STYLEVAULT", appSub:"KI-gestützter Smart-Kleiderschrank",
@@ -443,6 +467,12 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     outfitChips:["Romantisches Abendessen","Vorstellungsgespräch","Elegante Party","Lässiger Tag","Geschäftstreffen","Reise"],
     climateOptions:["Heiß","Gemäßigt","Kalt","Regnerisch","Variabel"],
     tripTypes:["Tourismus","Strand","Berge","Geschäft","Romantisch","Abenteuer"],
+    cats:["Tops","Hosen","Kleider","Schuhe","Accessoires","Mäntel","Sport"],
+    occasions:["Casual","Arbeit","Formal","Sport","Party","Reise"],
+    seasons:["Ganzjährig","Frühling","Sommer","Herbst","Winter"],
+    events:["Arbeit / Büro","Romantisches Date","Geschäftstreffen","Formelles Event","Casual Tag","Party","Sport / Gym","Reise"],
+    analyzingText:"Analysiere...",
+    newItemLabel:"✦ NEUES KLEIDUNGSSTÜCK",
   },
   zh: {
     appName:"STYLEVAULT", appSub:"AI 智能衣橱",
@@ -526,6 +556,12 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     outfitChips:["浪漫晚餐","工作面试","优雅派对","休闲日","商务会议","旅行"],
     climateOptions:["炎热","温和","寒冷","多雨","多变"],
     tripTypes:["观光","海滩","山地","商务","浪漫","冒险"],
+    cats:["上衣","裤子","裙子","鞋子","配饰","外套","运动"],
+    occasions:["休闲","工作","正式","运动","派对","旅行"],
+    seasons:["全年","春季","夏季","秋季","冬季"],
+    events:["工作/办公室","浪漫约会","商务会议","正式活动","休闲日","派对","运动/健身","旅行"],
+    analyzingText:"分析中...",
+    newItemLabel:"✦ 新单品",
   },
   ar: {
     appName:"STYLEVAULT", appSub:"خزانة ملابس ذكية بالذكاء الاصطناعي",
@@ -609,6 +645,12 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     outfitChips:["عشاء رومانسي","مقابلة عمل","حفلة أنيقة","يوم عادي","اجتماع عمل","سفر"],
     climateOptions:["حار","معتدل","بارد","ممطر","متغير"],
     tripTypes:["سياحة","شاطئ","جبال","أعمال","رومانسي","مغامرة"],
+    cats:["توبس","بناطيل","فساتين","أحذية","إكسسوارات","معاطف","رياضي"],
+    occasions:["كاجوال","عمل","رسمي","رياضة","حفلة","سفر"],
+    seasons:["طوال العام","ربيع","صيف","خريف","شتاء"],
+    events:["عمل / مكتب","موعد رومانسي","اجتماع عمل","حدث رسمي","يوم كاجوال","حفلة","رياضة / صالة","سفر"],
+    analyzingText:"جارٍ التحليل...",
+    newItemLabel:"✦ قطعة جديدة",
   },
   hi: {
     appName:"STYLEVAULT", appSub:"AI स्मार्ट वॉर्डरोब",
@@ -692,6 +734,12 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     outfitChips:["रोमांटिक डिनर","नौकरी इंटरव्यू","एलीगेंट पार्टी","कैजुअल दिन","बिजनेस मीटिंग","यात्रा"],
     climateOptions:["गर्म","समशीतोष्ण","ठंडा","बरसाती","परिवर्तनशील"],
     tripTypes:["पर्यटन","समुद्र तट","पहाड़","व्यापार","रोमांटिक","साहसिक"],
+    cats:["टॉप्स","पैंट","ड्रेस","जूते","एक्सेसरीज","कोट","स्पोर्ट्स"],
+    occasions:["कैजुअल","काम","फॉर्मल","स्पोर्ट","पार्टी","यात्रा"],
+    seasons:["पूरे साल","वसंत","गर्मी","शरद","सर्दी"],
+    events:["काम/कार्यालय","रोमांटिक डेट","बिज़नेस मीटिंग","फॉर्मल इवेंट","कैजुअल दिन","पार्टी","स्पोर्ट/जिम","यात्रा"],
+    analyzingText:"विश्लेषण हो रहा है...",
+    newItemLabel:"✦ नई वस्तु",
   },
   ja: {
     appName:"STYLEVAULT", appSub:"AIスマートワードローブ",
@@ -775,6 +823,12 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     outfitChips:["ロマンチックなディナー","就職面接","エレガントなパーティー","カジュアルな日","ビジネス会議","旅行"],
     climateOptions:["暑い","温暖","寒い","雨","変わりやすい"],
     tripTypes:["観光","ビーチ","山","ビジネス","ロマンチック","アドベンチャー"],
+    cats:["トップス","パンツ","ドレス","シューズ","アクセサリー","コート","スポーツ"],
+    occasions:["カジュアル","仕事","フォーマル","スポーツ","パーティー","旅行"],
+    seasons:["オールシーズン","春","夏","秋","冬"],
+    events:["仕事/オフィス","ロマンチックなデート","ビジネス会議","フォーマルイベント","カジュアルな日","パーティー","スポーツ/ジム","旅行"],
+    analyzingText:"分析中...",
+    newItemLabel:"✦ 新しいアイテム",
   },
   ru: {
     appName:"STYLEVAULT", appSub:"Умный гардероб с ИИ",
@@ -858,6 +912,12 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     outfitChips:["Романтический ужин","Собеседование","Элегантная вечеринка","Casual день","Деловая встреча","Путешествие"],
     climateOptions:["Жаркий","Умеренный","Холодный","Дождливый","Переменный"],
     tripTypes:["Туризм","Пляж","Горы","Бизнес","Романтическое","Приключение"],
+    cats:["Топы","Брюки","Платья","Обувь","Аксессуары","Пальто","Спорт"],
+    occasions:["Casual","Работа","Официально","Спорт","Вечеринка","Путешествие"],
+    seasons:["Весь год","Весна","Лето","Осень","Зима"],
+    events:["Работа / Офис","Романтическое свидание","Деловая встреча","Официальное мероприятие","Casual день","Вечеринка","Спорт / Зал","Путешествие"],
+    analyzingText:"Анализирую...",
+    newItemLabel:"✦ НОВАЯ ВЕЩЬ",
   },
 };
 
@@ -929,10 +989,11 @@ const dbDelete = (table: string, match: string) => sbFetch(`/rest/v1/${table}?${
 const dbUpdate = (table: string, match: string, body: any) => sbFetch(`/rest/v1/${table}?${match}`, { method: "PATCH", body: JSON.stringify(body) });
 
 // Constants
-const BASE_CATS = ["Tops","Pantalones","Vestidos","Zapatos","Accesorios","Abrigos","Deportivo"];
-const OCCASIONS = ["Casual","Trabajo","Formal","Deportivo","Fiesta","Viaje"];
-const SEASONS = ["Todo el año","Primavera","Verano","Otoño","Invierno"];
-const EVENTS = ["Trabajo / Oficina","Cita romántica","Reunión de negocios","Evento formal","Día casual","Fiesta / Antro","Deporte / Gym","Viaje"];
+const BASE_CATS_ES = ["Tops","Pantalones","Vestidos","Zapatos","Accesorios","Abrigos","Deportivo"];
+const BASE_CATS = BASE_CATS_ES; // kept for DB/AI compatibility (always ES keys)
+const OCCASIONS_ES = ["Casual","Trabajo","Formal","Deportivo","Fiesta","Viaje"];
+const SEASONS_ES = ["Todo el año","Primavera","Verano","Otoño","Invierno"];
+const EVENTS_ES = ["Trabajo / Oficina","Cita romántica","Reunión de negocios","Evento formal","Día casual","Fiesta / Antro","Deporte / Gym","Viaje"];
 const CAT_ICON: Record<string,string> = { Tops:"👕", Pantalones:"👖", Vestidos:"👗", Zapatos:"👟", Accesorios:"💍", Abrigos:"🧥", Deportivo:"🏃" };
 
 // System prompts
@@ -1227,7 +1288,7 @@ export default function StyleVault() {
   const [analyzing, setAnalyzing] = useState(false);
 
   const [selEv, setSelEv] = useState("");
-  const [selSe, setSelSe] = useState("Todo el año");
+  const [selSe, setSelSe] = useState("");
   const [outfitR, setOR] = useState<any>(null);
   const [outfitL, setOL] = useState(false);
 
@@ -1580,7 +1641,11 @@ Crea el outfit perfecto y personalizado para esta persona.`
     setTripL(false);
   };
 
-  const allCategories = [...BASE_CATS, ...customCats];
+  const tCats = (t.cats as string[]) ?? BASE_CATS_ES;
+  const tOccasions = (t.occasions as string[]) ?? OCCASIONS_ES;
+  const tSeasons = (t.seasons as string[]) ?? SEASONS_ES;
+  const tEvents = (t.events as string[]) ?? EVENTS_ES;
+  const allCategories = [...tCats, ...customCats];
   const addCustomCategory = () => {
     const cat = newCatInput.trim();
     if (!cat || allCategories.includes(cat)) return;
@@ -2176,7 +2241,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
 
             {showForm && (
               <div className="card card-gold fade" style={{ marginBottom:"18px" }}>
-                <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"14px" }}>✦ Nueva Prenda</div>
+                <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"14px" }}>{t.newItemLabel as string ?? t.newItem as string}</div>
                 <div className="pbox" style={{ height:"150px", marginBottom:"10px" }} onClick={()=>fileRef.current?.click()}>
                   {pp ? <img src={pp} alt="preview" style={{ width:"100%", height:"100%", objectFit:"cover" }} /> : (
                     <div style={{ textAlign:"center", color:"var(--text3)" }}>
@@ -2185,22 +2250,22 @@ Crea el outfit perfecto y personalizado para esta persona.`
                     </div>
                   )}
                 </div>
-                {analyzing && <div style={{ display:"flex", alignItems:"center", gap:"8px", padding:"6px 0", color:"var(--gold)", fontSize:"11px" }}><div className="dot"/><div className="dot"/><div className="dot"/><span style={{ marginLeft:"6px" }}>Analizando...</span></div>}
+                {analyzing && <div style={{ display:"flex", alignItems:"center", gap:"8px", padding:"6px 0", color:"var(--gold)", fontSize:"11px" }}><div className="dot"/><div className="dot"/><div className="dot"/><span style={{ marginLeft:"6px" }}>{t.analyzingText as string ?? t.analyzing as string}</span></div>}
                 <div style={{ display:"flex", gap:"7px", marginBottom:"12px" }}>
-                  <button className="btn-g" style={{ flex:1, border:"1px solid var(--border)", borderRadius:"1px" }} onClick={()=>fileRef.current?.click()}>📁 Galería</button>
-                  <button className="btn-g" style={{ flex:1, border:"1px solid var(--border)", borderRadius:"1px" }} onClick={()=>camRef.current?.click()}>📷 Cámara</button>
+                  <button className="btn-g" style={{ flex:1, border:"1px solid var(--border)", borderRadius:"1px" }} onClick={()=>fileRef.current?.click()}>{t.gallery}</button>
+                  <button className="btn-g" style={{ flex:1, border:"1px solid var(--border)", borderRadius:"1px" }} onClick={()=>camRef.current?.click()}>{t.camera}</button>
                 </div>
                 <div style={{ display:"flex", flexDirection:"column", gap:"9px" }}>
-                  <input className="inp" placeholder="Nombre de la prenda" value={ni.name} onChange={e=>setNi(p=>({...p,name:e.target.value}))} />
+                  <input className="inp" placeholder={t.itemName as string} value={ni.name} onChange={e=>setNi(p=>({...p,name:e.target.value}))} />
                   <select className="sel" value={ni.category} onChange={e=>setNi(p=>({...p,category:e.target.value}))}>
-                    {allCategories.map(c=><option key={c}>{c}</option>)}
+                    {tCats.map(c=><option key={c}>{c}</option>)}
                   </select>
                   <select className="sel" value={ni.occasion} onChange={e=>setNi(p=>({...p,occasion:e.target.value}))}>
-                    <option value="">Ocasión</option>
-                    {OCCASIONS.map(o=><option key={o}>{o}</option>)}
+                    <option value="">{t.occasion}</option>
+                    {tOccasions.map(o=><option key={o}>{o}</option>)}
                   </select>
                   <select className="sel" value={ni.season} onChange={e=>setNi(p=>({...p,season:e.target.value}))}>
-                    {SEASONS.map(s=><option key={s}>{s}</option>)}
+                    {tSeasons.map(s=><option key={s}>{s}</option>)}
                   </select>
                   <div style={{ display:"flex", gap:"9px", marginTop:"4px" }}>
                     <button className="btn-p" onClick={addItem} style={{ flex:1 }}>{t.save}</button>
@@ -2431,29 +2496,29 @@ Crea el outfit perfecto y personalizado para esta persona.`
 
             {/* ── GENERADOR CLÁSICO (original) ── */}
             <div className="divider" style={{ margin:"24px 0 20px" }}/>
-            <div style={{ fontSize:"14px", fontWeight:700, color:"var(--text)", marginBottom:"4px" }}>Generador por evento</div>
-            <div style={{ fontSize:"12px", color:"var(--text2)", marginBottom:"16px" }}>Selecciona el evento y temporada</div>
+            <div style={{ fontSize:"14px", fontWeight:700, color:"var(--text)", marginBottom:"4px" }}>{t.classicGenerator}</div>
+            <div style={{ fontSize:"12px", color:"var(--text2)", marginBottom:"16px" }}>{t.selectEvent}</div>
 
             {clothes.length===0 ? (
               <div style={{ textAlign:"center", padding:"40px", color:"var(--text3)", fontSize:"13px" }}>Agrega prendas a tu armario primero</div>
             ) : (
               <>
                 <div className="card" style={{ marginBottom:"12px" }}>
-                  <div style={{ fontSize:"12px", fontWeight:600, color:"var(--text2)", marginBottom:"12px" }}>¿Para qué evento?</div>
+                  <div style={{ fontSize:"12px", fontWeight:600, color:"var(--text2)", marginBottom:"12px" }}>{t.forWhatEvent}</div>
                   <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"7px" }}>
-                    {EVENTS.map(ev => (
+                    {tEvents.map(ev => (
                       <button key={ev} onClick={()=>setSelEv(ev)} style={{ padding:"10px 8px", background:selEv===ev?"var(--accent-light)":"var(--bg3)", color:selEv===ev?"var(--accent)":"var(--text2)", border:`2px solid ${selEv===ev?"var(--accent)":"var(--border)"}`, borderRadius:"var(--radius-sm)", cursor:"pointer", fontFamily:"var(--font)", fontSize:"11px", textAlign:"left", transition:"all .2s", fontWeight:selEv===ev?600:400 }}>{ev}</button>
                     ))}
                   </div>
                 </div>
                 <div className="card" style={{ marginBottom:"16px" }}>
-                  <div style={{ fontSize:"12px", fontWeight:600, color:"var(--text2)", marginBottom:"10px" }}>Temporada</div>
+                  <div style={{ fontSize:"12px", fontWeight:600, color:"var(--text2)", marginBottom:"10px" }}>{t.season}</div>
                   <div style={{ display:"flex", gap:"7px", flexWrap:"wrap" }}>
-                    {SEASONS.map(s => <button key={s} className={`pill ${selSe===s?"on":""}`} onClick={()=>setSelSe(s)}>{s}</button>)}
+                    {tSeasons.map(s => <button key={s} className={`pill ${selSe===s?"on":""}`} onClick={()=>setSelSe(s)}>{s}</button>)}
                   </div>
                 </div>
                 <button className="btn-p" onClick={generateOutfit} disabled={!selEv||outfitL} style={{ marginBottom:"18px" }}>
-                  {outfitL?"Creando outfit...":"✦  Generar Outfit con IA"}
+                  {outfitL ? t.creatingOutfit : t.generateClassic}
                 </button>
                 {outfitL && <div style={{ display:"flex", justifyContent:"center", gap:"6px", padding:"24px" }}><div className="dot"/><div className="dot"/><div className="dot"/></div>}
                 {outfitR && !outfitL && (
