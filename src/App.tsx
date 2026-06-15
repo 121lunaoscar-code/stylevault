@@ -117,6 +117,7 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     events:["Trabajo / Oficina","Cita romántica","Reunión de negocios","Evento formal","Día casual","Fiesta / Antro","Deporte / Gym","Viaje"],
     analyzingText:"Analizando...",
     newItemLabel:"✦ NUEVA PRENDA",
+    onboardingFeatures:["Análisis facial y corporal con IA","Fashion DNA™ personalizado","Recomendaciones basadas en tu cuerpo real","Prueba outfits antes de vestirte"],
   },
   en: {
     appName:"STYLEVAULT", appSub:"AI Smart Wardrobe",
@@ -206,6 +207,7 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     events:["Work / Office","Romantic date","Business meeting","Formal event","Casual day","Party","Sport / Gym","Travel"],
     analyzingText:"Analyzing...",
     newItemLabel:"✦ NEW ITEM",
+    onboardingFeatures:["AI facial and body analysis","Personalized Fashion DNA™","Recommendations based on your real body","Try outfits before wearing them"],
   },
   pt: {
     appName:"STYLEVAULT", appSub:"Guarda-Roupa Inteligente com IA",
@@ -295,6 +297,7 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     events:["Trabalho / Escritório","Encontro romântico","Reunião de negócios","Evento formal","Dia casual","Festa","Esporte / Academia","Viagem"],
     analyzingText:"Analisando...",
     newItemLabel:"✦ NOVA PEÇA",
+    onboardingFeatures:["Análise facial e corporal com IA","Fashion DNA™ personalizado","Recomendações baseadas no seu corpo real","Experimente looks antes de vestir"],
   },
   fr: {
     appName:"STYLEVAULT", appSub:"Garde-Robe Intelligente par IA",
@@ -384,6 +387,7 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     events:["Travail / Bureau","Rendez-vous romantique","Réunion d'affaires","Événement formel","Jour casual","Soirée","Sport / Salle","Voyage"],
     analyzingText:"Analyse en cours...",
     newItemLabel:"✦ NOUVELLE PIÈCE",
+    onboardingFeatures:["Analyse faciale et corporelle par IA","Fashion DNA™ personnalisé","Recommandations basées sur votre corps réel","Essayez des tenues avant de les porter"],
   },
   de: {
     appName:"STYLEVAULT", appSub:"KI-gestützter Smart-Kleiderschrank",
@@ -473,6 +477,7 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     events:["Arbeit / Büro","Romantisches Date","Geschäftstreffen","Formelles Event","Casual Tag","Party","Sport / Gym","Reise"],
     analyzingText:"Analysiere...",
     newItemLabel:"✦ NEUES KLEIDUNGSSTÜCK",
+    onboardingFeatures:["KI-Gesichts- und Körperanalyse","Personalisiertes Fashion DNA™","Empfehlungen basierend auf Ihrem echten Körper","Outfits vor dem Anziehen ausprobieren"],
   },
   zh: {
     appName:"STYLEVAULT", appSub:"AI 智能衣橱",
@@ -562,6 +567,7 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     events:["工作/办公室","浪漫约会","商务会议","正式活动","休闲日","派对","运动/健身","旅行"],
     analyzingText:"分析中...",
     newItemLabel:"✦ 新单品",
+    onboardingFeatures:["AI面部和身体分析","个性化时尚DNA™","基于您真实体型的推荐","穿之前先试穿"],
   },
   ar: {
     appName:"STYLEVAULT", appSub:"خزانة ملابس ذكية بالذكاء الاصطناعي",
@@ -651,6 +657,7 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     events:["عمل / مكتب","موعد رومانسي","اجتماع عمل","حدث رسمي","يوم كاجوال","حفلة","رياضة / صالة","سفر"],
     analyzingText:"جارٍ التحليل...",
     newItemLabel:"✦ قطعة جديدة",
+    onboardingFeatures:["تحليل الوجه والجسم بالذكاء الاصطناعي","Fashion DNA™ مخصص","توصيات بناءً على جسمك الحقيقي","جرب الأزياء قبل ارتدائها"],
   },
   hi: {
     appName:"STYLEVAULT", appSub:"AI स्मार्ट वॉर्डरोब",
@@ -740,6 +747,7 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     events:["काम/कार्यालय","रोमांटिक डेट","बिज़नेस मीटिंग","फॉर्मल इवेंट","कैजुअल दिन","पार्टी","स्पोर्ट/जिम","यात्रा"],
     analyzingText:"विश्लेषण हो रहा है...",
     newItemLabel:"✦ नई वस्तु",
+    onboardingFeatures:["AI चेहरे और शरीर का विश्लेषण","व्यक्तिगत Fashion DNA™","आपके असली शरीर पर आधारित सुझाव","पहनने से पहले आउटफिट आज़माएं"],
   },
   ja: {
     appName:"STYLEVAULT", appSub:"AIスマートワードローブ",
@@ -829,6 +837,7 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     events:["仕事/オフィス","ロマンチックなデート","ビジネス会議","フォーマルイベント","カジュアルな日","パーティー","スポーツ/ジム","旅行"],
     analyzingText:"分析中...",
     newItemLabel:"✦ 新しいアイテム",
+    onboardingFeatures:["AI顔・体型分析","パーソナライズされたFashion DNA™","あなたの実際の体に基づいたおすすめ","着る前にコーデを試着"],
   },
   ru: {
     appName:"STYLEVAULT", appSub:"Умный гардероб с ИИ",
@@ -918,6 +927,7 @@ const T: Record<LangCode, Record<string, string | string[]>> = {
     events:["Работа / Офис","Романтическое свидание","Деловая встреча","Официальное мероприятие","Casual день","Вечеринка","Спорт / Зал","Путешествие"],
     analyzingText:"Анализирую...",
     newItemLabel:"✦ НОВАЯ ВЕЩЬ",
+    onboardingFeatures:["ИИ-анализ лица и тела","Персональный Fashion DNA™","Рекомендации на основе вашего тела","Примерьте образы перед ноской"],
   },
 };
 
@@ -1369,6 +1379,9 @@ export default function StyleVault() {
       if (p.status === "blocked") { setLerr("Tu cuenta está bloqueada."); setAL(false); return; }
       localStorage.setItem("sb_profile", JSON.stringify(p));
       setProfile(p);
+      const savedDna = localStorage.getItem("sv_dna");
+      const savedGenero = localStorage.getItem("sv_genero") || p.genero || "";
+      applyTheme(savedDna ? (JSON.parse(savedDna).genero || savedGenero) : savedGenero);
       setScreen("app");
     } catch { setLerr("Error de conexión."); }
     setAL(false);
@@ -1779,11 +1792,11 @@ Crea el outfit perfecto y personalizado para esta persona.`
               <div style={{ fontSize:"48px", marginBottom:"20px" }}>🧬</div>
               <div className="serif" style={{ fontSize:"32px", fontWeight:300, marginBottom:"12px" }}>{t.createAvatar}</div>
               <div style={{ fontSize:"14px", color:"var(--text2)", lineHeight:1.7, maxWidth:"320px", margin:"0 auto" }}>
-                Tu estilista personal necesita conocerte para crear una versión digital de ti y darte recomendaciones perfectas.
+                {t.avatarSub}
               </div>
             </div>
             <div style={{ display:"flex", flexDirection:"column", gap:"12px", marginBottom:"32px" }}>
-              {["Análisis facial y corporal con IA", "Fashion DNA™ personalizado", "Recomendaciones basadas en tu cuerpo real", "Prueba outfits antes de vestirte"].map(f => (
+              {((t.onboardingFeatures as string[]) ?? ["Análisis facial y corporal con IA", "Fashion DNA™ personalizado", "Recomendaciones basadas en tu cuerpo real", "Prueba outfits antes de vestirte"]).map(f => (
                 <div key={f} style={{ display:"flex", alignItems:"center", gap:"12px", padding:"12px", background:"var(--bg2)", border:"1px solid var(--border)", borderRadius:"2px" }}>
                   <div style={{ color:"var(--gold)", fontSize:"14px" }}>✦</div>
                   <div style={{ fontSize:"13px", color:"var(--text2)" }}>{f}</div>
@@ -1792,7 +1805,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
             </div>
             <button className="btn-p" onClick={()=>setObStep(2)}>{t.begin}</button>
             <button onClick={()=>{ setScreen("app"); }} style={{ background:"none", border:"none", color:"var(--text2)", fontSize:"11px", cursor:"pointer", letterSpacing:"1px", fontFamily:"'Jost',sans-serif", textDecoration:"underline", textAlign:"center", width:"100%", marginTop:"16px", padding:"8px" }}>
-              Omitir — configurar después
+              {t.skip}
             </button>
           </div>
         )}
@@ -1802,56 +1815,56 @@ Crea el outfit perfecto y personalizado para esta persona.`
           <div className="fade">
             <div style={{ marginBottom:"28px" }}>
               <div className="serif" style={{ fontSize:"28px", fontWeight:300, marginBottom:"8px" }}>{t.basicInfo}</div>
-              <div style={{ fontSize:"12px", color:"var(--text2)" }}>Solo lo que la IA no puede detectar por sí sola</div>
+              <div style={{ fontSize:"12px", color:"var(--text2)" }}>{t.basicInfoSub}</div>
             </div>
             <div style={{ display:"flex", flexDirection:"column", gap:"12px", marginBottom:"24px" }}>
               <div>
-                <div style={{ fontSize:"13px", fontWeight:600, color:"var(--text)", marginBottom:"12px" }}>¿Cómo te identificas?</div>
+                <div style={{ fontSize:"13px", fontWeight:600, color:"var(--text)", marginBottom:"12px" }}>{t.howDoYouIdentify}</div>
                 <div style={{ display:"flex", gap:"10px", marginBottom:"20px" }}>
-                  {["Mujer","Hombre","Prefiero no decir"].map(g => (
-                    <button key={g} onClick={()=>{ setObInfo(p=>({...p,genero:g})); applyTheme(g); }}
-                      style={{ flex:1, padding:"14px 8px", background:obInfo.genero===g?"var(--accent)":"var(--bg3)", color:obInfo.genero===g?"#fff":"var(--text2)", border:`2px solid ${obInfo.genero===g?"var(--accent)":"var(--border)"}`, borderRadius:"var(--radius-sm)", cursor:"pointer", fontFamily:"var(--font)", fontSize:"12px", fontWeight:600, transition:"all .2s" }}>
-                      {g==="Mujer"?"👩":g==="Hombre"?"👨":"⭐"} {g}
+                  {[{id:"Mujer",label:t.woman,icon:"👩"},{id:"Hombre",label:t.man,icon:"👨"},{id:"Otro",label:t.other,icon:"⭐"}].map(g => (
+                    <button key={g.id} onClick={()=>{ setObInfo(p=>({...p,genero:g.id})); applyTheme(g.id); }}
+                      style={{ flex:1, padding:"14px 8px", background:obInfo.genero===g.id?"var(--accent)":"var(--bg3)", color:obInfo.genero===g.id?"#fff":"var(--text2)", border:`2px solid ${obInfo.genero===g.id?"var(--accent)":"var(--border)"}`, borderRadius:"var(--radius-sm)", cursor:"pointer", fontFamily:"var(--font)", fontSize:"12px", fontWeight:600, transition:"all .2s" }}>
+                      {g.icon} {g.label}
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <div style={{ fontSize:"11px", fontWeight:600, color:"var(--text2)", letterSpacing:".5px", marginBottom:"6px" }}>Nombre</div>
-                <input className="inp" placeholder="Tu nombre" value={obInfo.nombre} onChange={e=>setObInfo(p=>({...p,nombre:e.target.value}))} />
+                <div style={{ fontSize:"11px", fontWeight:600, color:"var(--text2)", letterSpacing:".5px", marginBottom:"6px" }}>{t.name}</div>
+                <input className="inp" placeholder={t.name as string} value={obInfo.nombre} onChange={e=>setObInfo(p=>({...p,nombre:e.target.value}))} />
               </div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px" }}>
                 <div>
-                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"6px" }}>Edad</div>
-                  <input className="inp" placeholder="Años" type="number" value={obInfo.edad} onChange={e=>setObInfo(p=>({...p,edad:e.target.value}))} />
+                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"6px" }}>{t.age}</div>
+                  <input className="inp" placeholder={t.age as string} type="number" value={obInfo.edad} onChange={e=>setObInfo(p=>({...p,edad:e.target.value}))} />
                 </div>
                 <div>
-                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"6px" }}>Altura (cm)</div>
+                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"6px" }}>{t.height}</div>
                   <input className="inp" placeholder="170" type="number" value={obInfo.altura} onChange={e=>setObInfo(p=>({...p,altura:e.target.value}))} />
                 </div>
               </div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px" }}>
                 <div>
-                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"6px" }}>Peso aprox. (kg)</div>
+                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"6px" }}>{t.weight}</div>
                   <input className="inp" placeholder="70" type="number" value={obInfo.peso} onChange={e=>setObInfo(p=>({...p,peso:e.target.value}))} />
                 </div>
                 <div>
-                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"6px" }}>Color de ojos</div>
-                  <input className="inp" placeholder="Café, verde..." value={obInfo.ojos} onChange={e=>setObInfo(p=>({...p,ojos:e.target.value}))} />
+                  <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"6px" }}>{t.eyeColor}</div>
+                  <input className="inp" placeholder={t.eyeColor as string} value={obInfo.ojos} onChange={e=>setObInfo(p=>({...p,ojos:e.target.value}))} />
                 </div>
               </div>
               <div>
-                <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"10px" }}>Tipo de cabello</div>
+                <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"10px" }}>{t.hairType}</div>
                 <div style={{ display:"flex", gap:"8px", flexWrap:"wrap" }}>
-                  {[t.straight,t.wavy,t.curly,t.afro].map(hair => (
-                    <button key={t} className={`pill ${obInfo.cabello===t?"on":""}`} onClick={()=>setObInfo(p=>({...p,cabello:t}))}>{t}</button>
+                  {([t.straight,t.wavy,t.curly,t.afro] as string[]).map(hair => (
+                    <button key={hair} className={`pill ${obInfo.cabello===hair?"on":""}`} onClick={()=>setObInfo(p=>({...p,cabello:hair}))}>{hair}</button>
                   ))}
                 </div>
               </div>
             </div>
             <div style={{ display:"flex", gap:"10px" }}>
-              <button className="btn-o" onClick={()=>setObStep(1)}>← Atrás</button>
-              <button className="btn-p" onClick={()=>setObStep(3)} disabled={!obInfo.nombre||!obInfo.altura} style={{ flex:1 }}>Continuar →</button>
+              <button className="btn-o" onClick={()=>setObStep(1)}>{t.back}</button>
+              <button className="btn-p" onClick={()=>setObStep(3)} disabled={!obInfo.nombre||!obInfo.altura} style={{ flex:1 }}>{t.continueBtn}</button>
             </div>
           </div>
         )}
@@ -1861,7 +1874,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
           <div className="fade">
             <div style={{ marginBottom:"24px" }}>
               <div className="serif" style={{ fontSize:"28px", fontWeight:300, marginBottom:"8px" }}>{t.smartScan}</div>
-              <div style={{ fontSize:"12px", color:"var(--text2)" }}>3 fotos para crear tu avatar con máxima precisión</div>
+              <div style={{ fontSize:"12px", color:"var(--text2)" }}>{t.smartScanSub}</div>
             </div>
 
             <input ref={selfieRef} type="file" accept="image/*" style={{display:"none"}} onChange={handleObPhoto("selfie")} />
@@ -1905,9 +1918,9 @@ Crea el outfit perfecto y personalizado para esta persona.`
               </div>
             ) : (
               <div style={{ display:"flex", gap:"10px" }}>
-                <button className="btn-o" onClick={()=>setObStep(2)}>← Atrás</button>
+                <button className="btn-o" onClick={()=>setObStep(2)}>{t.back}</button>
                 <button className="btn-p" onClick={analyzeWithAI} disabled={!obPhotos.selfie||!obPhotos.front||!obPhotos.side} style={{ flex:1 }}>
-                  🧬 Analizar con IA
+                  {t.analyzeAI}
                 </button>
               </div>
             )}
@@ -1919,8 +1932,8 @@ Crea el outfit perfecto y personalizado para esta persona.`
           <div className="fade">
             <div style={{ textAlign:"center", marginBottom:"28px" }}>
               <div style={{ fontSize:"40px", marginBottom:"12px" }}>🎉</div>
-              <div className="serif" style={{ fontSize:"28px", fontWeight:300, marginBottom:"8px" }}>Tu Avatar IA está listo</div>
-              <div style={{ fontSize:"12px", color:"var(--text2)" }}>Nivel de precisión: {dna.precisionLevel || 92}%</div>
+              <div className="serif" style={{ fontSize:"28px", fontWeight:300, marginBottom:"8px" }}>{t.avatarReady}</div>
+              <div style={{ fontSize:"12px", color:"var(--text2)" }}>{t.precisionLevel} {dna.precisionLevel || 92}%</div>
             </div>
 
             {/* DNA Card */}
@@ -1950,7 +1963,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
               </div>
 
               <div style={{ marginBottom:"14px" }}>
-                <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"8px" }}>Estilos recomendados</div>
+                <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"8px" }}>{t.recommendedClothes}</div>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:"4px" }}>
                   {dna.recommendedStyles?.map((s: string) => <span key={s} className="dna-tag dna-style">{s}</span>)}
                 </div>
@@ -1964,8 +1977,8 @@ Crea el outfit perfecto y personalizado para esta persona.`
             </div>
 
             <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
-              <button className="btn-p" onClick={()=>{ setScreen("app"); }}>Ver mi Armario →</button>
-              <button className="btn-o" onClick={()=>{ setTab("outfit"); setScreen("app"); }}>Crear mi primer outfit</button>
+              <button className="btn-p" onClick={()=>{ setScreen("app"); }}>{t.viewWardrobe}</button>
+              <button className="btn-o" onClick={()=>{ setTab("outfit"); setScreen("app"); }}>{t.createFirstOutfit}</button>
             </div>
           </div>
         )}
@@ -2147,8 +2160,8 @@ Crea el outfit perfecto y personalizado para esta persona.`
             {!dna?.bodyType ? (
               <div style={{ textAlign:"center", padding:"60px 20px" }}>
                 <div style={{ fontSize:"40px", marginBottom:"16px", opacity:.3 }}>🧬</div>
-                <div style={{ fontSize:"13px", color:"var(--text2)", marginBottom:"20px" }}>Aún no has creado tu Fashion DNA™</div>
-                <button className="btn-p" onClick={()=>setScreen("onboarding")}>Crear mi Fashion DNA™</button>
+                <div style={{ fontSize:"13px", color:"var(--text2)", marginBottom:"20px" }}>{t.noDNA}</div>
+                <button className="btn-p" onClick={()=>setScreen("onboarding")}>{t.createDNA}</button>
               </div>
             ) : (
               <>
@@ -2222,7 +2235,11 @@ Crea el outfit perfecto y personalizado para esta persona.`
                   </div>
                 )}
 
-                <button className="btn-o" onClick={()=>setScreen("onboarding")} style={{ width:"100%" }}>🔄 Actualizar mi Fashion DNA™</button>
+                <button className="btn-o" onClick={()=>{
+                  if (window.confirm(lang==="es"?"¿Seguro que quieres recalibrar tu Fashion DNA™? Tu análisis actual se conservará si cancelas el proceso.":lang==="fr"?"Voulez-vous vraiment recalibrer votre Fashion DNA™ ?":lang==="pt"?"Tem certeza que quer recalibrar seu Fashion DNA™?":"Are you sure you want to recalibrate your Fashion DNA™? Your current analysis will be kept if you cancel.")) {
+                    setObStep(2); setScreen("onboarding");
+                  }
+                }} style={{ width:"100%" }}>{t.updateDNA}</button>
               </>
             )}
           </div>
@@ -2580,13 +2597,13 @@ Crea el outfit perfecto y personalizado para esta persona.`
             ) : !dna?.bodyType ? (
               <div style={{ textAlign:"center", padding:"60px 20px" }}>
                 <div style={{ fontSize:"40px", marginBottom:"16px", opacity:.3 }}>🧬</div>
-                <div style={{ fontSize:"13px", color:"var(--text2)", marginBottom:"20px" }}>Primero crea tu Fashion DNA™</div>
-                <button className="btn-p" onClick={()=>setScreen("onboarding")}>Crear mi Fashion DNA™</button>
+                <div style={{ fontSize:"13px", color:"var(--text2)", marginBottom:"20px" }}>{t.createDNAFirst}</div>
+                <button className="btn-p" onClick={()=>setScreen("onboarding")}>{t.createDNA}</button>
               </div>
             ) : (
               <>
                 <div className="card card-accent" style={{ marginBottom:"14px" }}>
-                  <div style={{ fontSize:"9px", color:"var(--green)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"10px" }}>✓ Fashion DNA™ detectado</div>
+                  <div style={{ fontSize:"9px", color:"var(--green)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"10px" }}>{t.dnaDetected}</div>
                   <div style={{ display:"flex", gap:"8px", flexWrap:"wrap" }}>
                     <span className="dna-tag dna-style">{dna.bodyType}</span>
                     <span className="dna-tag dna-good">{dna.skinTone}</span>
