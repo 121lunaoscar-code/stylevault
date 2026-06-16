@@ -1454,22 +1454,14 @@ Crea el outfit perfecto y personalizado para esta persona.`
 
       const parsed = JSON.parse(raw.replace(/```json|```/g,"").trim());
       setSmartOutfit(parsed);
-      // Auto-generate visual card
-      setTimeout(() => {
-        if (parsed?.outfit?.length) {
-          const items = parsed.outfit?.slice(0, 5) || [];
-          const colors = [parsed.colores?.principal||"#C4973F", parsed.colores?.complementario||"#8B3A52", parsed.colores?.acento||"#2D5A3D"];
-          const rows = items.map((item: any, i: number) => {
-            const y = 100 + i * 62;
-            const col = colors[i % 3];
-            return `<rect x="30" y="${y}" width="340" height="50" rx="10" fill="${col}18" stroke="${col}" stroke-width="1.5"/><text x="55" y="${y+32}" font-family="Arial" font-size="24">${item.emoji||"👔"}</text><text x="88" y="${y+22}" font-family="Georgia,serif" font-size="13" font-weight="bold" fill="#222">${(item.prenda||"").substring(0,28)}</text><text x="88" y="${y+38}" font-family="Arial" font-size="11" fill="${col}">${(item.color||"").substring(0,30)}</text>`;
-          }).join("");
-          const h = 100 + items.length * 62 + 80;
-          const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="${h}" viewBox="0 0 400 ${h}"><rect width="400" height="${h}" fill="#FAF8F5"/><rect x="0" y="0" width="400" height="70" fill="${colors[0]}22"/><text x="200" y="28" text-anchor="middle" font-family="Georgia,serif" font-size="11" fill="${colors[0]}" letter-spacing="4">✦ STYLEVAULT ✦</text><text x="200" y="52" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="bold" fill="#222">${(outfitPrompt||"Mi Outfit").substring(0,32)}</text>${rows}<rect x="30" y="${h-55}" width="340" height="32" rx="16" fill="${colors[0]}"/><text x="200" y="${h-33}" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#fff">${parsed.compatibility||0}% Compatible · StyleVault™</text></svg>`;
-          const blob = new Blob([svg], {type:"image/svg+xml"});
-          setOutfitImageUrl(URL.createObjectURL(blob));
-        }
-      }, 100);
+      // Auto-generate outfit image with Pollinations AI
+      if (parsed?.outfit?.length) {
+        const imgItems = parsed.outfit.map((i: any) => `${i.prenda} in ${i.color}`).join(", ");
+        const imgColors = `${parsed.colores?.principal||""} ${parsed.colores?.complementario||""}`.trim();
+        const imgPrompt = `fashion flat lay photography, white background, studio lighting, top view, ${imgItems}, colors ${imgColors}, magazine editorial, high fashion, minimalist, no people`;
+        const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imgPrompt)}?width=512&height=512&seed=${Date.now()}&nologo=true`;
+        setOutfitImageUrl(imgUrl);
+      }
     } catch { setSmartOutfit({ greeting: "Error al generar. Intenta de nuevo.", outfit: [], accesorios: [], compatibility: 0 }); }
 
     setSmartOutfitL(false);
@@ -1485,42 +1477,21 @@ Crea el outfit perfecto y personalizado para esta persona.`
     showToast(t.outfitSaved);
   };
 
-  const generateOutfitImage = () => {
+  const generateOutfitImage = async () => {
     if (!smartOutfit?.outfit?.length) return;
-    setOutfitImageL(true);
+    setOutfitImageL(true); setOutfitImageUrl(null);
 
-    const items = smartOutfit.outfit?.slice(0, 5) || [];
-    const colors = [
-      smartOutfit.colores?.principal || "#C4973F",
-      smartOutfit.colores?.complementario || "#8B3A52",
-      smartOutfit.colores?.acento || "#2D5A3D",
-    ];
-
-    const svgRows = items.map((item: any, i: number) => {
-      const y = 100 + i * 62;
-      const col = colors[i % 3];
-      return `
-        <rect x="30" y="${y}" width="340" height="50" rx="10" fill="${col}18" stroke="${col}" stroke-width="1.5"/>
-        <text x="55" y="${y + 32}" font-family="Arial,sans-serif" font-size="24">${item.emoji || "👔"}</text>
-        <text x="88" y="${y + 22}" font-family="Georgia,serif" font-size="13" font-weight="bold" fill="#222">${(item.prenda || "").substring(0, 28)}</text>
-        <text x="88" y="${y + 38}" font-family="Arial,sans-serif" font-size="11" fill="${col}">${(item.color || "").substring(0, 30)}</text>
-      `;
-    }).join("");
-
-    const totalH = 100 + items.length * 62 + 80;
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="${totalH}" viewBox="0 0 400 ${totalH}">
-      <rect width="400" height="${totalH}" fill="#FAF8F5" rx="0"/>
-      <rect x="0" y="0" width="400" height="70" fill="${colors[0]}22"/>
-      <text x="200" y="28" text-anchor="middle" font-family="Georgia,serif" font-size="11" fill="${colors[0]}" letter-spacing="4">✦ STYLEVAULT ✦</text>
-      <text x="200" y="52" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="bold" fill="#222">${(outfitPrompt || "Mi Outfit").substring(0, 32)}</text>
-      ${svgRows}
-      <rect x="30" y="${totalH - 55}" width="340" height="32" rx="16" fill="${colors[0]}"/>
-      <text x="200" y="${totalH - 33}" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#fff">${smartOutfit.compatibility || 0}% Compatible · StyleVault™</text>
-    </svg>`;
-
-    const blob = new Blob([svg], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
-    setOutfitImageUrl(url);
+    // Build detailed fashion prompt from outfit data
+    const items = smartOutfit.outfit.map((i: any) => `${i.prenda} en ${i.color}`).join(", ");
+    const colors = `${smartOutfit.colores?.principal || ""} ${smartOutfit.colores?.complementario || ""}`.trim();
+    const occasion = outfitPrompt || "elegant occasion";
+    
+    const prompt = `fashion flat lay photography, white background, professional studio lighting, top view, ${items}, color palette ${colors}, for ${occasion}, magazine editorial style, high fashion, clean minimalist composition, no people`;
+    
+    const encodedPrompt = encodeURIComponent(prompt);
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&seed=${Date.now()}&nologo=true`;
+    
+    setOutfitImageUrl(imageUrl);
     setOutfitImageL(false);
   };
 
@@ -2405,17 +2376,26 @@ Crea el outfit perfecto y personalizado para esta persona.`
                   <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"12px" }}>🎨 Visualización del Outfit</div>
                   {outfitImageUrl ? (
                     <div>
-                      <img src={outfitImageUrl} alt="outfit visual" style={{ width:"100%", borderRadius:"var(--radius-sm)", marginBottom:"12px", objectFit:"contain", background:"#FAF8F5", minHeight:"200px" }} />
-                      <button className="btn-o" onClick={generateOutfitImage} style={{ width:"100%", fontSize:"11px" }}>🔄 Regenerar imagen</button>
+                      <img
+                        src={outfitImageUrl}
+                        alt="outfit visual"
+                        style={{ width:"100%", borderRadius:"var(--radius-sm)", marginBottom:"12px", objectFit:"cover", aspectRatio:"1", background:"var(--bg3)" }}
+                        onLoad={(e)=>{ (e.target as HTMLImageElement).style.opacity="1"; }}
+                        onError={(e)=>{ (e.target as HTMLImageElement).style.display="none"; }}
+                        style={{ width:"100%", borderRadius:"var(--radius-sm)", marginBottom:"12px", opacity:1, transition:"opacity .3s", background:"var(--bg3)", aspectRatio:"1", objectFit:"cover" }}
+                      />
+                      <button className="btn-o" onClick={generateOutfitImage} disabled={outfitImageL} style={{ width:"100%", fontSize:"11px" }}>
+                        {outfitImageL ? "Generando..." : "🔄 Nueva imagen"}
+                      </button>
                     </div>
                   ) : outfitImageL ? (
                     <div style={{ padding:"30px" }}>
                       <div style={{ display:"flex", justifyContent:"center", gap:"6px", marginBottom:"12px" }}><div className="dot"/><div className="dot"/><div className="dot"/></div>
-                      <div style={{ fontSize:"12px", color:"var(--text2)" }}>Generando visualización...</div>
+                      <div style={{ fontSize:"12px", color:"var(--text2)" }}>Generando imagen con IA...</div>
                     </div>
                   ) : (
                     <button className="btn-p" onClick={generateOutfitImage} style={{ fontSize:"12px" }}>
-                      🎨 Ver imagen del outfit
+                      🎨 Generar imagen del outfit
                     </button>
                   )}
                 </div>
