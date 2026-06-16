@@ -948,6 +948,7 @@ function saveLanguage(code: LangCode) {
 
 
 const API_URL = "https://stylevault-api.121lunaoscar.workers.dev/claude";
+const HOTMART_URL = "https://pay.hotmart.com/U106352317J?checkoutMode=10";
 const MODEL = "claude-sonnet-4-6";
 
 // Obtiene headers de autenticación para el Worker (rate limiting por usuario)
@@ -1738,6 +1739,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
       : lang==="de" ? `🔒 Limit erreicht — Upgrade auf Premium für ${feature}`
       : `🔒 Limit reached — Upgrade to Premium for ${feature}`;
     showToast(msg);
+    setTimeout(() => window.open(HOTMART_URL, "_blank"), 1500);
   };
   const renderStars = (n: number) => "★".repeat(Math.min(5,Math.max(0,Math.round(n)))) + "☆".repeat(5-Math.min(5,Math.max(0,Math.round(n))));
   const suggestions = [t.s1, t.s2, t.s3, t.s4];
@@ -2671,7 +2673,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                 <div style={{ fontSize:"48px", marginBottom:"16px" }}>👑</div>
                 <div className="serif" style={{ fontSize:"22px", fontWeight:300, marginBottom:"10px" }}>Función Premium</div>
                 <div style={{ fontSize:"13px", color:"var(--text2)", lineHeight:1.6, marginBottom:"20px" }}>Prueba virtualmente cualquier outfit de tu armario basado en tu Fashion DNA™ personal.</div>
-                <button className="btn-p">✦  Mejorar a Premium — $299 MXN/mes</button>
+                <button className="btn-p" onClick={()=>window.open(HOTMART_URL,"_blank")}>{t.upgradePremium}</button>
               </div>
             ) : !dna?.bodyType ? (
               <div style={{ textAlign:"center", padding:"60px 20px" }}>
@@ -2805,7 +2807,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                 <div style={{ fontSize:"20px", marginBottom:"6px" }}>✈️ Premium</div>
                 <div style={{ fontSize:"13px", fontWeight:600, color:"var(--accent)", marginBottom:"4px" }}>{t.premiumOnly}</div>
                 <div style={{ fontSize:"11px", color:"var(--text2)", marginBottom:"12px" }}>{lang==="es"?"El planificador de viaje es exclusivo Premium":lang==="fr"?"Le planificateur de voyage est exclusif Premium":lang==="pt"?"O planejador de viagem é exclusivo Premium":"The trip planner is a Premium-only feature"}</div>
-                <button className="btn-p" style={{ width:"auto", padding:"10px 20px", fontSize:"12px" }} onClick={()=>setTab("home")}>{t.upgradePremium}</button>
+                <button className="btn-p" style={{ width:"auto", padding:"10px 20px", fontSize:"12px" }} onClick={()=>window.open(HOTMART_URL,"_blank")}>{t.upgradePremium}</button>
               </div>
             )}
             <div className="card" style={{ marginBottom:"14px" }}>
