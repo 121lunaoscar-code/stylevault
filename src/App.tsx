@@ -947,27 +947,59 @@ function saveLanguage(code: LangCode) {
 }
 
 
-const API_URL = "https://stylevault-api.121lunaoscar.workers.dev";
-const MODEL = "claude-sonnet-4-5";
+const API_URL = "https://stylevault-api.121lunaoscar.workers.dev/claude";
+const MODEL = "claude-sonnet-4-6";
 
-const callClaude = async (systemPrompt: string, messages: any[]) => {
+// Obtiene headers de autenticación para el Worker (rate limiting por usuario)
+const getWorkerHeaders = () => {
+  try {
+    const profile = JSON.parse(localStorage.getItem("sb_profile") || "{}");
+    return {
+      "Content-Type": "application/json",
+      "X-User-Id": profile.id || "anonymous",
+      "X-User-Plan": profile.plan || "Basic",
+    };
+  } catch {
+    return { "Content-Type": "application/json" };
+  }
+};
+
+const callClaude = async (systemPrompt: string, messages: any[], showToastFn?: (msg: string) => void) => {
   const res = await fetch(API_URL, {
-    method: "POST", headers: { "Content-Type": "application/json" },
+    method: "POST",
+    headers: getWorkerHeaders(),
     body: JSON.stringify({ model: MODEL, max_tokens: 2000, system: systemPrompt, messages }),
   });
+  if (res.status === 429) {
+    const err = await res.json().catch(() => ({}));
+    const isUpgrade = err.upgrade;
+    showToastFn?.(isUpgrade
+      ? "🔒 Límite alcanzado — Mejora a Premium para continuar"
+      : "⏳ Demasiadas solicitudes — intenta en 1 hora");
+    throw new Error(isUpgrade ? "UPGRADE_REQUIRED" : "RATE_LIMITED");
+  }
   const data = await res.json();
   return data.content?.map((i: any) => i.text || "").join("") || "";
 };
 
-const callClaudeVision = async (systemPrompt: string, images: {base64: string, type: string}[], text: string) => {
+const callClaudeVision = async (systemPrompt: string, images: {base64: string, type: string}[], text: string, showToastFn?: (msg: string) => void) => {
   const content: any[] = images.map(img => ({
     type: "image", source: { type: "base64", media_type: img.type, data: img.base64 }
   }));
   content.push({ type: "text", text });
   const res = await fetch(API_URL, {
-    method: "POST", headers: { "Content-Type": "application/json" },
+    method: "POST",
+    headers: getWorkerHeaders(),
     body: JSON.stringify({ model: MODEL, max_tokens: 3000, system: systemPrompt, messages: [{ role: "user", content }] }),
   });
+  if (res.status === 429) {
+    const err = await res.json().catch(() => ({}));
+    const isUpgrade = err.upgrade;
+    showToastFn?.(isUpgrade
+      ? "🔒 Límite alcanzado — Mejora a Premium para continuar"
+      : "⏳ Demasiadas solicitudes — intenta en 1 hora");
+    throw new Error(isUpgrade ? "UPGRADE_REQUIRED" : "RATE_LIMITED");
+  }
   const data = await res.json();
   return data.content?.map((i: any) => i.text || "").join("") || "";
 };
@@ -1459,7 +1491,7 @@ export default function StyleVault() {
 
       const userContext = `Datos del usuario: Nombre: ${obInfo.nombre}, Edad: ${obInfo.edad} años, Altura: ${obInfo.altura} cm, Peso: ${obInfo.peso} kg, Color de ojos: ${obInfo.ojos}, Tipo de cabello: ${obInfo.cabello}, Género: ${obInfo.genero}.`;
 
-      const raw = await callClaudeVision(DNA_SYSTEM, images, userContext + " Analiza las 3 fotos y genera el Fashion DNA completo.");
+      const raw = await callClaudeVision(DNA_SYSTEM, images, userContext + " Analiza las 3 fotos y genera el Fashion DNA completo.", showToast);
       const parsed = JSON.parse(raw.replace(/```json|```/g,"").trim());
 
       const dnaData = { ...parsed, userInfo: obInfo, genero: obInfo.genero, createdAt: new Date().toISOString() };
@@ -1499,7 +1531,7 @@ export default function StyleVault() {
       try {
         const base64 = dataUrl.split(',')[1];
         const images = [{ base64, type: f.type }];
-        const text = await callClaudeVision(getPhotoSystem(lang), images, "Analyze this garment.");
+        const text = await callClaudeVision(getPhotoSystem(lang), images, "Analyze this garment.", showToast);
         const parsed = JSON.parse(text.replace(/```json|```/g,"").trim());
         setNi(prev => ({ ...prev, name: parsed.name||prev.name, category: parsed.category||prev.category, season: parsed.season||prev.season, occasion: parsed.occasion||prev.occasion }));
         showToast(t.itemAnalyzed);
@@ -1585,7 +1617,7 @@ Estación actual: ${season}
 Fecha: ${new Date().toLocaleDateString("es-MX", {weekday:"long", day:"numeric", month:"long"})}
 
 Crea el outfit perfecto y personalizado para esta persona.`
-      }]);
+      }], showToast);
 
       const parsed = JSON.parse(raw.replace(/```json|```/g,"").trim());
       setSmartOutfit(parsed);
@@ -1612,7 +1644,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
     const list = clothes.map(c => `${c.name} (${c.category}, ${c.occasion||""})`).join("\n");
     const dnaCtx = dna ? `\nFashion DNA del usuario: Tipo de cuerpo: ${dna.bodyType}, Tono: ${dna.skinTone}, Subtono: ${dna.skinUndertone}, Colores ideales: ${dna.idealColors?.join(", ")}.` : "";
     try {
-      const raw = await callClaude(getOutfitSystem(lang), [{ role:"user", content:`Armario:\n${list}\n\nEvento: ${selEv}\nTemporada: ${selSe}${dnaCtx}\n\nCrea el outfit ideal personalizado para este usuario y califícalo.` }]);
+      const raw = await callClaude(getOutfitSystem(lang), [{ role:"user", content:`Armario:\n${list}\n\nEvento: ${selEv}\nTemporada: ${selSe}${dnaCtx}\n\nCrea el outfit ideal personalizado para este usuario y califícalo.` }], showToast);
       setOR(JSON.parse(raw.replace(/```json|```/g,"").trim()));
       incUsage("outfits");
       showToast("✦ Outfit creado");
@@ -1630,7 +1662,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
     const dnaCtx = dna ? `\nFashion DNA: Body type: ${dna.bodyType}, Skin tone: ${dna.skinTone} (${dna.skinUndertone}), Ideal colors: ${dna.idealColors?.join(", ")}, Recommended clothes: ${dna.recommendedClothes?.slice(0,5).join(", ")}.` : "";
     const wardrobeCtx = clothes.length > 0 ? `\nWardrobe: ${clothes.slice(0,15).map(c=>`${c.name} (${c.category})`).join(", ")}` : "";
     try {
-      const reply = await callClaude(getAdvisorSystem(lang, dnaCtx, wardrobeCtx), next.map(x=>({ role:x.role==="assistant"?"assistant":"user", content:x.text })));
+      const reply = await callClaude(getAdvisorSystem(lang, dnaCtx, wardrobeCtx), next.map(x=>({ role:x.role==="assistant"?"assistant":"user", content:x.text })), showToast);
       setMsgs([...next, { role:"assistant", text:reply }]);
     } catch { setMsgs([...next, { role:"assistant", text:t.connectionError as string }]); }
     setCload(false);
@@ -1643,7 +1675,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
     const prendas = clothes.filter(c => selectedForTry.includes(c.id)).map(c => `${c.name} (${c.category}, color: ${c.color})`).join(", ");
     const perfil = `Tipo de cuerpo: ${dna.bodyType}, Proporciones: hombros ${dna.bodyProportions?.shoulders}, cintura ${dna.bodyProportions?.waist}, caderas ${dna.bodyProportions?.hips}. Tono de piel: ${dna.skinTone} (${dna.skinUndertone}). Colores ideales: ${dna.idealColors?.join(", ")}.`;
     try {
-      const result = await callClaude(getVirtualSystem(lang), [{ role:"user", content:`Fashion DNA:\n${perfil}\n\nOutfit seleccionado:\n${prendas}\n\nDescribe cómo luciría este outfit en esta persona específicamente.` }]);
+      const result = await callClaude(getVirtualSystem(lang), [{ role:"user", content:`Fashion DNA:\n${perfil}\n\nOutfit seleccionado:\n${prendas}\n\nDescribe cómo luciría este outfit en esta persona específicamente.` }], showToast);
       setTryResult(result);
     } catch { setTryResult("Error al procesar."); }
     setTryL(false);
@@ -1655,7 +1687,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
     setTripL(true); setTripR(null);
     const armario = clothes.length > 0 ? clothes.map(c => `${c.name} (${c.category})`).join(", ") : "Sin prendas";
     try {
-      const raw = await callClaude(getTripSystem(lang), [{ role:"user", content:`Destino: ${tripDest}\nDías: ${tripDays}\nClima: ${tripClima||"templado"}\nTipo: ${tripTipo||"turismo"}\nArmario: ${armario}` }]);
+      const raw = await callClaude(getTripSystem(lang), [{ role:"user", content:`Destino: ${tripDest}\nDías: ${tripDays}\nClima: ${tripClima||"templado"}\nTipo: ${tripTipo||"turismo"}\nArmario: ${armario}` }], showToast);
       setTripR(JSON.parse(raw.replace(/```json|```/g,"").trim()));
     } catch { setTripR({ intro:"Error.", llevar:[], faltan:[], consejo:"" }); }
     setTripL(false);
