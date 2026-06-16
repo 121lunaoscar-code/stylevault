@@ -2424,7 +2424,9 @@ Crea el outfit perfecto y personalizado para esta persona.`
                   ? `${remainingOutfits} ${lang==="es"?"outfits restantes este mes":lang==="fr"?"tenues restantes ce mois":lang==="pt"?"looks restantes este mês":"outfits left this month"}`
                   : `🔒 ${lang==="es"?"Mejora a Premium para outfits ilimitados":lang==="fr"?"Passez à Premium pour des tenues illimitées":lang==="pt"?"Atualize para Premium para looks ilimitados":"Upgrade to Premium for unlimited outfits"}`}
               </div>
-            )} onClick={generateSmartOutfit} disabled={!outfitPrompt.trim()||smartOutfitL||!canGenOutfit} style={{ marginBottom:"20px", opacity: canGenOutfit ? 1 : 0.6 }}>
+            )}
+
+            <button className="btn-p" onClick={generateSmartOutfit} disabled={!outfitPrompt.trim()||smartOutfitL||!canGenOutfit} style={{ marginBottom:"20px", opacity: canGenOutfit ? 1 : 0.6 }}>
               {!canGenOutfit ? `🔒 ${lang==="es"?"Límite mensual alcanzado":lang==="fr"?"Limite mensuelle atteinte":lang==="pt"?"Limite mensal atingido":"Monthly limit reached"} (0/${LIMITS.outfitsPerMonth})` : smartOutfitL ? (
                 <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"10px" }}>
                   <span>{smartOutfitSteps || "Generando tu outfit..."}</span>
