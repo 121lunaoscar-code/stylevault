@@ -1454,6 +1454,22 @@ Crea el outfit perfecto y personalizado para esta persona.`
 
       const parsed = JSON.parse(raw.replace(/```json|```/g,"").trim());
       setSmartOutfit(parsed);
+      // Auto-generate visual card
+      setTimeout(() => {
+        if (parsed?.outfit?.length) {
+          const items = parsed.outfit?.slice(0, 5) || [];
+          const colors = [parsed.colores?.principal||"#C4973F", parsed.colores?.complementario||"#8B3A52", parsed.colores?.acento||"#2D5A3D"];
+          const rows = items.map((item: any, i: number) => {
+            const y = 100 + i * 62;
+            const col = colors[i % 3];
+            return `<rect x="30" y="${y}" width="340" height="50" rx="10" fill="${col}18" stroke="${col}" stroke-width="1.5"/><text x="55" y="${y+32}" font-family="Arial" font-size="24">${item.emoji||"👔"}</text><text x="88" y="${y+22}" font-family="Georgia,serif" font-size="13" font-weight="bold" fill="#222">${(item.prenda||"").substring(0,28)}</text><text x="88" y="${y+38}" font-family="Arial" font-size="11" fill="${col}">${(item.color||"").substring(0,30)}</text>`;
+          }).join("");
+          const h = 100 + items.length * 62 + 80;
+          const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="${h}" viewBox="0 0 400 ${h}"><rect width="400" height="${h}" fill="#FAF8F5"/><rect x="0" y="0" width="400" height="70" fill="${colors[0]}22"/><text x="200" y="28" text-anchor="middle" font-family="Georgia,serif" font-size="11" fill="${colors[0]}" letter-spacing="4">✦ STYLEVAULT ✦</text><text x="200" y="52" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="bold" fill="#222">${(outfitPrompt||"Mi Outfit").substring(0,32)}</text>${rows}<rect x="30" y="${h-55}" width="340" height="32" rx="16" fill="${colors[0]}"/><text x="200" y="${h-33}" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#fff">${parsed.compatibility||0}% Compatible · StyleVault™</text></svg>`;
+          const blob = new Blob([svg], {type:"image/svg+xml"});
+          setOutfitImageUrl(URL.createObjectURL(blob));
+        }
+      }, 100);
     } catch { setSmartOutfit({ greeting: "Error al generar. Intenta de nuevo.", outfit: [], accesorios: [], compatibility: 0 }); }
 
     setSmartOutfitL(false);
@@ -1469,68 +1485,42 @@ Crea el outfit perfecto y personalizado para esta persona.`
     showToast(t.outfitSaved);
   };
 
-  const generateOutfitImage = async () => {
+  const generateOutfitImage = () => {
     if (!smartOutfit?.outfit?.length) return;
-    setOutfitImageL(true); setOutfitImageUrl(null);
-    const items = smartOutfit.outfit.map((i: any) => `${i.prenda} ${i.color}`).join(", ");
-    // Build Picsum URL with seed based on outfit content for consistency
-    const seed = Math.abs(items.split("").reduce((a: number, c: string) => a + c.charCodeAt(0), 0)) % 1000;
-    // Use Claude to get a visual SVG illustration of the outfit
-    try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: getWorkerHeaders(),
-        body: JSON.stringify({
-          model: "claude-sonnet-4-6",
-          max_tokens: 1500,
-          system: `You are a fashion SVG illustrator. Create a flat lay SVG illustration of clothing items. 
-ONLY respond with valid SVG code starting with <svg and ending with </svg>. 
-No markdown, no explanation. Use a white/cream background.
-Style: minimalist fashion illustration, elegant, magazine quality.
-Show the clothes as flat lay items arranged nicely.`,
-          messages: [{ role: "user", content: `Create a flat lay SVG illustration showing these outfit items: ${items}. 
-Occasion: ${outfitPrompt}
-Colors from the outfit: ${smartOutfit.colores?.principal || ""}, ${smartOutfit.colores?.complementario || ""}
-Make it look like a professional fashion magazine flat lay. SVG size 400x400.` }]
-        })
-      });
-      const data = await res.json();
-      const svgText = data.content?.map((i: any) => i.text || "").join("") || "";
-      const svgMatch = svgText.match(/<svg[\s\S]*<\/svg>/);
-      if (svgMatch) {
-        const blob = new Blob([svgMatch[0]], { type: "image/svg+xml" });
-        const url = URL.createObjectURL(blob);
-        setOutfitImageUrl(url);
-      } else {
-        // Fallback: generate a stylish color palette card
-        const colors = [
-          smartOutfit.colores?.principal || "#C4973F",
-          smartOutfit.colores?.complementario || "#8B3A52",
-          smartOutfit.colores?.acento || "#2D5A3D",
-        ];
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
-          <rect width="400" height="400" fill="#FAF8F5"/>
-          <text x="200" y="60" text-anchor="middle" font-family="Georgia,serif" font-size="14" fill="#888" letter-spacing="4">✦ OUTFIT VISUAL ✦</text>
-          ${smartOutfit.outfit?.slice(0,5).map((item: any, i: number) => `
-            <rect x="40" y="${90 + i*55}" width="320" height="44" rx="8" fill="${colors[i%3]}22" stroke="${colors[i%3]}" stroke-width="1"/>
-            <text x="65" y="${117 + i*55}" font-family="Georgia,serif" font-size="20">${item.emoji}</text>
-            <text x="95" y="${112 + i*55}" font-family="sans-serif" font-size="13" font-weight="600" fill="#333">${item.prenda}</text>
-            <text x="95" y="${127 + i*55}" font-family="sans-serif" font-size="11" fill="#888">${item.color}</text>
-          `).join("")}
-          <rect x="40" y="${90 + Math.min(smartOutfit.outfit?.length||0,5)*55 + 10}" width="320" height="3" fill="#C4973F" opacity="0.3"/>
-          <text x="200" y="${90 + Math.min(smartOutfit.outfit?.length||0,5)*55 + 35}" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#C4973F">${smartOutfit.compatibility}% Compatible · StyleVault™</text>
-        </svg>`;
-        const blob = new Blob([svg], { type: "image/svg+xml" });
-        setOutfitImageUrl(URL.createObjectURL(blob));
-      }
-    } catch {
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
-        <rect width="400" height="400" fill="#FAF8F5"/>
-        <text x="200" y="200" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="#888">✦ StyleVault Outfit ✦</text>
-      </svg>`;
-      const blob = new Blob([svg], { type: "image/svg+xml" });
-      setOutfitImageUrl(URL.createObjectURL(blob));
-    }
+    setOutfitImageL(true);
+
+    const items = smartOutfit.outfit?.slice(0, 5) || [];
+    const colors = [
+      smartOutfit.colores?.principal || "#C4973F",
+      smartOutfit.colores?.complementario || "#8B3A52",
+      smartOutfit.colores?.acento || "#2D5A3D",
+    ];
+
+    const svgRows = items.map((item: any, i: number) => {
+      const y = 100 + i * 62;
+      const col = colors[i % 3];
+      return `
+        <rect x="30" y="${y}" width="340" height="50" rx="10" fill="${col}18" stroke="${col}" stroke-width="1.5"/>
+        <text x="55" y="${y + 32}" font-family="Arial,sans-serif" font-size="24">${item.emoji || "👔"}</text>
+        <text x="88" y="${y + 22}" font-family="Georgia,serif" font-size="13" font-weight="bold" fill="#222">${(item.prenda || "").substring(0, 28)}</text>
+        <text x="88" y="${y + 38}" font-family="Arial,sans-serif" font-size="11" fill="${col}">${(item.color || "").substring(0, 30)}</text>
+      `;
+    }).join("");
+
+    const totalH = 100 + items.length * 62 + 80;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="${totalH}" viewBox="0 0 400 ${totalH}">
+      <rect width="400" height="${totalH}" fill="#FAF8F5" rx="0"/>
+      <rect x="0" y="0" width="400" height="70" fill="${colors[0]}22"/>
+      <text x="200" y="28" text-anchor="middle" font-family="Georgia,serif" font-size="11" fill="${colors[0]}" letter-spacing="4">✦ STYLEVAULT ✦</text>
+      <text x="200" y="52" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="bold" fill="#222">${(outfitPrompt || "Mi Outfit").substring(0, 32)}</text>
+      ${svgRows}
+      <rect x="30" y="${totalH - 55}" width="340" height="32" rx="16" fill="${colors[0]}"/>
+      <text x="200" y="${totalH - 33}" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#fff">${smartOutfit.compatibility || 0}% Compatible · StyleVault™</text>
+    </svg>`;
+
+    const blob = new Blob([svg], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    setOutfitImageUrl(url);
     setOutfitImageL(false);
   };
 
