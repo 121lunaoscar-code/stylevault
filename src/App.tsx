@@ -1472,37 +1472,64 @@ Crea el outfit perfecto y personalizado para esta persona.`
   const generateOutfitImage = async () => {
     if (!smartOutfit?.outfit?.length) return;
     setOutfitImageL(true); setOutfitImageUrl(null);
-    const items = smartOutfit.outfit.map((i: any) => `${i.prenda} en color ${i.color}`).join(", ");
-    const prompt = `Fashion flat lay photography, white background, professional studio lighting. Clothing items neatly arranged: ${items}. Magazine style, top-down view, elegant composition. No people, just clothes.`;
+    const items = smartOutfit.outfit.map((i: any) => `${i.prenda} ${i.color}`).join(", ");
+    // Build Picsum URL with seed based on outfit content for consistency
+    const seed = Math.abs(items.split("").reduce((a: number, c: string) => a + c.charCodeAt(0), 0)) % 1000;
+    // Use Claude to get a visual SVG illustration of the outfit
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": "",
-        },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-6",
-          max_tokens: 1024,
-          messages: [{ role: "user", content: `Generate a fashion flat lay image description for these items: ${items}. Describe it as a detailed visual scene.` }]
-        })
-      });
-      // Use Worker instead
-      const workerRes = await fetch(API_URL, {
+      const res = await fetch(API_URL, {
         method: "POST",
         headers: getWorkerHeaders(),
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
-          max_tokens: 500,
-          system: "You are a fashion image prompt generator. Respond ONLY with a single dall-e image URL placeholder description. Keep it under 100 words.",
-          messages: [{ role: "user", content: `Create a visual description of this fashion flat lay: ${items}` }]
+          max_tokens: 1500,
+          system: `You are a fashion SVG illustrator. Create a flat lay SVG illustration of clothing items. 
+ONLY respond with valid SVG code starting with <svg and ending with </svg>. 
+No markdown, no explanation. Use a white/cream background.
+Style: minimalist fashion illustration, elegant, magazine quality.
+Show the clothes as flat lay items arranged nicely.`,
+          messages: [{ role: "user", content: `Create a flat lay SVG illustration showing these outfit items: ${items}. 
+Occasion: ${outfitPrompt}
+Colors from the outfit: ${smartOutfit.colores?.principal || ""}, ${smartOutfit.colores?.complementario || ""}
+Make it look like a professional fashion magazine flat lay. SVG size 400x400.` }]
         })
       });
-      const data = await workerRes.json();
-      const desc = data.content?.[0]?.text || "";
-      setOutfitImageUrl(`https://source.unsplash.com/400x400/?fashion,clothes,flatlay,${encodeURIComponent(smartOutfit.outfit[0]?.prenda || "outfit")}`);
-    } catch { 
-      setOutfitImageUrl(`https://source.unsplash.com/400x400/?fashion,outfit,clothes`);
+      const data = await res.json();
+      const svgText = data.content?.map((i: any) => i.text || "").join("") || "";
+      const svgMatch = svgText.match(/<svg[\s\S]*<\/svg>/);
+      if (svgMatch) {
+        const blob = new Blob([svgMatch[0]], { type: "image/svg+xml" });
+        const url = URL.createObjectURL(blob);
+        setOutfitImageUrl(url);
+      } else {
+        // Fallback: generate a stylish color palette card
+        const colors = [
+          smartOutfit.colores?.principal || "#C4973F",
+          smartOutfit.colores?.complementario || "#8B3A52",
+          smartOutfit.colores?.acento || "#2D5A3D",
+        ];
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+          <rect width="400" height="400" fill="#FAF8F5"/>
+          <text x="200" y="60" text-anchor="middle" font-family="Georgia,serif" font-size="14" fill="#888" letter-spacing="4">✦ OUTFIT VISUAL ✦</text>
+          ${smartOutfit.outfit?.slice(0,5).map((item: any, i: number) => `
+            <rect x="40" y="${90 + i*55}" width="320" height="44" rx="8" fill="${colors[i%3]}22" stroke="${colors[i%3]}" stroke-width="1"/>
+            <text x="65" y="${117 + i*55}" font-family="Georgia,serif" font-size="20">${item.emoji}</text>
+            <text x="95" y="${112 + i*55}" font-family="sans-serif" font-size="13" font-weight="600" fill="#333">${item.prenda}</text>
+            <text x="95" y="${127 + i*55}" font-family="sans-serif" font-size="11" fill="#888">${item.color}</text>
+          `).join("")}
+          <rect x="40" y="${90 + Math.min(smartOutfit.outfit?.length||0,5)*55 + 10}" width="320" height="3" fill="#C4973F" opacity="0.3"/>
+          <text x="200" y="${90 + Math.min(smartOutfit.outfit?.length||0,5)*55 + 35}" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#C4973F">${smartOutfit.compatibility}% Compatible · StyleVault™</text>
+        </svg>`;
+        const blob = new Blob([svg], { type: "image/svg+xml" });
+        setOutfitImageUrl(URL.createObjectURL(blob));
+      }
+    } catch {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+        <rect width="400" height="400" fill="#FAF8F5"/>
+        <text x="200" y="200" text-anchor="middle" font-family="Georgia,serif" font-size="16" fill="#888">✦ StyleVault Outfit ✦</text>
+      </svg>`;
+      const blob = new Blob([svg], { type: "image/svg+xml" });
+      setOutfitImageUrl(URL.createObjectURL(blob));
     }
     setOutfitImageL(false);
   };
@@ -2388,8 +2415,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                   <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"12px" }}>🎨 Visualización del Outfit</div>
                   {outfitImageUrl ? (
                     <div>
-                      <img src={outfitImageUrl} alt="outfit" style={{ width:"100%", borderRadius:"var(--radius-sm)", marginBottom:"12px", objectFit:"cover", aspectRatio:"1" }} 
-                        onError={(e)=>{ (e.target as HTMLImageElement).src=`https://source.unsplash.com/400x400/?fashion,style`; }} />
+                      <img src={outfitImageUrl} alt="outfit visual" style={{ width:"100%", borderRadius:"var(--radius-sm)", marginBottom:"12px", objectFit:"contain", background:"#FAF8F5", minHeight:"200px" }} />
                       <button className="btn-o" onClick={generateOutfitImage} style={{ width:"100%", fontSize:"11px" }}>🔄 Regenerar imagen</button>
                     </div>
                   ) : outfitImageL ? (
