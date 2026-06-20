@@ -79,7 +79,7 @@ const T: Record<LangCode, Record<string,string>> = {
     generateOutfit:"✨ Generar mi Outfit Perfecto", generatingOutfit:"Generando tu outfit...",
     step1:"Analizando tu ocasión...", step2:"Consultando tu Fashion DNA™...", step3:"Seleccionando prendas perfectas...",
     yourStylist:"✦ Tu Estilista Personal", compatibleWith:"Compatible contigo", yourFullOutfit:"Tu outfit completo",
-    yourWardrobe:"Tu armario", recommendedAccessories:"Accesorios recomendados", colorPalette:"Paleta de colores",lette,
+    yourWardrobe:"Tu armario", recommendedAccessories:"Accesorios recomendados", colorPalette:"Paleta de colores",
     stylistAdvice:"Consejo del estilista", saveOutfit:"💾 Guardar outfit", newOutfit:"🔄 Nuevo outfit",
     generateAnother:"✨ Generar otra opción", savedOutfits:"Outfits guardados", outfitSaved:"✦ Outfit guardado",
     classicGenerator:"Generador por evento", selectEvent:"Selecciona evento y temporada",
