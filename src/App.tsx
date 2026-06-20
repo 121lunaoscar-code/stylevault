@@ -1764,7 +1764,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                 <div style={{ fontSize:"9px", color:"var(--text2)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:"10px" }}>Tipo de cabello</div>
                 <div style={{ display:"flex", gap:"8px", flexWrap:"wrap" }}>
                   {[t.straight,t.wavy,t.curly,t.afro].map(hair => (
-                    <button key={t} className={`pill ${obInfo.cabello===t?"on":""}`} onClick={()=>setObInfo(p=>({...p,cabello:t}))}>{t}</button>
+                    <button key={hair} className={`pill ${obInfo.cabello===hair?"on":""}`} onClick={()=>setObInfo(p=>({...p,cabello:hair}))}>{hair}</button>
                   ))}
                 </div>
               </div>
