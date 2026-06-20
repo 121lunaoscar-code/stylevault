@@ -37,40 +37,40 @@ const T: Record<LangCode, Record<string,string>> = {
     // Onboarding
     createAvatar:"Crea tu Avatar IA", avatarSub:"Tu estilista personal necesita conocerte para crear una versión digital de ti.",
     begin:"Comenzar →", skip:"Omitir — configurar después",
-    basicInfo:"Información básica", basicInfoSub:"Solo lo que la IA no puede detectar por sí sola",
+    basicInfo:"Información básica", basicInfoSub:t.basicInfoSub,
     name:"Nombre", age:"Edad", height:"Altura (cm)", weight:"Peso aprox. (kg)", eyeColor:"Color de ojos",
     hairType:"Tipo de cabello", straight:"Lacio", wavy:"Ondulado", curly:"Rizado", afro:"Afro",
     continueBtn:"Continuar →", back:"← Atrás",
-    smartScan:"Escaneo Inteligente", smartScanSub:"3 fotos para crear tu avatar con máxima precisión",
+    smartScan:"Escaneo Inteligente", smartScanSub:t.smartScanSub,
     photo1:"Foto 1 · Selfie frontal", photo2:"Foto 2 · Cuerpo completo frontal", photo3:"Foto 3 · Cuerpo completo lateral",
-    analyzeAI:"🧬 Analizar con IA", tapToChange:"Toca para cambiar",
+    analyzeAI:"🧬 Analizar con IA", tapToChange:t.tapToChange,
     analyzing1:"Analizando rasgos faciales...", analyzing2:"Analizando tipo de cuerpo y proporciones...",
     analyzing3:"Analizando tono de piel y colores ideales...", analyzing4:"Creando tu Fashion DNA™...",
     dnaReady:"¡Tu Fashion DNA™ está listo!", upload3Photos:"Sube las 3 fotos para continuar",
     avatarReady:"Tu Avatar IA está listo", precisionLevel:"Nivel de precisión:",
     viewWardrobe:"Ver mi Armario →", createFirstOutfit:"Crear mi primer outfit",
     // DNA
-    fashionDNA:"Fashion DNA™", fashionDNASub:"Tu perfil de moda personalizado",
-    bodyAnalysis:"✦ Análisis corporal", bodyType:"Tipo de cuerpo", skinTone:"Tono de piel",
-    undertone:"Subtono", faceShape:"Forma del rostro", neckType:"Tipo de cuello", posture:"Postura",
-    proportions:"Proporciones", favorableColors:"✦ Colores que te favorecen", avoidColors:"Colores a evitar",
-    recommendedClothes:"✦ Prendas recomendadas", avoidClothes:"Prendas a evitar",
-    personalTips:"✦ Consejos personales", updateDNA:"🔄 Actualizar mi Fashion DNA™",
-    noDNA:"Aún no has creado tu Fashion DNA™", createDNA:"Crear mi Fashion DNA™",
+    fashionDNA:"Fashion DNA™", fashionDNASub:t.fashionDNASub,
+    bodyAnalysis:t.bodyAnalysis, bodyType:t.bodyType, skinTone:t.skinTone,
+    undertone:t.undertone, faceShape:"Forma del rostro", neckType:t.neckType, posture:t.posture,
+    proportions:t.proportions, favorableColors:t.favorableColors, avoidColors:t.avoidColors,
+    recommendedClothes:t.recommendedClothes, avoidClothes:t.avoidClothes,
+    personalTips:"✦ Consejos personales", updateDNA:t.updateDNA,
+    noDNA:t.noDNA, createDNA:"Crear mi Fashion DNA™",
     // Home
     hello:"Hola,", styleReady:"Tu estilo personal está listo", wardrobeReady:"Tu armario inteligente te espera",
-    items:"Prendas", favorites:"Favoritas", outfits:"Outfits", yourDNA:"✦ Tu Fashion DNA™",
+    items:"Prendas", favorites:t.favorites, outfits:"Outfits", yourDNA:t.yourDNA,
     viewComplete:"Ver completo →", createProfile:"Crea tu perfil para recomendaciones personalizadas",
     create:"Crear →", outfitOfDay:"Outfit del día", personalizedForYou:"Personalizado para ti ✦",
     addItemsFirst:"Agrega prendas para generar outfits", tapCreate:"Toca 'Crear' para generar tu outfit",
     virtualTry:"✦ Prueba Virtual", seeHowItFits:"Ve cómo te queda el outfit", basedOnDNA:"Basado en tu Fashion DNA™ personal",
-    tryNow:"Probar ahora →", seePremium:"Ver función Premium →", recentItems:"Prendas recientes", viewAll:"Ver todas →",
+    tryNow:"Probar ahora →", seePremium:"Ver función Premium →", recentItems:t.recentItems, viewAll:"Ver todas →",
     // Wardrobe
-    myWardrobe:"Mi Armario", addItem:"+ Agregar", newItem:"✦ Nueva Prenda",
-    photoAI:"Foto → IA analiza automáticamente", gallery:"📁 Galería", camera:"📷 Cámara",
+    myWardrobe:"Mi Armario", addItem:"+ Agregar", newItem:t.newItem,
+    photoAI:t.photoAI, gallery:"📁 Galería", camera:"📷 Cámara",
     itemName:"Nombre de la prenda", occasion:"Ocasión", season:"Temporada",
-    save:"Guardar", cancel:"Cancelar", wardrobeEmpty:"Tu armario está vacío", noItemsInCat:"Sin prendas en esta categoría",
-    addCat:"+ Cat", newCategory:"Nueva categoría...", analyzing:"Analizando...", itemSaved:"✦ Prenda guardada", itemAnalyzed:"✦ Prenda analizada con IA",
+    save:"Guardar", cancel:"Cancelar", wardrobeEmpty:t.wardrobeEmpty, noItemsInCat:t.noItemsInCat,
+    addCat:"+ Cat", newCategory:t.newCategory, analyzing:t.analyzing, itemSaved:t.itemSaved, itemAnalyzed:t.itemAnalyzed,
     // Outfit
     whereTo:"¿A dónde iremos hoy?", whereToSub:"Cuéntame el lugar o evento y crearé el outfit perfecto para ti",
     withMyWardrobe:"Con mi armario", withMyWardrobeDesc:"Usar únicamente las prendas que tengo guardadas",
@@ -78,31 +78,31 @@ const T: Record<LangCode, Record<string,string>> = {
     mixedWardrobe:"Mi armario + IA", mixedWardrobeDesc:"Combinar mis prendas con nuevas sugerencias",
     generateOutfit:"✨ Generar mi Outfit Perfecto", generatingOutfit:"Generando tu outfit...",
     step1:"Analizando tu ocasión...", step2:"Consultando tu Fashion DNA™...", step3:"Seleccionando prendas perfectas...",
-    yourStylist:"✦ Tu Estilista Personal", compatibleWith:"Compatible contigo", yourFullOutfit:"Tu outfit completo",
-    yourWardrobe:"Tu armario", recommendedAccessories:"Accesorios recomendados", colorPalette:"Paleta de colores",
+    yourStylist:t.yourStylist, compatibleWith:t.compatibleWith, yourFullOutfit:t.yourFullOutfit,
+    yourWardrobe:t.yourWardrobe, recommendedAccessories:t.recommendedAccessories, colorPalette:t.colorPalette,
     stylistAdvice:"Consejo del estilista", saveOutfit:"💾 Guardar outfit", newOutfit:"🔄 Nuevo outfit",
-    generateAnother:"✨ Generar otra opción", savedOutfits:"Outfits guardados", outfitSaved:"✦ Outfit guardado",
-    classicGenerator:"Generador por evento", selectEvent:"Selecciona evento y temporada",
-    forWhatEvent:"¿Para qué evento?", generateClassic:"✦  Generar Outfit con IA", creatingOutfit:"Creando outfit...",
-    whyItWorks:"✦ Por qué funciona", palette:"Paleta", addItemsWardrobe:"Agrega prendas a tu armario primero",
+    generateAnother:"✨ Generar otra opción", savedOutfits:t.savedOutfits, outfitSaved:t.outfitSaved,
+    classicGenerator:t.classicGenerator, selectEvent:"Selecciona evento y temporada",
+    forWhatEvent:t.forWhatEvent, generateClassic:"✦  Generar Outfit con IA", creatingOutfit:t.creatingOutfit,
+    whyItWorks:"✦ Por qué funciona", palette:"Paleta", addItemsWardrobe:t.addItemsWardrobe,
     // Avatar
     virtualTryTitle:"Prueba Virtual", basedOnDNASub:"Basada en tu Fashion DNA™", premiumOnly:"Función exclusiva Premium",
-    premiumFunction:"Función Premium", premiumDesc:"Prueba virtualmente cualquier outfit de tu armario basado en tu Fashion DNA™ personal.",
-    upgradePremium:"✦  Mejorar a Premium — $9.99/mes", createDNAFirst:"Primero crea tu Fashion DNA™",
-    dnaDetected:"✓ Fashion DNA™ detectado", selectItemsTry:"Selecciona prendas para probar",
+    premiumFunction:t.premiumFunction, premiumDesc:"{t.premiumDesc}",
+    upgradePremium:"✦  Mejorar a Premium — $9.99/mes", createDNAFirst:t.createDNAFirst,
+    dnaDetected:t.dnaDetected, selectItemsTry:t.selectItemsTry,
     itemsSelected:"prenda(s) seleccionada(s)", tryVirtually:"🧍 Probar outfit virtualmente",
-    generatingVirtual:"Generando prueba virtual...", howItWouldLook:"✦ Cómo te quedaría",
+    generatingVirtual:t.generatingVirtual, howItWouldLook:"✦ Cómo te quedaría",
     // Advisor
-    advisorTitle:"Asesor IA", advisorSub:"Powered by Claude AI · Personalizado con tu DNA",
+    advisorTitle:"Asesor IA", advisorSub:t.advisorSub,
     advisorGreeting:"Hola, soy tu **asesor de estilo personal**. Puedo ayudarte con combinaciones, dress codes, tendencias y mucho más.\n\n¿En qué te ayudo hoy?",
     askAboutFashion:"Pregunta sobre moda, estilo, tendencias...", send:"Enviar",
     s1:"¿Qué colores van con mi tono de piel?", s2:"Armario cápsula para mi tipo de cuerpo",
     s3:"¿Cómo vestir para entrevista?", s4:"Prendas que me favorecen más",
     // Trips
-    tripTitle:"Planificador de Viaje", tripSub:"La IA organiza tu maleta con tu armario",
+    tripTitle:"Planificador de Viaje", tripSub:t.tripSub,
     destination:"¿A dónde vas? (París, Cancún...)", days:"Días", climate:"Clima",
-    planBag:"✈  Planificar Maleta con IA", planning:"Planificando...", missingItems:"⚠ Te falta comprar",
-    urgent:"Urgente", stylistTip:"✦ Consejo del estilista",
+    planBag:"✈  Planificar Maleta con IA", planning:"Planificando...", missingItems:t.missingItems,
+    urgent:t.urgent, stylistTip:t.stylistTip,
     // Premium
     premium:"Premium", basic:"Basic",
   },
@@ -213,13 +213,13 @@ const T: Record<LangCode, Record<string,string>> = {
     viewWardrobe:"Ver meu Guarda-Roupa →", createFirstOutfit:"Criar meu primeiro outfit",
     fashionDNA:"Fashion DNA™", fashionDNASub:"Seu perfil de moda personalizado",
     bodyAnalysis:"✦ Análise corporal", bodyType:"Tipo de corpo", skinTone:"Tom de pele",
-    undertone:"Subtom", faceShape:"Formato do rosto", neckType:"Tipo de pescoço", posture:"Postura",
+    undertone:"Subtom", faceShape:"Formato do rosto", neckType:"Tipo de pescoço", posture:t.posture,
     proportions:"Proporções", favorableColors:"✦ Cores que te favorecem", avoidColors:"Cores a evitar",
     recommendedClothes:"✦ Roupas recomendadas", avoidClothes:"Roupas a evitar",
     personalTips:"✦ Dicas personalizadas", updateDNA:"🔄 Atualizar meu Fashion DNA™",
     noDNA:"Você ainda não criou seu Fashion DNA™", createDNA:"Criar meu Fashion DNA™",
     hello:"Olá,", styleReady:"Seu estilo pessoal está pronto", wardrobeReady:"Seu guarda-roupa inteligente te espera",
-    items:"Peças", favorites:"Favoritas", outfits:"Outfits", yourDNA:"✦ Seu Fashion DNA™",
+    items:"Peças", favorites:t.favorites, outfits:"Outfits", yourDNA:"✦ Seu Fashion DNA™",
     viewComplete:"Ver completo →", createProfile:"Crie seu perfil para recomendações personalizadas",
     create:"Criar →", outfitOfDay:"Outfit do dia", personalizedForYou:"Personalizado para você ✦",
     addItemsFirst:"Adicione peças para gerar outfits", tapCreate:"Toque em 'Criar' para gerar seu outfit",
@@ -246,7 +246,7 @@ const T: Record<LangCode, Record<string,string>> = {
     virtualTryTitle:"Prova Virtual", basedOnDNASub:"Baseada no seu Fashion DNA™", premiumOnly:"Função exclusiva Premium",
     premiumFunction:"Função Premium", premiumDesc:"Experimente virtualmente qualquer outfit do seu guarda-roupa baseado no seu Fashion DNA™ pessoal.",
     upgradePremium:"✦  Upgrade para Premium — R$49/mês", createDNAFirst:"Primeiro crie seu Fashion DNA™",
-    dnaDetected:"✓ Fashion DNA™ detectado", selectItemsTry:"Selecione peças para experimentar",
+    dnaDetected:t.dnaDetected, selectItemsTry:"Selecione peças para experimentar",
     itemsSelected:"peça(s) selecionada(s)", tryVirtually:"🧍 Experimentar outfit virtualmente",
     generatingVirtual:"Gerando prova virtual...", howItWouldLook:"✦ Como ficaria em você",
     advisorTitle:"Consultor IA", advisorSub:"Powered by Claude AI · Personalizado com seu DNA",
@@ -257,7 +257,7 @@ const T: Record<LangCode, Record<string,string>> = {
     tripTitle:"Planejador de Viagem", tripSub:"A IA organiza sua mala com seu guarda-roupa",
     destination:"Para onde você vai? (Paris, Rio de Janeiro...)", days:"Dias", climate:"Clima",
     planBag:"✈  Planejar mala com IA", planning:"Planejando...", missingItems:"⚠ Você precisa comprar",
-    urgent:"Urgente", stylistTip:"✦ Dica do estilista",
+    urgent:t.urgent, stylistTip:"✦ Dica do estilista",
     premium:"Premium", basic:"Basic",
   },
   fr: {
@@ -1386,7 +1386,7 @@ export default function StyleVault() {
       setClothes([item, ...clothes]);
       setNi({ name:"", category:"Tops", color:"#C4973F", season:"Todo el año", occasion:"" });
       setPp(null); setSF(false); showToast(t.itemSaved);
-    } catch { showToast("Error al guardar."); }
+    } catch { showToast(lang==="es"?"Error al guardar.":"Error saving."); }
   };
 
   const removeItem = async (id: number) => {
@@ -1770,8 +1770,8 @@ Crea el outfit perfecto y personalizado para esta persona.`
               </div>
             </div>
             <div style={{ display:"flex", gap:"10px" }}>
-              <button className="btn-o" onClick={()=>setObStep(1)}>← Atrás</button>
-              <button className="btn-p" onClick={()=>setObStep(3)} disabled={!obInfo.nombre||!obInfo.altura} style={{ flex:1 }}>Continuar →</button>
+              <button className="btn-o" onClick={()=>setObStep(1)}>{t.back}</button>
+              <button className="btn-p" onClick={()=>setObStep(3)} disabled={!obInfo.nombre||!obInfo.altura} style={{ flex:1 }}>{t.continueBtn}</button>
             </div>
           </div>
         )}
@@ -1825,7 +1825,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
               </div>
             ) : (
               <div style={{ display:"flex", gap:"10px" }}>
-                <button className="btn-o" onClick={()=>setObStep(2)}>← Atrás</button>
+                <button className="btn-o" onClick={()=>setObStep(2)}>{t.back}</button>
                 <button className="btn-p" onClick={analyzeWithAI} disabled={!obPhotos.selfie||!obPhotos.front||!obPhotos.side} style={{ flex:1 }}>
                   🧬 Analizar con IA
                 </button>
@@ -1848,12 +1848,12 @@ Crea el outfit perfecto y personalizado para esta persona.`
               <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"16px" }}>✦ Fashion DNA™</div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginBottom:"16px" }}>
                 {[
-                  { label:"Tipo de cuerpo", value:dna.bodyType },
-                  { label:"Tono de piel", value:dna.skinTone },
-                  { label:"Subtono", value:dna.skinUndertone },
-                  { label:"Forma de rostro", value:dna.faceShape },
+                  { label:t.bodyType, value:dna.bodyType },
+                  { label:t.skinTone, value:dna.skinTone },
+                  { label:t.undertone, value:dna.skinUndertone },
+                  { label:t.faceShape, value:dna.faceShape },
                   { label:"Cuello", value:dna.neckType },
-                  { label:"Postura", value:dna.posture },
+                  { label:t.posture, value:dna.posture },
                 ].map(item => (
                   <div key={item.label} style={{ background:"var(--bg)", border:"1px solid var(--border)", borderRadius:"2px", padding:"10px" }}>
                     <div style={{ fontSize:"9px", color:"var(--text3)", letterSpacing:"1px", textTransform:"uppercase", marginBottom:"4px" }}>{item.label}</div>
@@ -1884,8 +1884,8 @@ Crea el outfit perfecto y personalizado para esta persona.`
             </div>
 
             <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
-              <button className="btn-p" onClick={()=>{ setScreen("app"); }}>Ver mi Armario →</button>
-              <button className="btn-o" onClick={()=>{ setTab("outfit"); setScreen("app"); }}>Crear mi primer outfit</button>
+              <button className="btn-p" onClick={()=>{ setScreen("app"); }}>{t.viewWardrobe}</button>
+              <button className="btn-o" onClick={()=>{ setTab("outfit"); setScreen("app"); }}>{t.createFirstOutfit}</button>
             </div>
           </div>
         )}
@@ -1944,9 +1944,9 @@ Crea el outfit perfecto y personalizado para esta persona.`
             <div style={{ background:`linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%)`, borderRadius:"var(--radius)", padding:"22px 20px", marginBottom:"18px", position:"relative", overflow:"hidden" }}>
               <div style={{ position:"absolute", right:"-10px", top:"-10px", width:"120px", height:"120px", background:"rgba(255,255,255,.08)", borderRadius:"50%" }}/>
               <div style={{ position:"absolute", right:"20px", bottom:"-20px", width:"80px", height:"80px", background:"rgba(255,255,255,.06)", borderRadius:"50%" }}/>
-              <div style={{ fontSize:"22px", fontWeight:700, color:"#fff", marginBottom:"4px" }}>Hola, {profile?.name?.split(" ")[0]} 👋</div>
+              <div style={{ fontSize:"22px", fontWeight:700, color:"#fff", marginBottom:"4px" }}>{t.hello} {profile?.name?.split(" ")[0]} 👋</div>
               <div style={{ fontSize:"13px", color:"rgba(255,255,255,.75)", marginBottom:"16px" }}>
-                {dna?.bodyType ? t.styleReady : "Tu armario inteligente te espera"}
+                {dna?.bodyType ? t.styleReady : t.wardrobeReady}
               </div>
               {dna?.bodyType && (
                 <div style={{ display:"inline-flex", alignItems:"center", gap:"6px", background:"rgba(255,255,255,.15)", borderRadius:"30px", padding:"6px 14px" }}>
@@ -2014,7 +2014,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                 </div>
               ) : (
                 <div style={{ textAlign:"center", padding:"16px", color:"var(--text3)", fontSize:"12px" }}>
-                  {clothes.length === 0 ? "Agrega prendas para generar outfits" : "Toca 'Crear' para generar tu outfit"}
+                  {clothes.length === 0 ? t.addItemsFirst : t.tapCreate}
                 </div>
               )}
             </div>
@@ -2027,7 +2027,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                   <div style={{ fontSize:"14px", fontWeight:400, marginBottom:"6px" }}>{t.seeHowItFits}</div>
                   <div style={{ fontSize:"11px", color:"var(--text2)", lineHeight:1.5, marginBottom:"12px" }}>{t.basedOnDNA}</div>
                   <button className="btn-p" style={{ width:"auto", padding:"10px 18px" }} onClick={()=>setTab("avatar")}>
-                    {isPremium ? "Probar ahora →" : "Ver función Premium →"}
+                    {isPremium ? t.tryNow : t.seePremium}
                   </button>
                 </div>
                 <div style={{ fontSize:"44px", opacity:.25 }}>🧍</div>
@@ -2068,7 +2068,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
               <div style={{ textAlign:"center", padding:"60px 20px" }}>
                 <div style={{ fontSize:"40px", marginBottom:"16px", opacity:.3 }}>🧬</div>
                 <div style={{ fontSize:"13px", color:"var(--text2)", marginBottom:"20px" }}>Aún no has creado tu Fashion DNA™</div>
-                <button className="btn-p" onClick={()=>setScreen("onboarding")}>Crear mi Fashion DNA™</button>
+                <button className="btn-p" onClick={()=>setScreen("onboarding")}>{t.createDNA}</button>
               </div>
             ) : (
               <>
@@ -2076,12 +2076,12 @@ Crea el outfit perfecto y personalizado para esta persona.`
                   <div style={{ fontSize:"9px", color:"var(--gold)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:"16px" }}>✦ Análisis corporal</div>
                   <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px", marginBottom:"14px" }}>
                     {[
-                      { label:"Tipo de cuerpo", value:dna.bodyType },
-                      { label:"Tono de piel", value:dna.skinTone },
-                      { label:"Subtono", value:dna.skinUndertone },
-                      { label:"Forma de rostro", value:dna.faceShape },
-                      { label:"Tipo de cuello", value:dna.neckType },
-                      { label:"Postura", value:dna.posture },
+                      { label:t.bodyType, value:dna.bodyType },
+                      { label:t.skinTone, value:dna.skinTone },
+                      { label:t.undertone, value:dna.skinUndertone },
+                      { label:t.faceShape, value:dna.faceShape },
+                      { label:t.neckType, value:dna.neckType },
+                      { label:t.posture, value:dna.posture },
                     ].map(item => (
                       <div key={item.label} style={{ background:"var(--bg)", border:"1px solid var(--border)", borderRadius:"2px", padding:"10px" }}>
                         <div style={{ fontSize:"9px", color:"var(--text3)", letterSpacing:"1px", textTransform:"uppercase", marginBottom:"4px" }}>{item.label}</div>
@@ -2176,12 +2176,12 @@ Crea el outfit perfecto y personalizado para esta persona.`
                   <button className="btn-g" style={{ flex:1, border:"1px solid var(--border)", borderRadius:"1px" }} onClick={()=>camRef.current?.click()}>📷 Cámara</button>
                 </div>
                 <div style={{ display:"flex", flexDirection:"column", gap:"9px" }}>
-                  <input className="inp" placeholder="Nombre de la prenda" value={ni.name} onChange={e=>setNi(p=>({...p,name:e.target.value}))} />
+                  <input className="inp" placeholder={t.itemName} value={ni.name} onChange={e=>setNi(p=>({...p,name:e.target.value}))} />
                   <select className="sel" value={ni.category} onChange={e=>setNi(p=>({...p,category:e.target.value}))}>
                     {allCategories.map(c=><option key={c}>{c}</option>)}
                   </select>
                   <select className="sel" value={ni.occasion} onChange={e=>setNi(p=>({...p,occasion:e.target.value}))}>
-                    <option value="">Ocasión</option>
+                    <option value="">{t.occasion}</option>
                     {OCCASIONS.map(o=><option key={o}>{o}</option>)}
                   </select>
                   <select className="sel" value={ni.season} onChange={e=>setNi(p=>({...p,season:e.target.value}))}>
@@ -2202,7 +2202,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
             </div>
             {showAddCat && (
               <div style={{ display:"flex", gap:"7px", marginBottom:"12px" }}>
-                <input className="inp" placeholder="Nueva categoría..." value={newCatInput} onChange={e=>setNewCatInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCustomCategory()} style={{ flex:1, padding:"9px 12px", fontSize:"12px" }} />
+                <input className="inp" placeholder=t.newCategory value={newCatInput} onChange={e=>setNewCatInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addCustomCategory()} style={{ flex:1, padding:"9px 12px", fontSize:"12px" }} />
                 <button onClick={addCustomCategory} className="btn-o" style={{ padding:"9px 14px", fontSize:"10px" }}>+</button>
               </div>
             )}
@@ -2245,13 +2245,13 @@ Crea el outfit perfecto y personalizado para esta persona.`
             <div className="card" style={{ marginBottom:"16px" }}>
               <textarea
                 className="inp"
-                placeholder={"Ej: Cena romántica en restaurante elegante\nEntrevista de trabajo para gerente\nFiesta en la playa\nViaje a Nueva York por 5 días..."}
+                placeholder={lang==="es"?"Ej: Cena romántica en restaurante elegante\nEntrevista de trabajo para gerente\nFiesta en la playa\nViaje a Nueva York por 5 días...":lang==="fr"?"Ex: Dîner romantique\nEntretien d'embauche\nFête sur la plage\nVoyage à Paris pour 5 jours...":lang==="pt"?"Ex: Jantar romântico em restaurante elegante\nEntrevista de emprego\nFesta na praia\nViagem ao Rio por 5 dias...":lang==="de"?"z.B. Romantisches Abendessen\nVorstellungsgespräch\nStrandparty\nReise nach Berlin für 5 Tage...":"e.g. Romantic dinner at elegant restaurant\nJob interview for manager\nBeach party\nTrip to New York for 5 days..."}
                 value={outfitPrompt}
                 onChange={e=>setOutfitPrompt(e.target.value)}
                 style={{ resize:"none", minHeight:"100px", lineHeight:1.6, borderRadius:"var(--radius-sm)" }}
               />
               <div style={{ display:"flex", gap:"7px", flexWrap:"wrap", marginTop:"12px" }}>
-                {["Cena romántica","Entrevista de trabajo","Fiesta elegante","Día casual","Reunión de negocios","Viaje"].map(s => (
+                {(lang==="es"?["Cena romántica","Entrevista de trabajo","Fiesta elegante","Día casual","Reunión de negocios","Viaje"]:lang==="en"?["Romantic dinner","Job interview","Elegant party","Casual day","Business meeting","Travel"]:lang==="fr"?["Dîner romantique","Entretien d'embauche","Soirée élégante","Jour décontracté","Réunion d'affaires","Voyage"]:lang==="pt"?["Jantar romântico","Entrevista de trabalho","Festa elegante","Dia casual","Reunião de negócios","Viagem"]:lang==="de"?["Romantisches Abendessen","Vorstellungsgespräch","Elegante Party","Lässiger Tag","Geschäftstreffen","Reise"]:["Romantic dinner","Job interview","Elegant party","Casual day","Business meeting","Travel"]).map(s => (
                   <button key={s} onClick={()=>setOutfitPrompt(s)} className="pill" style={{ fontSize:"11px", padding:"6px 12px" }}>{s}</button>
                 ))}
               </div>
@@ -2400,21 +2400,21 @@ Crea el outfit perfecto y personalizado para esta persona.`
                   {outfitImageUrl ? (
                     <div>
                       <img src={outfitImageUrl} alt="outfit" style={{ width:"100%", borderRadius:"var(--radius-sm)", marginBottom:"12px", objectFit:"cover", aspectRatio:"1", background:"var(--bg3)" }} onError={(e)=>{ (e.target as HTMLImageElement).style.display="none"; }} />
-                      <button className="btn-o" onClick={generateOutfitImage} disabled={outfitImageL} style={{ width:"100%", fontSize:"11px" }}>🔄 Nueva imagen</button>
+                      <button className="btn-o" onClick={generateOutfitImage} disabled={outfitImageL} style={{ width:"100%", fontSize:"11px" }}>{lang==="es"?"🔄 Nueva imagen":lang==="fr"?"🔄 Nouvelle image":lang==="pt"?"🔄 Nova imagem":lang==="de"?"🔄 Neues Bild":"🔄 New image"}</button>
                     </div>
                   ) : outfitImageL ? (
                     <div style={{ padding:"20px" }}><div style={{ display:"flex", justifyContent:"center", gap:"6px", marginBottom:"8px" }}><div className="dot"/><div className="dot"/><div className="dot"/></div><div style={{ fontSize:"11px", color:"var(--text2)" }}>Generando imagen...</div></div>
                   ) : (
-                    <button className="btn-p" onClick={generateOutfitImage} style={{ fontSize:"12px" }}>🎨 Ver imagen del outfit</button>
+                    <button className="btn-p" onClick={generateOutfitImage} style={{ fontSize:"12px" }}>{lang==="es"?"🎨 Ver imagen del outfit":lang==="fr"?"🎨 Voir l'image":lang==="pt"?"🎨 Ver imagem":lang==="de"?"🎨 Bild sehen":"🎨 View outfit image"}</button>
                   )}
                 </div>
 
                 {/* Actions */}
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", marginBottom:"10px" }}>
-                  <button className="btn-p" onClick={saveSmartOutfit}>💾 Guardar outfit</button>
-                  <button className="btn-o" onClick={()=>{setSmartOutfit(null);setOutfitPrompt("");setOutfitImageUrl(null);}}>🔄 Nuevo outfit</button>
+                  <button className="btn-p" onClick={saveSmartOutfit}>{t.saveOutfit}</button>
+                  <button className="btn-o" onClick={()=>{setSmartOutfit(null);setOutfitPrompt("");setOutfitImageUrl(null);}}>{t.newOutfit}</button>
                 </div>
-                <button className="btn-o" onClick={generateSmartOutfit} style={{ width:"100%" }}>✨ Generar otra opción</button>
+                <button className="btn-o" onClick={generateSmartOutfit} style={{ width:"100%" }}>{t.generateAnother}</button>
 
                 {/* Divider to saved */}
                 {savedOutfits.length > 0 && (
@@ -2458,7 +2458,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                   </div>
                 </div>
                 <button className="btn-p" onClick={generateOutfit} disabled={!selEv||outfitL} style={{ marginBottom:"18px" }}>
-                  {outfitL?"Creando outfit...":"✦  Generar Outfit con IA"}
+                  {outfitL?t.creatingOutfit:"✦  Generar Outfit con IA"}
                 </button>
                 {outfitL && <div style={{ display:"flex", justifyContent:"center", gap:"6px", padding:"24px" }}><div className="dot"/><div className="dot"/><div className="dot"/></div>}
                 {outfitR && !outfitL && (
@@ -2508,20 +2508,20 @@ Crea el outfit perfecto y personalizado para esta persona.`
           <div className="fade">
             <div style={{ marginBottom:"20px" }}>
               <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>{t.virtualTryTitle}</div>
-              <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>{isPremium ? "Basada en tu Fashion DNA™" : "Función exclusiva Premium"}</div>
+              <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>{isPremium ? t.basedOnDNASub : t.premiumOnly}</div>
             </div>
             {!isPremium ? (
               <div className="card card-accent" style={{ textAlign:"center", padding:"32px 20px" }}>
                 <div style={{ fontSize:"48px", marginBottom:"16px" }}>👑</div>
-                <div className="serif" style={{ fontSize:"22px", fontWeight:300, marginBottom:"10px" }}>Función Premium</div>
-                <div style={{ fontSize:"13px", color:"var(--text2)", lineHeight:1.6, marginBottom:"20px" }}>Prueba virtualmente cualquier outfit de tu armario basado en tu Fashion DNA™ personal.</div>
+                <div className="serif" style={{ fontSize:"22px", fontWeight:300, marginBottom:"10px" }}>{t.premiumFunction}</div>
+                <div style={{ fontSize:"13px", color:"var(--text2)", lineHeight:1.6, marginBottom:"20px" }}>{t.premiumDesc}</div>
                 <a href={HOTMART_URL} target="_blank" rel="noreferrer" style={{ display:"inline-block", background:"var(--accent)", color:"#fff", padding:"14px 24px", borderRadius:"var(--radius-sm)", fontFamily:"var(--font)", fontSize:"13px", fontWeight:600, textDecoration:"none", letterSpacing:".5px", boxShadow:"0 4px 14px var(--accent-glow)" }}>{t.upgradePremium}</a>
               </div>
             ) : !dna?.bodyType ? (
               <div style={{ textAlign:"center", padding:"60px 20px" }}>
                 <div style={{ fontSize:"40px", marginBottom:"16px", opacity:.3 }}>🧬</div>
                 <div style={{ fontSize:"13px", color:"var(--text2)", marginBottom:"20px" }}>Primero crea tu Fashion DNA™</div>
-                <button className="btn-p" onClick={()=>setScreen("onboarding")}>Crear mi Fashion DNA™</button>
+                <button className="btn-p" onClick={()=>setScreen("onboarding")}>{t.createDNA}</button>
               </div>
             ) : (
               <>
@@ -2657,11 +2657,11 @@ Crea el outfit perfecto y personalizado para esta persona.`
                   <input className="inp" placeholder="Días" type="number" min="1" max="30" value={tripDays} onChange={e=>setTripDays(e.target.value)} style={{ width:"90px" }} />
                   <select className="sel" value={tripClima} onChange={e=>setTripClima(e.target.value)}>
                     <option value="">Clima</option>
-                    {["Caluroso","Templado","Frío","Lluvioso","Variable"].map(c=><option key={c}>{c}</option>)}
+                    {(lang==="es"?["Caluroso","Templado","Frío","Lluvioso","Variable"]:lang==="en"?["Hot","Mild","Cold","Rainy","Variable"]:lang==="fr"?["Chaud","Tempéré","Froid","Pluvieux","Variable"]:lang==="pt"?["Quente","Temperado","Frio","Chuvoso","Variável"]:lang==="de"?["Heiß","Gemäßigt","Kalt","Regnerisch","Variabel"]:["Hot","Mild","Cold","Rainy","Variable"]).map(c=><option key={c}>{c}</option>)}
                   </select>
                 </div>
                 <div style={{ display:"flex", gap:"7px", flexWrap:"wrap" }}>
-                  {["Turismo","Playa","Montaña","Negocios","Romántico","Aventura"].map(t => (
+                  {(lang==="es"?["Turismo","Playa","Montaña","Negocios","Romántico","Aventura"]:lang==="en"?["Tourism","Beach","Mountain","Business","Romantic","Adventure"]:lang==="fr"?["Tourisme","Plage","Montagne","Affaires","Romantique","Aventure"]:lang==="pt"?["Turismo","Praia","Montanha","Negócios","Romântico","Aventura"]:lang==="de"?["Tourismus","Strand","Berge","Geschäft","Romantisch","Abenteuer"]:["Tourism","Beach","Mountain","Business","Romantic","Adventure"]).map(t => (
                     <button key={t} className={`pill ${tripTipo===t?"on":""}`} onClick={()=>setTripTipo(tripTipo===t?"":t)}>{t}</button>
                   ))}
                 </div>
