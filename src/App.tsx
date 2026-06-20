@@ -43,55 +43,55 @@ const T: Record<LangCode, Record<string,string>> = {
     continueBtn:"Continuar →", back:"← Atrás",
     smartScan:"Escaneo Inteligente", smartScanSub:"3 fotos para crear tu avatar con máxima precisión",
     photo1:"Foto 1 · Selfie frontal", photo2:"Foto 2 · Cuerpo completo frontal", photo3:"Foto 3 · Cuerpo completo lateral",
-    analyzeAI:"🧬 Analizar con IA", tapToChange:t.tapToChange,
+    analyzeAI:"🧬 Analizar con IA", tapToChange:"Toca para cambiar",
     analyzing1:"Analizando rasgos faciales...", analyzing2:"Analizando tipo de cuerpo y proporciones...",
     analyzing3:"Analizando tono de piel y colores ideales...", analyzing4:"Creando tu Fashion DNA™...",
     dnaReady:"¡Tu Fashion DNA™ está listo!", upload3Photos:"Sube las 3 fotos para continuar",
-    avatarReady:t.avatarReady, precisionLevel:t.precisionLevel,
-    viewWardrobe:t.viewWardrobe, createFirstOutfit:t.createFirstOutfit,
+    avatarReady:"Tu Avatar IA está listo", precisionLevel:"Nivel de precisión:",
+    viewWardrobe:"Ver mi Armario →", createFirstOutfit:"Crear mi primer outfit",
     // DNA
     fashionDNA:"Fashion DNA™", fashionDNASub:"Tu perfil de moda personalizado",
-    bodyAnalysis:t.bodyAnalysis, bodyType:t.bodyType, skinTone:t.skinTone,
-    undertone:t.undertone, faceShape:t.faceShape, neckType:t.neckType, posture:t.posture,
-    proportions:t.proportions, favorableColors:t.favorableColors, avoidColors:t.avoidColors,
-    recommendedClothes:t.recommendedClothes, avoidClothes:t.avoidClothes,
-    personalTips:t.personalTips, updateDNA:t.updateDNA,
+    bodyAnalysis:"✦ Análisis corporal", bodyType:"Tipo de cuerpo", skinTone:"Tono de piel",
+    undertone:"Subtono", faceShape:"Forma del rostro", neckType:"Tipo de cuello", posture:"Postura",
+    proportions:"Proporciones", favorableColors:"✦ Colores que te favorecen", avoidColors:"Colores a evitar",
+    recommendedClothes:"✦ Prendas recomendadas", avoidClothes:"Prendas a evitar",
+    personalTips:"✦ Consejos personales", updateDNA:"🔄 Actualizar mi Fashion DNA™",
     noDNA:"Aún no has creado tu Fashion DNA™", createDNA:"Crear mi Fashion DNA™",
     // Home
-    hello:"Hola,", styleReady:t.styleReady, wardrobeReady:t.wardrobeReady,
-    items:"Prendas", favorites:"Favoritas", outfits:"Outfits", yourDNA:t.yourDNA,
-    viewComplete:t.viewComplete, createProfile:"Crea tu perfil para recomendaciones personalizadas",
+    hello:"Hola,", styleReady:"Tu estilo personal está listo", wardrobeReady:"Tu armario inteligente te espera",
+    items:"Prendas", favorites:"Favoritas", outfits:"Outfits", yourDNA:"✦ Tu Fashion DNA™",
+    viewComplete:"Ver completo →", createProfile:"Crea tu perfil para recomendaciones personalizadas",
     create:"Crear →", outfitOfDay:"Outfit del día", personalizedForYou:"Personalizado para ti ✦",
-    addItemsFirst:t.addItemsFirst, tapCreate:t.tapCreate,
+    addItemsFirst:"Agrega prendas para generar outfits", tapCreate:"Toca 'Crear' para generar tu outfit",
     virtualTry:"✦ Prueba Virtual", seeHowItFits:"Ve cómo te queda el outfit", basedOnDNA:"Basado en tu Fashion DNA™ personal",
-    tryNow:t.tryNow, seePremium:t.seePremium, recentItems:t.recentItems, viewAll:t.viewAll,
+    tryNow:"Probar ahora →", seePremium:"Ver función Premium →", recentItems:"Prendas recientes", viewAll:"Ver todas →",
     // Wardrobe
-    myWardrobe:"Mi Armario", addItem:"+ Agregar", newItem:t.newItem,
-    photoAI:t.photoAI, gallery:t.gallery, camera:t.camera,
-    itemName:t.itemName, occasion:"Ocasión", season:"Temporada",
+    myWardrobe:"Mi Armario", addItem:"+ Agregar", newItem:"✦ Nueva Prenda",
+    photoAI:"Foto → IA analiza automáticamente", gallery:"📁 Galería", camera:"📷 Cámara",
+    itemName:"Nombre de la prenda", occasion:"Ocasión", season:"Temporada",
     save:"Guardar", cancel:"Cancelar", wardrobeEmpty:"Tu armario está vacío", noItemsInCat:"Sin prendas en esta categoría",
-    addCat:t.addCat, newCategory:"Nueva categoría...", analyzing:t.analyzing, itemSaved:"✦ Prenda guardada", itemAnalyzed:"✦ Prenda analizada con IA",
+    addCat:"+ Cat", newCategory:"Nueva categoría...", analyzing:"Analizando...", itemSaved:"✦ Prenda guardada", itemAnalyzed:"✦ Prenda analizada con IA",
     // Outfit
     whereTo:"¿A dónde iremos hoy?", whereToSub:"Cuéntame el lugar o evento y crearé el outfit perfecto para ti",
     withMyWardrobe:"Con mi armario", withMyWardrobeDesc:"Usar únicamente las prendas que tengo guardadas",
     noWardrobe:"Sin mi armario", noWardrobeDesc:"Generar recomendaciones con prendas nuevas y tendencias",
     mixedWardrobe:"Mi armario + IA", mixedWardrobeDesc:"Combinar mis prendas con nuevas sugerencias",
-    generateOutfit:t.generateOutfit, generatingOutfit:"Generando tu outfit...",
+    generateOutfit:"✨ Generar mi Outfit Perfecto", generatingOutfit:"Generando tu outfit...",
     step1:"Analizando tu ocasión...", step2:"Consultando tu Fashion DNA™...", step3:"Seleccionando prendas perfectas...",
-    yourStylist:t.yourStylist, compatibleWith:t.compatibleWith, yourFullOutfit:t.yourFullOutfit,
-    yourWardrobe:"Tu armario", recommendedAccessories:t.recommendedAccessories, colorPalette:t.colorPalette,
-    stylistAdvice:t.stylistAdvice, saveOutfit:t.saveOutfit, newOutfit:t.newOutfit,
-    generateAnother:t.generateAnother, savedOutfits:t.savedOutfits, outfitSaved:"✦ Outfit guardado",
-    classicGenerator:t.classicGenerator, selectEvent:t.selectEvent,
-    forWhatEvent:t.forWhatEvent, generateClassic:t.generateClassic, creatingOutfit:t.creatingOutfit,
-    whyItWorks:"✦ Por qué funciona", palette:"Paleta", addItemsWardrobe:t.addItemsWardrobe,
+    yourStylist:"✦ Tu Estilista Personal", compatibleWith:"Compatible contigo", yourFullOutfit:"Tu outfit completo",
+    yourWardrobe:"Tu armario", recommendedAccessories:"Accesorios recomendados", colorPalette:"Paleta de colores",
+    stylistAdvice:"Consejo del estilista", saveOutfit:"💾 Guardar outfit", newOutfit:"🔄 Nuevo outfit",
+    generateAnother:"✨ Generar otra opción", savedOutfits:"Outfits guardados", outfitSaved:"✦ Outfit guardado",
+    classicGenerator:"Generador por evento", selectEvent:"Selecciona evento y temporada",
+    forWhatEvent:"¿Para qué evento?", generateClassic:"✦  Generar Outfit con IA", creatingOutfit:"Creando outfit...",
+    whyItWorks:"✦ Por qué funciona", palette:"Paleta", addItemsWardrobe:"Agrega prendas a tu armario primero",
     // Avatar
     virtualTryTitle:"Prueba Virtual", basedOnDNASub:"Basada en tu Fashion DNA™", premiumOnly:"Función exclusiva Premium",
-    premiumFunction:t.premiumFunction, premiumDesc:t.premiumDesc,
-    upgradePremium:t.upgradePremium, createDNAFirst:t.createDNAFirst,
-    dnaDetected:t.dnaDetected, selectItemsTry:t.selectItemsTry,
+    premiumFunction:"Función Premium", premiumDesc:"Prueba virtualmente cualquier outfit de tu armario basado en tu Fashion DNA™ personal.",
+    upgradePremium:"✦  Mejorar a Premium — $9.99/mes", createDNAFirst:"Primero crea tu Fashion DNA™",
+    dnaDetected:"✓ Fashion DNA™ detectado", selectItemsTry:"Selecciona prendas para probar",
     itemsSelected:"prenda(s) seleccionada(s)", tryVirtually:"🧍 Probar outfit virtualmente",
-    generatingVirtual:"Generando prueba virtual...", howItWouldLook:t.howItWouldLook,
+    generatingVirtual:"Generando prueba virtual...", howItWouldLook:"✦ Cómo te quedaría",
     // Advisor
     advisorTitle:"Asesor IA", advisorSub:"Powered by Claude AI · Personalizado con tu DNA",
     advisorGreeting:"Hola, soy tu **asesor de estilo personal**. Puedo ayudarte con combinaciones, dress codes, tendencias y mucho más.\n\n¿En qué te ayudo hoy?",
@@ -101,8 +101,8 @@ const T: Record<LangCode, Record<string,string>> = {
     // Trips
     tripTitle:"Planificador de Viaje", tripSub:"La IA organiza tu maleta con tu armario",
     destination:"¿A dónde vas? (París, Cancún...)", days:"Días", climate:"Clima",
-    planBag:"✈  Planificar Maleta con IA", planning:"Planificando...", missingItems:t.missingItems,
-    urgent:t.urgent, stylistTip:t.stylistTip,
+    planBag:"✈  Planificar Maleta con IA", planning:"Planificando...", missingItems:"⚠ Te falta comprar",
+    urgent:"Urgente", stylistTip:"✦ Consejo del estilista",
     // Premium
     premium:"Premium", basic:"Basic",
   },
@@ -817,38 +817,25 @@ function saveLanguage(code: LangCode) {
 }
 
 
-const API_URL = "https://stylevault-api.121lunaoscar.workers.dev/claude";
-const HOTMART_URL = "https://pay.hotmart.com/U106352317J?checkoutMode=10";
-const MODEL = "claude-sonnet-4-6";
+const API_URL = "https://stylevault-api.121lunaoscar.workers.dev";
+const MODEL = "claude-sonnet-4-5";
 
-const getWorkerHeaders = () => {
-  try {
-    const profile = JSON.parse(localStorage.getItem("sb_profile") || "{}");
-    return { "Content-Type": "application/json", "X-User-Id": profile.id || "anonymous", "X-User-Plan": profile.plan || "Basic" };
-  } catch { return { "Content-Type": "application/json" }; }
-};
-
-const callClaude = async (systemPrompt: string, messages: any[], showToastFn?: (msg: string) => void) => {
+const callClaude = async (systemPrompt: string, messages: any[]) => {
   const res = await fetch(API_URL, {
-    method: "POST", headers: getWorkerHeaders(),
+    method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ model: MODEL, max_tokens: 2000, system: systemPrompt, messages }),
   });
-  if (res.status === 429) {
-    const err = await res.json().catch(() => ({}));
-    showToastFn?.(err.upgrade ? "🔒 Límite alcanzado — Mejora a Premium" : "⏳ Demasiadas solicitudes");
-    throw new Error(err.upgrade ? "UPGRADE_REQUIRED" : "RATE_LIMITED");
-  }
   const data = await res.json();
   return data.content?.map((i: any) => i.text || "").join("") || "";
 };
 
-const callClaudeVision = async (systemPrompt: string, images: {base64: string, type: string}[], text: string, showToastFn?: (msg: string) => void) => {
+const callClaudeVision = async (systemPrompt: string, images: {base64: string, type: string}[], text: string) => {
   const content: any[] = images.map(img => ({
     type: "image", source: { type: "base64", media_type: img.type, data: img.base64 }
   }));
   content.push({ type: "text", text });
   const res = await fetch(API_URL, {
-    method: "POST", headers: getWorkerHeaders(),
+    method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ model: MODEL, max_tokens: 3000, system: systemPrompt, messages: [{ role: "user", content }] }),
   });
   const data = await res.json();
@@ -1392,7 +1379,6 @@ export default function StyleVault() {
 
   const addItem = async () => {
     if (!ni.name) return;
-    if (!canAddCloth) { showUpgradeToast(lang==="es"?"más prendas":"more items"); return; }
     try {
       const inserted = await dbInsert("clothes", { user_id: profile.id, ...ni, photo_url: pp });
       const item = inserted?.[0] || { id: Date.now(), user_id: profile.id, ...ni, photo_url: pp };
@@ -1415,9 +1401,7 @@ export default function StyleVault() {
   // Smart AI Outfit Generator
   const generateSmartOutfit = async () => {
     if (!outfitPrompt.trim()) return;
-    if (!canGenOutfit) { showUpgradeToast(lang==="es"?"generar outfits":"generate outfits"); return; }
-    incUsage("outfits");
-    setSmartOutfitL(true); setSmartOutfit(null); setOutfitImageUrl(null);
+    setSmartOutfitL(true); setSmartOutfit(null);
 
     const dnaCtx = dna?.bodyType ? `Fashion DNA: Tipo de cuerpo: ${dna.bodyType}, Tono de piel: ${dna.skinTone} (${dna.skinUndertone}), Colores ideales: ${dna.idealColors?.join(", ")}, Altura: ${dna.userInfo?.altura}cm, Complexión: ${dna.build || "promedio"}, Estilo recomendado: ${dna.recommendedStyles?.slice(0,2).join(", ")}.` : "Sin Fashion DNA definido.";
 
@@ -1470,7 +1454,6 @@ Crea el outfit perfecto y personalizado para esta persona.`
 
       const parsed = JSON.parse(raw.replace(/```json|```/g,"").trim());
       setSmartOutfit(parsed);
-      // Auto-generate image with Pollinations AI
       if (parsed?.outfit?.length) {
         const imgItems = parsed.outfit.map((i: any) => `${i.prenda} in ${i.color}`).join(", ");
         const imgColors = `${parsed.colores?.principal||""} ${parsed.colores?.complementario||""}`.trim();
@@ -1483,6 +1466,16 @@ Crea el outfit perfecto y personalizado para esta persona.`
     setSmartOutfitSteps("");
   };
 
+  const generateOutfitImage = async () => {
+    if (!smartOutfit?.outfit?.length) return;
+    setOutfitImageL(true); setOutfitImageUrl(null);
+    const items = smartOutfit.outfit.map((i: any) => `${i.prenda} en ${i.color}`).join(", ");
+    const colors = `${smartOutfit.colores?.principal || ""} ${smartOutfit.colores?.complementario || ""}`.trim();
+    const prompt = `fashion flat lay photography, white background, professional studio lighting, top view, ${items}, color palette ${colors}, for ${outfitPrompt || "elegant occasion"}, magazine editorial style, high fashion, clean minimalist, no people`;
+    setOutfitImageUrl(`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&seed=${Date.now()}&nologo=true`);
+    setOutfitImageL(false);
+  };
+
   const saveSmartOutfit = () => {
     if (!smartOutfit) return;
     const saved = { ...smartOutfit, prompt: outfitPrompt, date: new Date().toISOString(), id: Date.now() };
@@ -1492,22 +1485,9 @@ Crea el outfit perfecto y personalizado para esta persona.`
     showToast(t.outfitSaved);
   };
 
-  const generateOutfitImage = async () => {
-    if (!smartOutfit?.outfit?.length) return;
-    setOutfitImageL(true); setOutfitImageUrl(null);
-    const items = smartOutfit.outfit.map((i: any) => `${i.prenda} en ${i.color}`).join(", ");
-    const colors = `${smartOutfit.colores?.principal || ""} ${smartOutfit.colores?.complementario || ""}`.trim();
-    const prompt = `fashion flat lay photography, white background, professional studio lighting, top view, ${items}, color palette ${colors}, for ${outfitPrompt || "elegant occasion"}, magazine editorial style, high fashion, clean minimalist, no people`;
-    const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&seed=${Date.now()}&nologo=true`;
-    setOutfitImageUrl(imgUrl);
-    setOutfitImageL(false);
-  };
-
   // Outfit
   const generateOutfit = async () => {
     if (!selEv) return;
-    if (!canGenOutfit) { showUpgradeToast(lang==="es"?"generar outfits":"generate outfits"); return; }
-    incUsage("outfits");
     setOL(true); setOR(null);
     const list = clothes.map(c => `${c.name} (${c.category}, ${c.occasion||""})`).join("\n");
     const dnaCtx = dna ? `\nFashion DNA del usuario: Tipo de cuerpo: ${dna.bodyType}, Tono: ${dna.skinTone}, Subtono: ${dna.skinUndertone}, Colores ideales: ${dna.idealColors?.join(", ")}.` : "";
@@ -1522,8 +1502,6 @@ Crea el outfit perfecto y personalizado para esta persona.`
   // Chat
   const sendChat = async (msg?: string) => {
     const m = msg || cin; if (!m.trim()) return;
-    if (!canChat) { showUpgradeToast(lang==="es"?"más mensajes":"more messages"); return; }
-    incUsage("advisor");
     const next = [...msgs, { role:"user", text:m }];
     setMsgs(next); setCin(""); setCload(true);
     const dnaCtx = dna ? `\nFashion DNA: Body type: ${dna.bodyType}, Skin tone: ${dna.skinTone} (${dna.skinUndertone}), Ideal colors: ${dna.idealColors?.join(", ")}, Recommended clothes: ${dna.recommendedClothes?.slice(0,5).join(", ")}.` : "";
@@ -1576,29 +1554,6 @@ Crea el outfit perfecto y personalizado para esta persona.`
   const filtered = clothes.filter(c => fc === "Todo" || c.category === fc);
   const favClothes = clothes.filter(c => favorites.includes(c.id));
   const isPremium = profile?.plan === "Premium" || profile?.plan === "Admin";
-
-  // ── USAGE LIMITS ─────────────────────────────────────────────
-  const LIMITS = { clothes: 15, outfitsPerMonth: 3, advisorPerMonth: 5 };
-  const usageKey = `sv_usage_${profile?.id}_${new Date().getFullYear()}_${new Date().getMonth()}`;
-  const getUsage = () => { try { return JSON.parse(localStorage.getItem(usageKey) || "{}"); } catch { return {}; } };
-  const incUsage = (key: string) => { const u = getUsage(); u[key] = (u[key] || 0) + 1; localStorage.setItem(usageKey, JSON.stringify(u)); };
-  const usage = getUsage();
-  const canAddCloth  = isPremium || clothes.length < LIMITS.clothes;
-  const canGenOutfit = isPremium || (usage.outfits  || 0) < LIMITS.outfitsPerMonth;
-  const canChat      = isPremium || (usage.advisor  || 0) < LIMITS.advisorPerMonth;
-  const remainingClothes  = isPremium ? "∞" : Math.max(0, LIMITS.clothes - clothes.length);
-  const remainingOutfits  = isPremium ? "∞" : Math.max(0, LIMITS.outfitsPerMonth - (usage.outfits || 0));
-  const remainingChats    = isPremium ? "∞" : Math.max(0, LIMITS.advisorPerMonth - (usage.advisor || 0));
-
-  const showUpgradeToast = (feature: string) => {
-    const msg = lang==="es" ? `🔒 Límite alcanzado — Mejora a Premium para ${feature}`
-      : lang==="fr" ? `🔒 Limite atteinte — Passez à Premium pour ${feature}`
-      : lang==="pt" ? `🔒 Limite atingido — Atualize para Premium para ${feature}`
-      : lang==="de" ? `🔒 Limit erreicht — Upgrade auf Premium für ${feature}`
-      : `🔒 Limit reached — Upgrade to Premium for ${feature}`;
-    showToast(msg);
-    setTimeout(() => window.open(HOTMART_URL, "_blank"), 1500);
-  };
   const renderStars = (n: number) => "★".repeat(Math.min(5,Math.max(0,Math.round(n)))) + "☆".repeat(5-Math.min(5,Math.max(0,Math.round(n))));
   const suggestions = [t.s1, t.s2, t.s3, t.s4];
 
@@ -2171,9 +2126,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"18px" }}>
               <div>
                 <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>{t.myWardrobe}</div>
-                <div style={{ fontSize:"10px", color:"var(--text2)", marginTop:"3px" }}>{clothes.length} {t.items}
-                {!isPremium && <span style={{ marginLeft:"8px", color: clothes.length >= LIMITS.clothes ? "var(--red)" : "var(--text3)" }}>({remainingClothes} {lang==="es"?"restantes":"left"})</span>}
-              </div>
+                <div style={{ fontSize:"10px", color:"var(--text2)", marginTop:"3px" }}>{clothes.length} {t.items}</div>
               </div>
               <button className="btn-o" onClick={()=>setSF(!showForm)}>{t.addItem}</button>
             </div>
@@ -2301,12 +2254,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
               </div>
             </div>
 
-            {!isPremium && (
-              <div style={{ textAlign:"center", fontSize:"11px", color: canGenOutfit ? "var(--text3)" : "var(--red)", marginBottom:"8px" }}>
-                {canGenOutfit ? `${remainingOutfits} ${lang==="es"?"outfits restantes este mes":"outfits left this month"}` : `🔒 ${lang==="es"?"Límite mensual alcanzado":"Monthly limit reached"}`}
-              </div>
-            )}
-            <button className="btn-p" onClick={generateSmartOutfit} disabled={!outfitPrompt.trim()||smartOutfitL||!canGenOutfit} style={{ marginBottom:"20px", opacity: canGenOutfit ? 1 : 0.6 }}>
+            <button className="btn-p" onClick={generateSmartOutfit} disabled={!outfitPrompt.trim()||smartOutfitL} style={{ marginBottom:"20px" }}>
               {smartOutfitL ? (
                 <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"10px" }}>
                   <span>{smartOutfitSteps || "Generando tu outfit..."}</span>
@@ -2534,7 +2482,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                 <div style={{ fontSize:"48px", marginBottom:"16px" }}>👑</div>
                 <div className="serif" style={{ fontSize:"22px", fontWeight:300, marginBottom:"10px" }}>Función Premium</div>
                 <div style={{ fontSize:"13px", color:"var(--text2)", lineHeight:1.6, marginBottom:"20px" }}>Prueba virtualmente cualquier outfit de tu armario basado en tu Fashion DNA™ personal.</div>
-                <button className="btn-p">✦  Mejorar a Premium — $299 MXN/mes</button>
+                <button className="btn-p" onClick={()=>window.open(HOTMART_URL,"_blank")}>{t.upgradePremium}</button>
               </div>
             ) : !dna?.bodyType ? (
               <div style={{ textAlign:"center", padding:"60px 20px" }}>
@@ -2642,14 +2590,9 @@ Crea el outfit perfecto y personalizado para esta persona.`
               {cload && <div style={{ display:"flex", gap:"7px", alignItems:"center" }}><div style={{ color:"var(--gold)", fontSize:"12px", fontFamily:"'Cormorant Garamond',serif" }}>✦</div><div className="bubble-a"><div style={{ display:"flex", gap:"4px", padding:"2px 0" }}><div className="dot"/><div className="dot"/><div className="dot"/></div></div></div>}
               <div ref={chatEnd}/>
             </div>
-            {!isPremium && (
-              <div style={{ textAlign:"center", fontSize:"10px", color: canChat ? "var(--text3)" : "var(--red)", padding:"4px 0" }}>
-                {canChat ? `${remainingChats} ${lang==="es"?"mensajes restantes este mes":"messages left this month"}` : `🔒 ${lang==="es"?"Mejora a Premium":"Upgrade to Premium"}`}
-              </div>
-            )}
             <div style={{ display:"flex", gap:"8px", paddingTop:"12px", borderTop:"1px solid var(--border)" }}>
-              <input className="inp" style={{ flex:1, opacity: canChat ? 1 : 0.5 }} placeholder={canChat ? t.askAboutFashion : "🔒 Premium"} value={cin} onChange={e=>setCin(e.target.value)} onKeyDown={e=>e.key==="Enter"&&!cload&&canChat&&sendChat()} disabled={!canChat} />
-              <button className="btn-o" style={{ flexShrink:0 }} onClick={()=>sendChat()} disabled={cload||!cin.trim()||!canChat}>{t.send}</button>
+              <input className="inp" style={{ flex:1 }} placeholder={t.askAboutFashion} value={cin} onChange={e=>setCin(e.target.value)} onKeyDown={e=>e.key==="Enter"&&!cload&&sendChat()} />
+              <button className="btn-o" style={{ flexShrink:0 }} onClick={()=>sendChat()} disabled={cload||!cin.trim()}>{t.send}</button>
             </div>
           </div>
         )}
@@ -2661,14 +2604,6 @@ Crea el outfit perfecto y personalizado para esta persona.`
               <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>{t.tripTitle}</div>
               <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>La IA organiza tu maleta con tu armario</div>
             </div>
-            {!isPremium && (
-              <div className="card" style={{ marginBottom:"14px", background:"var(--accent-light)", border:"1px solid var(--accent-glow)", textAlign:"center", padding:"18px" }}>
-                <div style={{ fontSize:"20px", marginBottom:"6px" }}>✈️ Premium</div>
-                <div style={{ fontSize:"13px", fontWeight:600, color:"var(--accent)", marginBottom:"4px" }}>Función Premium</div>
-                <div style={{ fontSize:"11px", color:"var(--text2)", marginBottom:"12px" }}>{lang==="es"?"El planificador de viaje es exclusivo Premium":"The trip planner is a Premium-only feature"}</div>
-                <button className="btn-p" style={{ width:"auto", padding:"10px 20px", fontSize:"12px" }} onClick={()=>window.open(HOTMART_URL,"_blank")}>{t.upgradePremium}</button>
-              </div>
-            )}
             <div className="card" style={{ marginBottom:"14px" }}>
               <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
                 <input className="inp" placeholder={t.destination} value={tripDest} onChange={e=>setTripDest(e.target.value)} />
@@ -2686,7 +2621,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                 </div>
               </div>
             </div>
-            <button className="btn-p" onClick={isPremium ? planTrip : ()=>showUpgradeToast(lang==="es"?"el planificador":"the trip planner")} disabled={!tripDest||tripL} style={{ marginBottom:"18px", opacity: isPremium ? 1 : 0.6 }}>
+            <button className="btn-p" onClick={planTrip} disabled={!tripDest||tripL} style={{ marginBottom:"18px" }}>
               {tripL?t.planning:t.planBag}
             </button>
             {tripL && <div style={{ display:"flex", justifyContent:"center", gap:"6px", padding:"30px" }}><div className="dot"/><div className="dot"/><div className="dot"/></div>}
