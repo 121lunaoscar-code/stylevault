@@ -2515,7 +2515,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                 <div style={{ fontSize:"48px", marginBottom:"16px" }}>👑</div>
                 <div className="serif" style={{ fontSize:"22px", fontWeight:300, marginBottom:"10px" }}>Función Premium</div>
                 <div style={{ fontSize:"13px", color:"var(--text2)", lineHeight:1.6, marginBottom:"20px" }}>Prueba virtualmente cualquier outfit de tu armario basado en tu Fashion DNA™ personal.</div>
-                <button className="btn-p" onClick={()=>window.open(HOTMART_URL,"_blank")}>{t.upgradePremium}</button>
+                <a href={HOTMART_URL} target="_blank" rel="noreferrer" style={{ display:"inline-block", background:"var(--accent)", color:"#fff", padding:"14px 24px", borderRadius:"var(--radius-sm)", fontFamily:"var(--font)", fontSize:"13px", fontWeight:600, textDecoration:"none", letterSpacing:".5px", boxShadow:"0 4px 14px var(--accent-glow)" }}>{t.upgradePremium}</a>
               </div>
             ) : !dna?.bodyType ? (
               <div style={{ textAlign:"center", padding:"60px 20px" }}>
@@ -2647,7 +2647,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                 <div style={{ fontSize:"20px", marginBottom:"6px" }}>✈️ Premium</div>
                 <div style={{ fontSize:"13px", fontWeight:600, color:"var(--accent)", marginBottom:"4px" }}>Función Premium</div>
                 <div style={{ fontSize:"11px", color:"var(--text2)", marginBottom:"12px" }}>{lang==="es"?"El planificador de viaje es exclusivo Premium":"The trip planner is a Premium-only feature"}</div>
-                <button className="btn-p" style={{ width:"auto", padding:"10px 20px", fontSize:"12px" }} onClick={()=>window.open(HOTMART_URL,"_blank")}>{t.upgradePremium}</button>
+                <a href={HOTMART_URL} target="_blank" rel="noreferrer" style={{ display:"inline-block", background:"var(--accent)", color:"#fff", padding:"12px 20px", borderRadius:"var(--radius-sm)", fontFamily:"var(--font)", fontSize:"12px", fontWeight:600, textDecoration:"none", letterSpacing:".5px" }}>{t.upgradePremium}</a>
               </div>
             )}
             <div className="card" style={{ marginBottom:"14px" }}>
