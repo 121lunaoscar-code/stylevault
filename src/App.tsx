@@ -1379,6 +1379,7 @@ export default function StyleVault() {
 
   const addItem = async () => {
     if (!ni.name) return;
+    if (!canAddCloth) { showUpgradeToast(lang==="es"?"más prendas":"more items"); return; }
     try {
       const inserted = await dbInsert("clothes", { user_id: profile.id, ...ni, photo_url: pp });
       const item = inserted?.[0] || { id: Date.now(), user_id: profile.id, ...ni, photo_url: pp };
@@ -1488,6 +1489,8 @@ Crea el outfit perfecto y personalizado para esta persona.`
   // Outfit
   const generateOutfit = async () => {
     if (!selEv) return;
+    if (!canGenOutfit) { showUpgradeToast(lang==="es"?"generar outfits":"generate outfits"); return; }
+    incUsage("outfits");
     setOL(true); setOR(null);
     const list = clothes.map(c => `${c.name} (${c.category}, ${c.occasion||""})`).join("\n");
     const dnaCtx = dna ? `\nFashion DNA del usuario: Tipo de cuerpo: ${dna.bodyType}, Tono: ${dna.skinTone}, Subtono: ${dna.skinUndertone}, Colores ideales: ${dna.idealColors?.join(", ")}.` : "";
@@ -1502,6 +1505,8 @@ Crea el outfit perfecto y personalizado para esta persona.`
   // Chat
   const sendChat = async (msg?: string) => {
     const m = msg || cin; if (!m.trim()) return;
+    if (!canChat) { showUpgradeToast(lang==="es"?"más mensajes":"more messages"); return; }
+    incUsage("advisor");
     const next = [...msgs, { role:"user", text:m }];
     setMsgs(next); setCin(""); setCload(true);
     const dnaCtx = dna ? `\nFashion DNA: Body type: ${dna.bodyType}, Skin tone: ${dna.skinTone} (${dna.skinUndertone}), Ideal colors: ${dna.idealColors?.join(", ")}, Recommended clothes: ${dna.recommendedClothes?.slice(0,5).join(", ")}.` : "";
@@ -1554,6 +1559,29 @@ Crea el outfit perfecto y personalizado para esta persona.`
   const filtered = clothes.filter(c => fc === "Todo" || c.category === fc);
   const favClothes = clothes.filter(c => favorites.includes(c.id));
   const isPremium = profile?.plan === "Premium" || profile?.plan === "Admin";
+
+  // ── USAGE LIMITS ─────────────────────────────────────────────
+  const LIMITS = { clothes: 15, outfitsPerMonth: 3, advisorPerMonth: 5 };
+  const usageKey = `sv_usage_${profile?.id}_${new Date().getFullYear()}_${new Date().getMonth()}`;
+  const getUsage = () => { try { return JSON.parse(localStorage.getItem(usageKey) || "{}"); } catch { return {}; } };
+  const incUsage = (key: string) => { const u = getUsage(); u[key] = (u[key] || 0) + 1; localStorage.setItem(usageKey, JSON.stringify(u)); };
+  const usage = getUsage();
+  const canAddCloth  = isPremium || clothes.length < LIMITS.clothes;
+  const canGenOutfit = isPremium || (usage.outfits  || 0) < LIMITS.outfitsPerMonth;
+  const canChat      = isPremium || (usage.advisor  || 0) < LIMITS.advisorPerMonth;
+  const remainingClothes = isPremium ? "∞" : Math.max(0, LIMITS.clothes - clothes.length);
+  const remainingOutfits = isPremium ? "∞" : Math.max(0, LIMITS.outfitsPerMonth - (usage.outfits || 0));
+  const remainingChats   = isPremium ? "∞" : Math.max(0, LIMITS.advisorPerMonth - (usage.advisor || 0));
+
+  const showUpgradeToast = (feature: string) => {
+    const msg = lang==="es" ? `🔒 Límite alcanzado — Mejora a Premium para ${feature}`
+      : lang==="fr" ? `🔒 Limite atteinte — Passez à Premium pour ${feature}`
+      : lang==="pt" ? `🔒 Limite atingido — Atualize para Premium para ${feature}`
+      : lang==="de" ? `🔒 Limit erreicht — Upgrade auf Premium für ${feature}`
+      : `🔒 Limit reached — Upgrade to Premium for ${feature}`;
+    showToast(msg);
+    setTimeout(() => window.open(HOTMART_URL, "_blank"), 1500);
+  };
   const renderStars = (n: number) => "★".repeat(Math.min(5,Math.max(0,Math.round(n)))) + "☆".repeat(5-Math.min(5,Math.max(0,Math.round(n))));
   const suggestions = [t.s1, t.s2, t.s3, t.s4];
 
@@ -2254,7 +2282,12 @@ Crea el outfit perfecto y personalizado para esta persona.`
               </div>
             </div>
 
-            <button className="btn-p" onClick={generateSmartOutfit} disabled={!outfitPrompt.trim()||smartOutfitL} style={{ marginBottom:"20px" }}>
+            {!isPremium && (
+              <div style={{ textAlign:"center", fontSize:"11px", color: canGenOutfit ? "var(--text3)" : "var(--red)", marginBottom:"8px" }}>
+                {canGenOutfit ? `${remainingOutfits} ${lang==="es"?"outfits restantes este mes":"outfits left this month"}` : `🔒 ${lang==="es"?"Límite mensual alcanzado":"Monthly limit reached"}`}
+              </div>
+            )}
+            <button className="btn-p" onClick={generateSmartOutfit} disabled={!outfitPrompt.trim()||smartOutfitL||!canGenOutfit} style={{ marginBottom:"20px", opacity: canGenOutfit ? 1 : 0.6 }}>
               {smartOutfitL ? (
                 <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"10px" }}>
                   <span>{smartOutfitSteps || "Generando tu outfit..."}</span>
@@ -2590,9 +2623,14 @@ Crea el outfit perfecto y personalizado para esta persona.`
               {cload && <div style={{ display:"flex", gap:"7px", alignItems:"center" }}><div style={{ color:"var(--gold)", fontSize:"12px", fontFamily:"'Cormorant Garamond',serif" }}>✦</div><div className="bubble-a"><div style={{ display:"flex", gap:"4px", padding:"2px 0" }}><div className="dot"/><div className="dot"/><div className="dot"/></div></div></div>}
               <div ref={chatEnd}/>
             </div>
+            {!isPremium && (
+              <div style={{ textAlign:"center", fontSize:"10px", color: canChat ? "var(--text3)" : "var(--red)", padding:"4px 0" }}>
+                {canChat ? `${remainingChats} ${lang==="es"?"mensajes restantes este mes":"messages left this month"}` : `🔒 ${lang==="es"?"Mejora a Premium":"Upgrade to Premium"}`}
+              </div>
+            )}
             <div style={{ display:"flex", gap:"8px", paddingTop:"12px", borderTop:"1px solid var(--border)" }}>
-              <input className="inp" style={{ flex:1 }} placeholder={t.askAboutFashion} value={cin} onChange={e=>setCin(e.target.value)} onKeyDown={e=>e.key==="Enter"&&!cload&&sendChat()} />
-              <button className="btn-o" style={{ flexShrink:0 }} onClick={()=>sendChat()} disabled={cload||!cin.trim()}>{t.send}</button>
+              <input className="inp" style={{ flex:1, opacity: canChat ? 1 : 0.5 }} placeholder={canChat ? t.askAboutFashion : "🔒 Premium"} value={cin} onChange={e=>setCin(e.target.value)} onKeyDown={e=>e.key==="Enter"&&!cload&&canChat&&sendChat()} disabled={!canChat} />
+              <button className="btn-o" style={{ flexShrink:0 }} onClick={()=>sendChat()} disabled={cload||!cin.trim()||!canChat}>{t.send}</button>
             </div>
           </div>
         )}
@@ -2604,6 +2642,14 @@ Crea el outfit perfecto y personalizado para esta persona.`
               <div className="serif" style={{ fontSize:"26px", fontWeight:300 }}>{t.tripTitle}</div>
               <div style={{ fontSize:"11px", color:"var(--text2)", marginTop:"3px" }}>La IA organiza tu maleta con tu armario</div>
             </div>
+            {!isPremium && (
+              <div className="card" style={{ marginBottom:"14px", background:"var(--accent-light)", border:"1px solid var(--accent-glow)", textAlign:"center", padding:"18px" }}>
+                <div style={{ fontSize:"20px", marginBottom:"6px" }}>✈️ Premium</div>
+                <div style={{ fontSize:"13px", fontWeight:600, color:"var(--accent)", marginBottom:"4px" }}>Función Premium</div>
+                <div style={{ fontSize:"11px", color:"var(--text2)", marginBottom:"12px" }}>{lang==="es"?"El planificador de viaje es exclusivo Premium":"The trip planner is a Premium-only feature"}</div>
+                <button className="btn-p" style={{ width:"auto", padding:"10px 20px", fontSize:"12px" }} onClick={()=>window.open(HOTMART_URL,"_blank")}>{t.upgradePremium}</button>
+              </div>
+            )}
             <div className="card" style={{ marginBottom:"14px" }}>
               <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
                 <input className="inp" placeholder={t.destination} value={tripDest} onChange={e=>setTripDest(e.target.value)} />
@@ -2621,7 +2667,7 @@ Crea el outfit perfecto y personalizado para esta persona.`
                 </div>
               </div>
             </div>
-            <button className="btn-p" onClick={planTrip} disabled={!tripDest||tripL} style={{ marginBottom:"18px" }}>
+            <button className="btn-p" onClick={isPremium ? planTrip : ()=>showUpgradeToast(lang==="es"?"el planificador":"the trip planner")} disabled={!tripDest||tripL} style={{ marginBottom:"18px", opacity: isPremium ? 1 : 0.6 }}>
               {tripL?t.planning:t.planBag}
             </button>
             {tripL && <div style={{ display:"flex", justifyContent:"center", gap:"6px", padding:"30px" }}><div className="dot"/><div className="dot"/><div className="dot"/></div>}
