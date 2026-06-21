@@ -83,7 +83,7 @@ const T: Record<LangCode, Record<string,string>> = {
     stylistAdvice:"Consejo del estilista", saveOutfit:"💾 Guardar outfit", newOutfit:"🔄 Nuevo outfit",
     generateAnother:"✨ Generar otra opción", savedOutfits:"Outfits guardados", outfitSaved:"✦ Outfit guardado",
     classicGenerator:"Generador por evento", selectEvent:"Selecciona evento y temporada",
-    forWhatEvent:"¿Para qué evento?", generateClassic:"✦  Generar Outfit con IA", creatingOutfit:"Creando outfit...",tfit,
+    forWhatEvent:"¿Para qué evento?", generateClassic:"✦  Generar Outfit con IA", creatingOutfit:"Creando outfit...",
     whyItWorks:"✦ Por qué funciona", palette:"Paleta", addItemsWardrobe:"Agrega prendas a tu armario primero",
     // Avatar
     virtualTryTitle:"Prueba Virtual", basedOnDNASub:"Basada en tu Fashion DNA™", premiumOnly:"Función exclusiva Premium",
